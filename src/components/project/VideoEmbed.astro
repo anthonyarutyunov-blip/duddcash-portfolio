@@ -1,0 +1,133 @@
+---
+interface Props {
+  url: string;
+  title: string;
+}
+
+const { url, title } = Astro.props;
+
+// Extract video ID and platform
+function getVideoData(url: string) {
+  // YouTube
+  const ytMatch = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+  );
+  if (ytMatch) {
+    return {
+      platform: 'youtube' as const,
+      id: ytMatch[1],
+      thumb: `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`,
+      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`,
+    };
+  }
+
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) {
+    return {
+      platform: 'vimeo' as const,
+      id: vimeoMatch[1],
+      thumb: '', // Vimeo requires API call for thumbnails, use placeholder
+      embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
+    };
+  }
+
+  return null;
+}
+
+const video = getVideoData(url);
+---
+
+{video && (
+  <div class="video-embed" data-embed-url={video.embedUrl}>
+    <div class="video-embed__poster">
+      {video.thumb && (
+        <img
+          src={video.thumb}
+          alt={`Play ${title}`}
+          loading="lazy"
+          class="video-embed__thumb"
+        />
+      )}
+      <button class="video-embed__play" aria-label={`Play ${title}`}>
+        <svg width="68" height="68" viewBox="0 0 68 68" fill="none">
+          <circle cx="34" cy="34" r="33" stroke="white" stroke-width="2" opacity="0.9" />
+          <polygon points="28,22 28,46 48,34" fill="white" opacity="0.9" />
+        </svg>
+      </button>
+    </div>
+  </div>
+)}
+
+<script>
+  function initVideoEmbeds() {
+    document.querySelectorAll('.video-embed').forEach((container) => {
+      const btn = container.querySelector('.video-embed__play');
+      if (!btn) return;
+
+      btn.addEventListener('click', () => {
+        const embedUrl = container.getAttribute('data-embed-url');
+        if (!embedUrl) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.classList.add('video-embed__iframe');
+
+        container.innerHTML = '';
+        container.appendChild(iframe);
+      }, { once: true });
+    });
+  }
+
+  initVideoEmbeds();
+  document.addEventListener('astro:after-swap', initVideoEmbeds);
+</script>
+
+<style>
+  .video-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #111;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .video-embed__poster {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .video-embed__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-embed__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.85;
+  }
+
+  .video-embed__play:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+
+  .video-embed__iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>

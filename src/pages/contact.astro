@@ -1,0 +1,196 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Contact" description="Get in touch with Duddcash for your next video or photography project.">
+  <section class="contact section container">
+    <div class="contact__header" data-animate>
+      <h1>Let's Work Together</h1>
+      <p class="contact__sub">
+        Have a project in mind? Tell us about it and we'll get back to you within 24 hours.
+      </p>
+    </div>
+
+    <div class="contact__grid">
+      <form
+        class="contact__form"
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        data-animate
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="sr-only">
+          <label>Don't fill this out: <input name="bot-field" /></label>
+        </p>
+
+        <div class="form-group">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" id="name" name="name" required class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" name="email" required class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="project-type" class="form-label">Project Type</label>
+          <select id="project-type" name="project-type" required class="form-input">
+            <option value="" disabled selected>Select a type</option>
+            <option value="wedding">Wedding</option>
+            <option value="commercial">Commercial</option>
+            <option value="music-video">Music Video</option>
+            <option value="documentary">Documentary</option>
+            <option value="event">Event</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message" class="form-label">Tell us about your project</label>
+          <textarea id="message" name="message" rows="5" required class="form-input"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--full">Send Message</button>
+      </form>
+
+      <div class="contact__info" data-animate>
+        <div class="contact__info-block">
+          <h3>Email</h3>
+          <a href="mailto:hello@duddcash.com">hello@duddcash.com</a>
+        </div>
+        <div class="contact__info-block">
+          <h3>Follow Along</h3>
+          <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer">
+            Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    padding-top: calc(64px + var(--space-3xl));
+  }
+
+  .contact__header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .contact__sub {
+    font-size: var(--text-lg);
+    color: var(--color-muted);
+    margin-top: var(--space-sm);
+    max-width: 500px;
+  }
+
+  .contact__grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-3xl);
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .contact__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: var(--space-lg);
+  }
+
+  .form-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    margin-bottom: var(--space-xs);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    border: 1px solid var(--color-border);
+    border-radius: 2px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color var(--transition-base);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--color-text);
+  }
+
+  textarea.form-input {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23777' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  .btn {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    border-radius: 2px;
+    transition: all var(--transition-base);
+  }
+
+  .btn--primary {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .btn--primary:hover {
+    background: #333;
+  }
+
+  .btn--full {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Info sidebar */
+  .contact__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .contact__info-block h3 {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .contact__info-block a {
+    font-size: var(--text-base);
+    transition: color var(--transition-base);
+  }
+
+  .contact__info-block a:hover {
+    color: var(--color-muted);
+  }
+</style>

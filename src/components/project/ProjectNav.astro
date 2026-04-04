@@ -1,0 +1,67 @@
+---
+interface Props {
+  prev?: { id: string; title: string } | null;
+  next?: { id: string; title: string } | null;
+}
+
+const { prev, next } = Astro.props;
+---
+
+<nav class="project-nav" aria-label="Project navigation">
+  {prev ? (
+    <a href={`/work/${prev.id}`} class="project-nav__link project-nav__prev">
+      <span class="project-nav__label">Previous</span>
+      <span class="project-nav__title">{prev.title}</span>
+    </a>
+  ) : (
+    <span />
+  )}
+
+  {next ? (
+    <a href={`/work/${next.id}`} class="project-nav__link project-nav__next">
+      <span class="project-nav__label">Next</span>
+      <span class="project-nav__title">{next.title}</span>
+    </a>
+  ) : (
+    <span />
+  )}
+</nav>
+
+<style>
+  .project-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    padding-top: var(--space-3xl);
+    margin-top: var(--space-3xl);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .project-nav__link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    transition: color var(--transition-base);
+  }
+
+  .project-nav__link:hover {
+    color: var(--color-muted);
+  }
+
+  .project-nav__next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .project-nav__label {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .project-nav__title {
+    font-size: var(--text-lg);
+    font-weight: 500;
+  }
+</style>

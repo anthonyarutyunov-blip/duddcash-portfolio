@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import VideoEmbed from '../../components/project/VideoEmbed.astro';
+import PhotoGallery from '../../components/project/PhotoGallery.astro';
+import ProjectNav from '../../components/project/ProjectNav.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const sorted = projects.sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime()
+  );
+
+  return sorted.map((project, index) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      prev: index > 0 ? { id: sorted[index - 1].id, title: sorted[index - 1].data.title } : null,
+      next: index < sorted.length - 1 ? { id: sorted[index + 1].id, title: sorted[index + 1].data.title } : null,
+    },
+  }));
+}
+
+const { project, prev, next } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+
+const categoryLabels: Record<string, string> = {
+  wedding: 'Wedding',
+  commercial: 'Commercial',
+  'music-video': 'Music Video',
+  documentary: 'Documentary',
+  branded: 'Branded',
+  event: 'Event',
+};
+
+const dateFormatted = data.date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+});
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <article class="project section container">
+    <!-- Header -->
+    <header class="project__header" data-animate>
+      <div class="project__meta">
+        <span class="project__category">{categoryLabels[data.category] || data.category}</span>
+        <span class="project__date">{dateFormatted}</span>
+        {data.client && <span class="project__client">{data.client}</span>}
+      </div>
+      <h1 class="project__title" transition:name={`project-${project.id}`}>
+        {data.title}
+      </h1>
+      <p class="project__desc">{data.description}</p>
+    </header>
+
+    <!-- Video -->
+    {data.videoUrl && (
+      <div class="project__video" data-animate>
+        <VideoEmbed url={data.videoUrl} title={data.title} />
+      </div>
+    )}
+
+    <!-- Body Content -->
+    <div class="project__body" data-animate>
+      <Content />
+    </div>
+
+    <!-- Photo Gallery -->
+    {data.photos.length > 0 && (
+      <div data-animate>
+        <h2 class="project__gallery-title">Gallery</h2>
+        <PhotoGallery photos={data.photos} />
+      </div>
+    )}
+
+    <!-- Navigation -->
+    <ProjectNav prev={prev} next={next} />
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    padding-top: calc(64px + var(--space-3xl));
+    max-width: 900px;
+  }
+
+  .project__header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .project__meta {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-md);
+  }
+
+  .project__meta span + span::before {
+    content: '·';
+    margin-right: var(--space-md);
+  }
+
+  .project__title {
+    margin-bottom: var(--space-md);
+  }
+
+  .project__desc {
+    font-size: var(--text-lg);
+    color: var(--color-muted);
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  .project__video {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .project__body {
+    font-size: var(--text-base);
+    line-height: 1.8;
+    color: var(--color-muted);
+    max-width: 640px;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .project__gallery-title {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-sm);
+  }
+</style>

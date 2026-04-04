@@ -1,0 +1,108 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  category: string;
+  thumbnail: { src: string; alt: string };
+  description: string;
+}
+
+const { id, title, category, thumbnail, description } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+  wedding: 'Wedding',
+  commercial: 'Commercial',
+  'music-video': 'Music Video',
+  documentary: 'Documentary',
+  branded: 'Branded',
+  event: 'Event',
+};
+---
+
+<article class="card" data-category={category}>
+  <a href={`/work/${id}`} class="card__link" transition:name={`project-${id}`}>
+    <div class="card__media">
+      <img
+        src={thumbnail.src}
+        alt={thumbnail.alt}
+        loading="lazy"
+        class="card__img"
+      />
+      <div class="card__overlay">
+        <span class="card__category">{categoryLabels[category] || category}</span>
+      </div>
+    </div>
+    <div class="card__info">
+      <h3 class="card__title">{title}</h3>
+      <p class="card__desc">{description}</p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .card {
+    overflow: hidden;
+  }
+
+  .card__link {
+    display: block;
+  }
+
+  .card__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    aspect-ratio: 16 / 10;
+    background: #eee;
+  }
+
+  .card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .card__link:hover .card__img {
+    transform: scale(1.03);
+  }
+
+  .card__overlay {
+    position: absolute;
+    top: var(--space-sm);
+    left: var(--space-sm);
+  }
+
+  .card__category {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  .card__info {
+    padding: var(--space-md) 0 0;
+  }
+
+  .card__title {
+    font-size: var(--text-base);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .card__desc {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    margin-top: var(--space-xs);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

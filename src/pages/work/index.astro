@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/portfolio/ProjectCard.astro';
+import FilterBar from '../../components/portfolio/FilterBar.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const sorted = allProjects.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+// Get unique categories
+const categories = [...new Set(sorted.map((p) => p.data.category))];
+---
+
+<BaseLayout title="Work" description="Portfolio of video and photography work by Duddcash.">
+  <section class="work-page section container">
+    <div class="work-page__header" data-animate>
+      <h1>Work</h1>
+      <p class="work-page__sub">
+        A selection of projects across weddings, commercial, music videos, and more.
+      </p>
+    </div>
+
+    <FilterBar categories={categories} />
+
+    <div class="project-grid" data-animate-stagger>
+      {sorted.map((project) => (
+        <ProjectCard
+          id={project.id}
+          title={project.data.title}
+          category={project.data.category}
+          thumbnail={project.data.thumbnail}
+          description={project.data.description}
+        />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .work-page {
+    padding-top: calc(64px + var(--space-3xl));
+  }
+
+  .work-page__header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .work-page__sub {
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+    margin-top: var(--space-sm);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 768px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+interface Props {
+  categories: string[];
+}
+
+const { categories } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+  wedding: 'Weddings',
+  commercial: 'Commercial',
+  'music-video': 'Music Videos',
+  documentary: 'Docs',
+  branded: 'Branded',
+  event: 'Events',
+};
+---
+
+<div class="filter-bar" data-animate>
+  <button class="filter-btn is-active" data-filter="all">All</button>
+  {categories.map((cat) => (
+    <button class="filter-btn" data-filter={cat}>
+      {categoryLabels[cat] || cat}
+    </button>
+  ))}
+</div>
+
+<script>
+  function initFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const cards = document.querySelectorAll<HTMLElement>('[data-category]');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+
+        // Update active button
+        buttons.forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+
+        // Filter cards
+        cards.forEach((card) => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+            requestAnimationFrame(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'scale(1)';
+            });
+          } else {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              card.style.display = 'none';
+            }, 300);
+          }
+        });
+
+        // Update URL hash
+        window.location.hash = filter === 'all' ? '' : filter;
+      });
+    });
+
+    // Check for hash on load
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const matchingBtn = document.querySelector<HTMLButtonElement>(
+        `[data-filter="${hash}"]`
+      );
+      matchingBtn?.click();
+    }
+  }
+
+  initFilter();
+  document.addEventListener('astro:after-swap', initFilter);
+</script>
+
+<style>
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .filter-btn {
+    font-size: var(--text-sm);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all var(--transition-base);
+  }
+
+  .filter-btn:hover {
+    color: var(--color-text);
+  }
+
+  .filter-btn.is-active {
+    color: var(--color-text);
+    border-color: var(--color-text);
+  }
+</style>

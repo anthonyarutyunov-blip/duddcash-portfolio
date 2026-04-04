@@ -1,0 +1,176 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/portfolio/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const featured = allProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99))
+  .slice(0, 6);
+---
+
+<BaseLayout title="Home" description="Duddcash — Video & Photography. Weddings, commercial, music videos, and more.">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__content container">
+      <h1 class="hero__title" data-animate>
+        We tell stories<br />through motion & light.
+      </h1>
+      <p class="hero__sub" data-animate>
+        Video & photography for brands, artists, and people who care about how their story is told.
+      </p>
+      <div class="hero__cta" data-animate>
+        <a href="/work" class="btn btn--primary">View Work</a>
+        <a href="/contact" class="btn btn--outline">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Work -->
+  <section class="section container">
+    <div class="section-header" data-animate>
+      <h2>Featured Work</h2>
+      <a href="/work" class="section-header__link">View All &rarr;</a>
+    </div>
+
+    <div class="featured-grid" data-animate-stagger>
+      {featured.map((project) => (
+        <ProjectCard
+          id={project.id}
+          title={project.data.title}
+          category={project.data.category}
+          thumbnail={project.data.thumbnail}
+          description={project.data.description}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- About Teaser -->
+  <section class="section container">
+    <div class="about-teaser" data-animate>
+      <h2>About Duddcash</h2>
+      <p>
+        We're a video and photography studio focused on crafting visual stories that connect.
+        Whether it's a wedding, a brand campaign, or a music video — we bring the same level
+        of care and creativity to every project.
+      </p>
+      <a href="/about" class="btn btn--text">Learn More &rarr;</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    padding-top: 64px;
+  }
+
+  .hero__content {
+    max-width: 720px;
+  }
+
+  .hero__title {
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-lg);
+  }
+
+  .hero__sub {
+    font-size: var(--text-lg);
+    color: var(--color-muted);
+    max-width: 540px;
+    line-height: 1.6;
+  }
+
+  .hero__cta {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  .btn {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    border-radius: 2px;
+    transition: all var(--transition-base);
+  }
+
+  .btn--primary {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .btn--primary:hover {
+    background: #333;
+  }
+
+  .btn--outline {
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+
+  .btn--outline:hover {
+    border-color: var(--color-text);
+  }
+
+  .btn--text {
+    padding: 0;
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: var(--text-base);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .btn--text:hover {
+    color: var(--color-muted);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+  }
+
+  .section-header__link {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    transition: color var(--transition-base);
+  }
+
+  .section-header__link:hover {
+    color: var(--color-text);
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-xl);
+  }
+
+  @media (max-width: 768px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .about-teaser {
+    max-width: 600px;
+  }
+
+  .about-teaser p {
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+    line-height: 1.7;
+    margin: var(--space-lg) 0;
+  }
+</style>
