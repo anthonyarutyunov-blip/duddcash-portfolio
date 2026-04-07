@@ -1,0 +1,52 @@
+---
+import { ShimmerText } from '../ui/shimmer-text';
+import { ShineBorder } from '../ui/shine-border';
+---
+
+<section class="cinematic-section" data-animate>
+  <div class="container" style="display: flex; justify-content: center;">
+    <ShineBorder
+      client:visible
+      borderRadius={20}
+      borderWidth={1}
+      duration={12}
+      color={["rgba(180, 170, 150, 0.5)", "rgba(210, 200, 180, 0.3)", "rgba(160, 155, 140, 0.5)"]}
+      style={{
+        background: "rgba(255, 255, 255, 0.04)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        padding: "clamp(3.5rem, 7vw, 7rem) clamp(4rem, 8vw, 10rem)",
+        minWidth: "auto",
+        boxShadow: "0 1px 0 rgba(255, 255, 255, 0.1) inset, 0 -1px 0 rgba(0, 0, 0, 0.03) inset, 0 20px 60px -20px rgba(0, 0, 0, 0.06)",
+      }}
+    >
+      <ShimmerText
+        client:visible
+        duration={2.5}
+        delay={0.5}
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(1.8rem, 4.2vw, 5rem)",
+          fontWeight: 500,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.05,
+          textAlign: "center",
+          color: "var(--color-text)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Where cinematic isn't just a buzz word.
+      </ShimmerText>
+    </ShineBorder>
+  </div>
+</section>
+
+<style>
+  .cinematic-section {
+    padding: clamp(8rem, 15vh, 16rem) 0 clamp(4rem, 8vh, 8rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+  }
+</style>

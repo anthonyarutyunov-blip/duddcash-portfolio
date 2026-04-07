@@ -1,18 +1,20 @@
 /* ============================================
    DUDDCASH — Global Styles
+   Inspired by Monopo London's design system
    ============================================ */
 
 /* Custom Properties */
 :root {
-  --color-bg: #fafafa;
-  --color-text: #1a1a1a;
-  --color-accent: #111;
-  --color-muted: #777;
-  --color-border: #e5e5e5;
-  --color-surface: #fff;
+  --color-bg: #f2f2f2;
+  --color-text: #111;
+  --color-accent: #000;
+  --color-muted: #666;
+  --color-border: #ccc;
+  --color-surface: #e8e8e8;
 
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Clash Display', system-ui, sans-serif;
 
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
@@ -22,16 +24,22 @@
   --space-2xl: 4rem;
   --space-3xl: 6rem;
 
-  --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
-  --text-base: clamp(0.95rem, 0.9rem + 0.25vw, 1.05rem);
-  --text-lg: clamp(1.15rem, 1rem + 0.5vw, 1.35rem);
-  --text-xl: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  --text-2xl: clamp(2rem, 1.5rem + 1.5vw, 3rem);
-  --text-3xl: clamp(2.5rem, 2rem + 2vw, 4rem);
+  /* Fluid type — max(vw, floor) like Monopo */
+  --text-sm: max(0.68vw, 12px);
+  --text-base: max(0.83vw, 14px);
+  --text-lg: max(1vw, 17px);
+  --text-xl: max(1.56vw, 20px);
+  --text-2xl: max(3.1vw, 28px);
+  --text-3xl: max(5.5vw, 44px);
 
-  --max-width: 1200px;
-  --transition-base: 0.3s ease;
-  --transition-slow: 0.6s ease;
+  --max-width: 1400px;
+
+  /* Signature easing — easeOutQuart (Monopo's curve) */
+  --ease: cubic-bezier(.165, .84, .44, 1);
+  --ease-in: cubic-bezier(.895, .03, .685, .22);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  --transition-base: 0.6s var(--ease);
+  --transition-slow: 1s var(--ease);
 }
 
 /* Reset */
@@ -44,8 +52,17 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
@@ -56,6 +73,22 @@ body {
   background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga', 'kern';
+  text-rendering: optimizeLegibility;
+}
+
+/* Gradient background layer */
+.gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Site content sits above gradient */
+.site-content {
+  position: relative;
+  z-index: 1;
 }
 
 img,
@@ -82,18 +115,32 @@ ol {
   list-style: none;
 }
 
-/* Typography */
+/* Typography — big, tight, confident */
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: -0.03em;
 }
 
-h1 { font-size: var(--text-3xl); }
-h2 { font-size: var(--text-2xl); }
-h3 { font-size: var(--text-xl); }
-h4 { font-size: var(--text-lg); }
+h1 {
+  font-size: var(--text-3xl);
+  line-height: 0.95;
+}
+
+h2 {
+  font-size: var(--text-2xl);
+  line-height: 1.05;
+}
+
+h3 {
+  font-size: var(--text-xl);
+  line-height: 1.15;
+}
+
+h4 {
+  font-size: var(--text-lg);
+  line-height: 1.2;
+}
 
 p + p {
   margin-top: var(--space-md);
@@ -104,11 +151,166 @@ p + p {
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 var(--space-lg);
+  padding: 0 3.9vw;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--space-lg);
+  }
 }
 
 .section {
   padding: var(--space-3xl) 0;
+}
+
+/* Label style — small caps, heavy weight */
+.label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ============================================
+   Buttons — Monopo circle-expand pattern
+   ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 42px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: color 0.6s var(--ease);
+}
+
+.btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  transform: translate(-150%, 50%) translateZ(0);
+  transition: transform 0.6s var(--ease);
+}
+
+.btn:hover::before {
+  transform: translate(-50%, -50%) scale(4) translateZ(0);
+}
+
+/* Primary: black border, black fill on hover */
+.btn--primary {
+  color: #111;
+  border: 1px solid #111;
+}
+
+.btn--primary::before {
+  background: #111;
+}
+
+.btn--primary:hover {
+  color: #fff;
+}
+
+/* Outline: subtle border, black fill on hover */
+.btn--outline {
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn--outline::before {
+  background: #111;
+}
+
+.btn--outline:hover {
+  color: #fff;
+}
+
+/* Text link with underline reveal */
+.btn--text {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--text-base);
+  font-weight: 500;
+  overflow: visible;
+}
+
+.btn--text::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  border-radius: 0;
+  top: auto;
+  transform: scaleX(0) translateZ(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease);
+}
+
+.btn--text:hover {
+  color: var(--color-text);
+}
+
+.btn--text:hover::before {
+  transform: scaleX(1) translateZ(0);
+}
+
+/* Arrow after buttons */
+.btn__arrow {
+  display: inline-block;
+  margin-left: 8px;
+  transition: transform 0.6s var(--ease);
+  position: relative;
+  z-index: 1;
+}
+
+.btn:hover .btn__arrow {
+  transform: translateX(4px);
+}
+
+/* ============================================
+   Link hover — underline reveal
+   ============================================ */
+.link-reveal {
+  position: relative;
+  display: inline-block;
+}
+
+.link-reveal::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+  transform: scaleX(0) translateZ(0);
+  transition: transform 0.6s var(--ease);
+}
+
+.link-reveal:hover::after {
+  transform: scaleX(1) translateZ(0);
 }
 
 /* Visually hidden (accessible) */

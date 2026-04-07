@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import MacFileWindow from '../components/ui/mac-file-window';
 ---
 
 <BaseLayout title="Contact" description="Get in touch with Duddcash for your next video or photography project.">
+  <MacFileWindow client:load />
+
   <section class="contact section container">
     <div class="contact__header" data-animate>
       <h1>Let's Work Together</h1>
@@ -39,11 +42,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <label for="project-type" class="form-label">Project Type</label>
           <select id="project-type" name="project-type" required class="form-input">
             <option value="" disabled selected>Select a type</option>
-            <option value="wedding">Wedding</option>
-            <option value="commercial">Commercial</option>
-            <option value="music-video">Music Video</option>
-            <option value="documentary">Documentary</option>
-            <option value="event">Event</option>
+            <option value="social">Social Content</option>
+            <option value="commercial">Commercial / Brand</option>
+            <option value="event">Event Coverage</option>
+            <option value="music">Music Video</option>
+            <option value="photo">Photo Shoot</option>
+            <option value="sports">Sports</option>
+            <option value="spec-ad">Spec Ad</option>
             <option value="other">Other</option>
           </select>
         </div>
@@ -53,7 +58,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <textarea id="message" name="message" rows="5" required class="form-input"></textarea>
         </div>
 
-        <button type="submit" class="btn btn--primary btn--full">Send Message</button>
+        <button type="submit" class="submit-btn"><span>Send Message</span></button>
       </form>
 
       <div class="contact__info" data-animate>
@@ -74,7 +79,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <style>
   .contact {
-    padding-top: calc(64px + var(--space-3xl));
+    padding-top: var(--space-3xl);
   }
 
   .contact__header {
@@ -145,29 +150,50 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     padding-right: 40px;
   }
 
-  .btn {
-    display: inline-block;
+  .submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
     font-size: var(--text-sm);
     font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    padding: 14px 28px;
-    border-radius: 2px;
-    transition: all var(--transition-base);
+    padding: 16px 28px;
+    border-radius: 42px;
+    border: 1px solid #111;
+    color: #111;
+    background: none;
+    overflow: hidden;
+    cursor: pointer;
+    transition: color 0.6s var(--ease);
   }
 
-  .btn--primary {
-    background: var(--color-text);
-    color: var(--color-bg);
+  .submit-btn span {
+    position: relative;
+    z-index: 1;
   }
 
-  .btn--primary:hover {
-    background: #333;
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    background: #111;
+    transform: translate(-150%, 50%) translateZ(0);
+    transition: transform 0.6s var(--ease);
   }
 
-  .btn--full {
-    width: 100%;
-    text-align: center;
+  .submit-btn:hover {
+    color: #fff;
+  }
+
+  .submit-btn:hover::before {
+    transform: translate(-50%, -50%) scale(6) translateZ(0);
   }
 
   /* Info sidebar */

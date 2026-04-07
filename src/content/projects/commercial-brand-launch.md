@@ -1,23 +1,23 @@
 ---
-title: "Elevate Brand Launch"
+title: "Mastercard — Creator Series"
 category: commercial
-date: 2024-03-20
-client: "Elevate Co."
+date: 2025-09-15
+client: "Mastercard"
 thumbnail:
-  src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80"
-  alt: "Elevate brand launch campaign"
+  src: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80"
+  alt: "Mastercard commercial shoot behind the scenes"
 videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 photos:
-  - src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&q=80"
-    alt: "Product hero shot"
-  - src: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80"
-    alt: "Lifestyle product photography"
-  - src: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&q=80"
-    alt: "Minimal product shot"
-description: "Full brand launch package including hero video and product photography for Elevate Co."
+  - src: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80"
+    alt: "Campaign hero shot"
+  - src: "https://images.unsplash.com/photo-1556742205-e10c9486e506?w=1200&q=80"
+    alt: "On-set production"
+  - src: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80"
+    alt: "Post-production color grade"
+description: "Full video production for Mastercard's digital-first creator campaign — concept through delivery."
 featured: true
-order: 2
-tags: ["commercial", "brand", "product"]
+order: 1
+tags: ["commercial", "brand", "campaign"]
 ---
 
-Elevate Co. came to us for a complete visual identity launch. We produced a 60-second hero spot and a suite of product imagery that defined the brand's bold, modern aesthetic. The campaign rolled out across digital and print channels.
+Produced a multi-spot digital campaign for Mastercard's Creator Series initiative. Handled concept development, two-day shoot across three locations, and post-production including color grade, sound design, and deliverables for social, web, and digital OOH.

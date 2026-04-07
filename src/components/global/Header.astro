@@ -1,173 +1,101 @@
 ---
-const currentPath = Astro.url.pathname;
-
-const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/work', label: 'Work' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
-];
+import { SpecialText } from '../ui/special-text';
 ---
 
 <header class="header">
-  <div class="header__inner container">
-    <a href="/" class="header__logo" transition:name="logo">
-      DUDDCASH
-    </a>
-
-    <button class="header__toggle" aria-label="Toggle menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-    </button>
-
-    <nav class="header__nav" aria-label="Main navigation">
-      <ul class="header__links">
-        {navLinks.map(({ href, label }) => (
-          <li>
-            <a
-              href={href}
-              class:list={['header__link', { 'is-active': currentPath === href || (href !== '/' && currentPath.startsWith(href)) }]}
-            >
-              {label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </div>
+  <a href="/" class="header__logo" transition:name="logo">
+    <SpecialText client:load text="DUDDCASH STUDIO" speed={40} delay={0} />
+  </a>
 </header>
 
-<script>
-  function initMobileNav() {
-    const toggle = document.querySelector('.header__toggle');
-    const nav = document.querySelector('.header__nav');
-    if (!toggle || !nav) return;
-
-    toggle.addEventListener('click', () => {
-      const expanded = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!expanded));
-      nav.classList.toggle('is-open');
-      document.body.classList.toggle('nav-open');
-    });
-  }
-
-  initMobileNav();
-  document.addEventListener('astro:after-swap', initMobileNav);
-</script>
-
-<style>
+<style is:global>
   .header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    background: rgba(250, 250, 250, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .header__inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    height: 64px;
+    padding: var(--space-lg) 3.9vw;
+    pointer-events: none;
   }
 
   .header__logo {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: max(0.85vw, 13px);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: #111 !important;
+    transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s var(--ease);
+    pointer-events: auto;
   }
 
-  .header__links {
-    display: flex;
-    gap: var(--space-xl);
+  .header__logo span {
+    color: inherit !important;
   }
 
-  .header__link {
-    font-size: var(--text-sm);
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-    transition: color var(--transition-base);
-    position: relative;
+  .header--light .header__logo {
+    color: #fff !important;
   }
 
-  .header__link:hover,
-  .header__link.is-active {
-    color: var(--color-text);
-  }
-
-  .header__link.is-active::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: var(--color-text);
-  }
-
-  .header__toggle {
-    display: none;
-    flex-direction: column;
-    gap: 6px;
-    padding: 4px;
-  }
-
-  .header__toggle span {
-    display: block;
-    width: 24px;
-    height: 1.5px;
-    background: var(--color-text);
-    transition: transform var(--transition-base), opacity var(--transition-base);
-  }
-
-  @media (max-width: 768px) {
-    .header__toggle {
-      display: flex;
-    }
-
-    .header__nav {
-      position: fixed;
-      top: 64px;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--color-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity var(--transition-base), visibility var(--transition-base);
-    }
-
-    .header__nav.is-open {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .header__links {
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-xl);
-    }
-
-    .header__link {
-      font-size: var(--text-lg);
-    }
-
-    .header__toggle[aria-expanded='true'] span:first-child {
-      transform: translateY(3.75px) rotate(45deg);
-    }
-
-    .header__toggle[aria-expanded='true'] span:last-child {
-      transform: translateY(-3.75px) rotate(-45deg);
-    }
+  .header__logo:hover {
+    opacity: 0.6;
   }
 </style>
+
+<script is:inline>
+  (function() {
+    var checkerId = null;
+
+    function initHeaderColorSwitch() {
+      var header = document.querySelector('.header');
+      if (!header) return;
+
+      // Clear any previous interval from prior page
+      if (checkerId) clearInterval(checkerId);
+
+      function isDarkBg(el) {
+        var bg = getComputedStyle(el).backgroundColor;
+        if (bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') return false;
+        var match = bg.match(/[\d.]+/g);
+        if (!match || match.length < 3) return false;
+        var r = Number(match[0]), g = Number(match[1]), b = Number(match[2]);
+        if (match.length >= 4 && parseFloat(match[3]) < 0.1) return false;
+        return (r * 0.299 + g * 0.587 + b * 0.114) < 60;
+      }
+
+      var lastState = null;
+      function check() {
+        var checkY = 30;
+        var overDark = false;
+        var candidates = document.querySelectorAll('.globe-section, .footer, section');
+        for (var i = 0; i < candidates.length; i++) {
+          var rect = candidates[i].getBoundingClientRect();
+          if (rect.top <= checkY && rect.bottom >= checkY && isDarkBg(candidates[i])) {
+            overDark = true;
+            break;
+          }
+        }
+        if (lastState !== overDark) {
+          header.classList.toggle('header--light', overDark);
+          lastState = overDark;
+        }
+      }
+
+      // Use rAF-based polling — works regardless of scroll method (Lenis, native, etc.)
+      function loop() {
+        check();
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeaderColorSwitch);
+    } else {
+      initHeaderColorSwitch();
+    }
+    document.addEventListener('astro:after-swap', initHeaderColorSwitch);
+  })();
+</script>

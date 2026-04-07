@@ -1,0 +1,260 @@
+---
+import { MagneticCTA } from '../ui/magnetic-cta';
+import { ShimmerText } from '../ui/shimmer-text';
+import { GradientDots } from '../ui/gradient-dots';
+---
+
+<section class="contact-cta section">
+  <!-- Bubbly holographic card -->
+  <div class="contact-cta__card">
+    <div class="contact-cta__card-border"></div>
+    <div class="contact-cta__card-inner">
+      <!-- Gradient dots INSIDE the card -->
+      <div class="contact-cta__dots">
+        <GradientDots
+          client:visible
+          dotSize={4}
+          spacing={8}
+          duration={25}
+          backgroundColor="rgba(240, 238, 235, 0.85)"
+          colors={[
+            "rgba(195, 185, 165, 0.9)",
+            "rgba(175, 190, 170, 0.8)",
+            "rgba(185, 175, 195, 0.7)",
+            "rgba(200, 185, 165, 0.85)"
+          ]}
+          style={{ opacity: 0.45 }}
+        />
+      </div>
+
+      <div class="contact-cta__content">
+        <p class="contact-cta__eyebrow" data-animate>Ready?</p>
+
+        <div class="contact-cta__headline" data-animate>
+          <ShimmerText
+            client:visible
+            duration={2.5}
+            delay={0.3}
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2rem, 5vw + 0.5rem, 5rem)",
+              fontWeight: 500,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.05,
+              textAlign: "center",
+              color: "var(--color-text)",
+            }}
+          >
+            Let's make something together.
+          </ShimmerText>
+        </div>
+
+        <p class="contact-cta__sub" data-animate>
+          We move fast. Tell us what you need — we'll handle the rest.
+        </p>
+
+        <div class="contact-cta__btn" data-animate>
+          <MagneticCTA client:visible href="/contact">Start a Project</MagneticCTA>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .contact-cta {
+    text-align: center;
+    padding: clamp(6rem, 10vh, 10rem) 3.9vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 70vh;
+    /* No background — let the grid show through */
+  }
+
+  /* Bubbly organic border card */
+  .contact-cta__card {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    width: 100%;
+  }
+
+  .contact-cta__card-border {
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 28px;
+    background: linear-gradient(
+      135deg,
+      rgba(180, 170, 150, 0.3) 0%,
+      rgba(220, 210, 195, 0.15) 20%,
+      rgba(160, 200, 220, 0.25) 40%,
+      rgba(200, 180, 220, 0.2) 60%,
+      rgba(180, 210, 200, 0.25) 80%,
+      rgba(210, 195, 170, 0.3) 100%
+    );
+    background-size: 400% 400%;
+    animation: borderFlow 10s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes borderFlow {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 100% 0%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+  }
+
+  .contact-cta__card-inner {
+    position: relative;
+    z-index: 1;
+    /* Holographic / translucent — lets the grid bleed through */
+    background: rgba(240, 238, 235, 0.35);
+    backdrop-filter: blur(24px) saturate(1.3);
+    -webkit-backdrop-filter: blur(24px) saturate(1.3);
+    border-radius: 27px;
+    padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 5rem);
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+      0 1px 0 rgba(255, 255, 255, 0.35) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.03) inset,
+      0 0 60px rgba(180, 170, 150, 0.2),
+      0 0 120px rgba(180, 190, 210, 0.12),
+      0 30px 80px -20px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Holographic rainbow sheen overlay */
+  .contact-cta__card-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 27px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 200, 180, 0.06) 0%,
+      rgba(180, 200, 255, 0.08) 25%,
+      rgba(200, 180, 255, 0.06) 50%,
+      rgba(180, 255, 220, 0.06) 75%,
+      rgba(255, 220, 180, 0.08) 100%
+    );
+    background-size: 300% 300%;
+    animation: holoSheen 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes holoSheen {
+    0%, 100% { background-position: 0% 0%; }
+    33% { background-position: 100% 50%; }
+    66% { background-position: 50% 100%; }
+  }
+
+  /* Gradient dots layer inside the card */
+  .contact-cta__dots {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 27px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Content sits above the dots */
+  .contact-cta__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Floating ambient orbs behind the card */
+  .contact-cta__card::before,
+  .contact-cta__card::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: -1;
+    pointer-events: none;
+    animation: orbFloat 10s ease-in-out infinite;
+  }
+
+  .contact-cta__card::before {
+    width: 280px;
+    height: 280px;
+    background: rgba(190, 180, 160, 0.25);
+    top: -60px;
+    right: -50px;
+    animation-delay: -3s;
+  }
+
+  .contact-cta__card::after {
+    width: 220px;
+    height: 220px;
+    background: rgba(160, 185, 210, 0.2);
+    bottom: -50px;
+    left: -40px;
+    animation-delay: -7s;
+  }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(15px, -10px) scale(1.05); }
+    66% { transform: translate(-10px, 8px) scale(0.95); }
+  }
+
+  .contact-cta__eyebrow {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .contact-cta__headline {
+    margin-bottom: var(--space-lg);
+  }
+
+  .contact-cta__sub {
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    max-width: 480px;
+    margin-bottom: var(--space-xl);
+    font-style: italic;
+  }
+
+  .contact-cta__btn {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .contact-cta {
+      padding: clamp(4rem, 8vh, 6rem) 1.5rem;
+    }
+
+    .contact-cta__card-inner {
+      padding: 2.5rem 1.5rem;
+      border-radius: 20px;
+    }
+
+    .contact-cta__card-border {
+      border-radius: 21px;
+    }
+
+    .contact-cta__card-inner::before {
+      border-radius: 20px;
+    }
+
+    .contact-cta__dots {
+      border-radius: 20px;
+    }
+  }
+</style>

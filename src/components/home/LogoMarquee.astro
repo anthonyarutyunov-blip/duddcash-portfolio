@@ -1,0 +1,114 @@
+---
+const brands = [
+  'Mastercard',
+  'Chipotle',
+  'Lululemon',
+  'Pringles',
+  'The Rock',
+  'Wynn',
+  'PrizePicks',
+  'MoneyGram',
+  'The Sphere',
+  'Tao Group',
+  'Marine Layer',
+  'Academy Sports',
+  'Sebastian Maniscalco',
+  'The Fall Guy',
+  'Furiosa',
+];
+---
+
+<section class="marquee-section">
+  <p class="marquee-label">Trusted by</p>
+  <div class="marquee">
+    <div class="marquee__track">
+      {brands.map((name) => (
+        <span class="marquee__item">{name}</span>
+      ))}
+      {brands.map((name) => (
+        <span class="marquee__item" aria-hidden="true">{name}</span>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .marquee-section {
+    padding: var(--space-3xl) 0;
+    border-top: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+
+  .marquee-label {
+    text-align: center;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xl);
+  }
+
+  .marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+
+  .marquee__track {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xl);
+    width: max-content;
+    animation: scroll 40s linear infinite;
+  }
+
+  .marquee__item {
+    font-size: clamp(0.85rem, 0.7rem + 0.5vw, 1.1rem);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
+    transition: color 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .marquee:hover .marquee__track {
+    animation-play-state: paused;
+  }
+
+  .marquee:hover .marquee__item {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+</style>

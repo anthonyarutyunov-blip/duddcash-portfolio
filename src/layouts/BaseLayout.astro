@@ -1,9 +1,12 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import '../styles/tailwind.css';
 import '../styles/global.css';
 import '../styles/animations.css';
 import Header from '../components/global/Header.astro';
 import Footer from '../components/global/Footer.astro';
+import { BackgroundGradientAnimation } from '../components/ui/background-gradient-animation';
+import SpotlightBackground from '../components/ui/spotlight-background';
 
 interface Props {
   title: string;
@@ -13,7 +16,7 @@ interface Props {
 
 const {
   title,
-  description = 'Duddcash — Video & Photography',
+  description = 'Duddcash — Video & Photo Production',
   ogImage = '/og-image.jpg',
 } = Astro.props;
 
@@ -38,10 +41,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
 
-    <!-- Preload font -->
+    <!-- Preload fonts -->
     <link
       rel="preload"
       href="/fonts/inter-variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/clash-display-medium.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -55,18 +65,70 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         font-display: swap;
         font-style: normal;
       }
+
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('/fonts/clash-display-medium.woff2') format('woff2');
+        font-weight: 500;
+        font-display: swap;
+        font-style: normal;
+      }
     </style>
 
     <ClientRouter />
   </head>
   <body>
-    <Header />
-    <main>
-      <slot />
-    </main>
-    <Footer />
+    <!-- Animated gradient background -->
+    <div class="gradient-bg">
+      <BackgroundGradientAnimation
+        client:load
+        gradientBackgroundStart="rgb(234, 234, 234)"
+        gradientBackgroundEnd="rgb(219, 219, 219)"
+        firstColor="173, 169, 150"
+        secondColor="200, 195, 180"
+        thirdColor="180, 190, 200"
+        fourthColor="210, 200, 185"
+        fifthColor="190, 185, 175"
+        pointerColor="195, 190, 180"
+        size="80%"
+        blendingValue="hard-light"
+        interactive={true}
+        containerClassName="!fixed !inset-0 !w-full !h-full !z-0"
+      />
+    </div>
+
+    <!-- Cursor spotlight -->
+    <SpotlightBackground client:load />
+
+    <!-- Site content -->
+    <div class="site-content">
+      <Header />
+      <main>
+        <slot />
+      </main>
+      <Footer />
+    </div>
 
     <script>
+      import Lenis from 'lenis';
+
+      let lenis: InstanceType<typeof Lenis> | null = null;
+
+      function initLenis() {
+        if (lenis) lenis.destroy();
+        lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+        });
+
+        function raf(time: number) {
+          lenis!.raf(time);
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+      }
+
       // Scroll-triggered animation observer
       const observer = new IntersectionObserver(
         (entries) => {
@@ -86,10 +148,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         });
       }
 
+      initLenis();
       initAnimations();
 
       // Re-init after Astro page transitions
-      document.addEventListener('astro:after-swap', initAnimations);
+      document.addEventListener('astro:after-swap', () => {
+        initLenis();
+        initAnimations();
+      });
     </script>
   </body>
 </html>
