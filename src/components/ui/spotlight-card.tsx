@@ -4,6 +4,8 @@ interface SpotlightCardProps {
   children: ReactNode;
   className?: string;
   glowColor?: 'blue' | 'purple' | 'green' | 'red' | 'orange';
+  /** Disable spotlight glow effect (e.g. when card is expanded) */
+  disabled?: boolean;
 }
 
 const glowColorMap = {
@@ -18,6 +20,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
   children,
   className = '',
   glowColor = 'blue',
+  disabled = false,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -25,6 +28,8 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
+
+    if (disabled) return;
 
     const syncPointer = (e: PointerEvent) => {
       const rect = card.getBoundingClientRect();
@@ -34,7 +39,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
 
     card.addEventListener('pointermove', syncPointer);
     return () => card.removeEventListener('pointermove', syncPointer);
-  }, []);
+  }, [disabled]);
 
   const { base, spread } = glowColorMap[glowColor];
 
@@ -63,7 +68,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
             hsl(${base} 80% 65% / 0.1),
             transparent 70%
           )`,
-          opacity: isHovered ? 1 : 0,
+          opacity: isHovered && !disabled ? 1 : 0,
           transition: 'opacity 0.3s ease',
           pointerEvents: 'none',
           zIndex: 1,
