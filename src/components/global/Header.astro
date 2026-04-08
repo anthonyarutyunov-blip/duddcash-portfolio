@@ -3,9 +3,22 @@ import { SpecialText } from '../ui/special-text';
 ---
 
 <header class="header">
-  <a href="/" class="header__logo" transition:name="logo">
-    <SpecialText client:load text="DUDDCASH STUDIO" speed={40} delay={0} />
-  </a>
+  <div class="header__block">
+    <a href="/" class="header__logo" transition:name="logo">
+      <SpecialText client:load text="DUDDCASH STUDIO" speed={40} delay={0} />
+    </a>
+    <nav class="header__nav">
+      <a href="/#portfolio" class="header__nav-link">
+        <SpecialText client:load text="Work" speed={25} delay={0.6} />
+      </a>
+      <a href="/about" class="header__nav-link">
+        <SpecialText client:load text="About Us" speed={25} delay={0.8} />
+      </a>
+      <a href="/contact" class="header__nav-link">
+        <SpecialText client:load text="Contact" speed={25} delay={1.0} />
+      </a>
+    </nav>
+  </div>
 </header>
 
 <style is:global>
@@ -23,12 +36,19 @@ import { SpecialText } from '../ui/special-text';
 
   .header__logo {
     font-family: var(--font-display);
-    font-size: max(0.85vw, 13px);
+    font-size: max(1.1vw, 15px);
     font-weight: 500;
     letter-spacing: 0.08em;
     color: #111 !important;
-    transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s var(--ease);
+    opacity: 1;
+    filter: blur(0px);
+    transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s var(--ease), filter 0.4s ease;
     pointer-events: auto;
+  }
+
+  .header--over-text .header__logo {
+    filter: blur(1.5px);
+    opacity: 0.45;
   }
 
   .header__logo span {
@@ -41,6 +61,73 @@ import { SpecialText } from '../ui/special-text';
 
   .header__logo:hover {
     opacity: 0.6;
+  }
+
+  /* Nav block */
+  .header__block {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    pointer-events: auto;
+  }
+
+  .header__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.4s ease;
+  }
+
+  .header__nav-link {
+    font-family: var(--font-display);
+    font-size: max(0.75vw, 12px);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted) !important;
+    text-decoration: none;
+    transition: color 0.3s ease, opacity 0.6s var(--ease), filter 0.4s ease;
+    line-height: 1.7;
+    pointer-events: auto;
+  }
+
+  .header__nav-link span {
+    color: inherit !important;
+  }
+
+  .header__nav-link:hover {
+    color: var(--color-text) !important;
+  }
+
+  .header--light .header__nav-link {
+    color: rgba(255,255,255,0.5) !important;
+  }
+
+  .header--light .header__nav-link:hover {
+    color: #fff !important;
+  }
+
+  .header--over-text .header__nav {
+    filter: blur(1.5px);
+    opacity: 0.45;
+  }
+
+  /* Hide nav links when scrolled past hero */
+  .header--nav-hidden .header__nav {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+  }
+
+  /* Blur wordmark over media content */
+  .header--over-media .header__logo {
+    filter: blur(2px);
+    opacity: 0.35;
   }
 </style>
 
@@ -66,6 +153,37 @@ import { SpecialText } from '../ui/special-text';
       }
 
       var lastState = null;
+      var lastTextState = null;
+      var lastNavHidden = null;
+      var lastMediaState = null;
+
+      function isOverText(logoRect) {
+        // Check if logo overlaps any text elements
+        var textEls = document.querySelectorAll('h1, h2, h3, p, .label, .stat__number, .stat__label');
+        for (var i = 0; i < textEls.length; i++) {
+          var r = textEls[i].getBoundingClientRect();
+          // Check horizontal and vertical overlap
+          if (r.right > logoRect.left && r.left < logoRect.right &&
+              r.bottom > logoRect.top && r.top < logoRect.bottom) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function isOverMedia(logoRect) {
+        // Check if logo overlaps any image, video, or gallery elements
+        var mediaEls = document.querySelectorAll('img, video, picture, .gallery__item, .sticky-gallery__media, [data-media]');
+        for (var i = 0; i < mediaEls.length; i++) {
+          var r = mediaEls[i].getBoundingClientRect();
+          if (r.right > logoRect.left && r.left < logoRect.right &&
+              r.bottom > logoRect.top && r.top < logoRect.bottom) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       function check() {
         var checkY = 30;
         var overDark = false;
@@ -81,14 +199,39 @@ import { SpecialText } from '../ui/special-text';
           header.classList.toggle('header--light', overDark);
           lastState = overDark;
         }
+
+        // Check if scrolled past hero — hide nav links
+        var hero = document.getElementById('hero');
+        if (hero) {
+          var heroBottom = hero.getBoundingClientRect().bottom;
+          var navHidden = heroBottom < 0;
+          if (lastNavHidden !== navHidden) {
+            header.classList.toggle('header--nav-hidden', navHidden);
+            lastNavHidden = navHidden;
+          }
+        }
+
+        // Check if logo is over text or media
+        var logo = header.querySelector('.header__logo');
+        if (logo) {
+          var logoRect = logo.getBoundingClientRect();
+          var overText = !overDark && isOverText(logoRect);
+          if (lastTextState !== overText) {
+            header.classList.toggle('header--over-text', overText);
+            lastTextState = overText;
+          }
+
+          var overMedia = !overDark && isOverMedia(logoRect);
+          if (lastMediaState !== overMedia) {
+            header.classList.toggle('header--over-media', overMedia);
+            lastMediaState = overMedia;
+          }
+        }
       }
 
-      // Use rAF-based polling — works regardless of scroll method (Lenis, native, etc.)
-      function loop() {
-        check();
-        requestAnimationFrame(loop);
-      }
-      requestAnimationFrame(loop);
+      // Throttled check — every 200ms instead of every frame
+      check();
+      setInterval(check, 200);
     }
 
     if (document.readyState === 'loading') {

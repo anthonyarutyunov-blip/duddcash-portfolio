@@ -56,6 +56,8 @@ function FileItem({ node, depth, isLast, parentPath }: FileItemProps) {
       document.dispatchEvent(
         new CustomEvent("nav:navigate", { detail: { href: node.href }, bubbles: true })
       )
+      // Mark as internal navigation so the intro screen doesn't replay
+      try { sessionStorage.setItem("duddcash_nav", "1") } catch {}
       window.location.href = node.href
     }
   }

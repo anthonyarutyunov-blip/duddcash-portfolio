@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useId } from "react"
+import React, { useRef, useEffect, useId, useState } from "react"
 import { cn } from "../../lib/utils"
 import {
   motion,
@@ -26,12 +26,26 @@ export function InfiniteGrid({
 }: InfiniteGridProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const patternId = useId().replace(/:/g, "")
+  const [isVisible, setIsVisible] = useState(false)
 
   const mouseX = useMotionValue(-999)
   const mouseY = useMotionValue(-999)
 
+  // Pause when off-screen
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   // Use window-level mouse tracking so it works even when behind other content
   useEffect(() => {
+    if (!isVisible) return
     const handleMouseMove = (e: MouseEvent) => {
       const el = containerRef.current
       if (!el) return
@@ -41,12 +55,13 @@ export function InfiniteGrid({
     }
     window.addEventListener("mousemove", handleMouseMove, { passive: true })
     return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [mouseX, mouseY])
+  }, [isVisible, mouseX, mouseY])
 
   const gridOffsetX = useMotionValue(0)
   const gridOffsetY = useMotionValue(0)
 
   useAnimationFrame(() => {
+    if (!isVisible) return
     gridOffsetX.set((gridOffsetX.get() + speedX) % 40)
     gridOffsetY.set((gridOffsetY.get() + speedY) % 40)
   })

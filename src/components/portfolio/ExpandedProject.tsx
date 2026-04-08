@@ -2,31 +2,240 @@ import React from "react"
 import { motion } from "motion/react"
 import { X } from "lucide-react"
 import { VideoPlayer } from "./VideoPlayer"
-import type { PortfolioItem } from "../../data/portfolio"
+import type { PortfolioItem, VideoSection, Credit, ImageGallery, BunnyVideo } from "../../data/portfolio"
 
 interface ExpandedProjectProps {
   item: PortfolioItem
   onClose: () => void
 }
 
-/**
- * Full expanded view that replaces the card in-place.
- * Shows metadata + video grid for projects, single video for singles.
- * Supports optional image galleries below the videos.
- */
-export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
-  const videos =
-    item.type === "project" ? item.videos : [item.video]
+/** Renders a credits block */
+function CreditsBlock({ credits }: { credits: Credit[] }) {
+  if (!credits.length) return null
+  return (
+    <details
+      style={{
+        marginTop: 12,
+        fontSize: 12,
+        color: "rgba(255,255,255,0.45)",
+      }}
+    >
+      <summary
+        style={{
+          cursor: "pointer",
+          color: "rgba(255,255,255,0.55)",
+          fontSize: 11,
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          marginBottom: 6,
+        }}
+      >
+        Credits
+      </summary>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          gap: "3px 12px",
+          paddingTop: 4,
+        }}
+      >
+        {credits.map((credit, i) => (
+          <React.Fragment key={i}>
+            <span style={{ color: "rgba(255,255,255,0.35)" }}>
+              {credit.label}
+            </span>
+            <span style={{ color: "rgba(255,255,255,0.55)" }}>
+              {credit.value}
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    </details>
+  )
+}
 
-  // Check if videos are portrait (9/16 or 4/5) to constrain width
+/** Renders a video grid */
+function VideoGrid({ videos }: { videos: BunnyVideo[] }) {
+  if (!videos.length) return null
+
   const isPortrait = videos.some(
     (v) => v.aspectRatio === "9/16" || v.aspectRatio === "4/5"
   )
-
-  // Check if videos are narrower than 16/9 (e.g. 4/3, 1/1) to constrain width
   const isNarrow = videos.some(
     (v) => v.aspectRatio === "4/3" || v.aspectRatio === "1/1"
   )
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns:
+          videos.length === 1 && isPortrait
+            ? "1fr"
+            : videos.length === 1
+            ? "1fr"
+            : isPortrait
+            ? "repeat(auto-fill, minmax(min(100%, 280px), 1fr))"
+            : "repeat(auto-fill, minmax(min(100%, 400px), 1fr))",
+        gap: 12,
+        maxWidth:
+          videos.length === 1 && isPortrait
+            ? 360
+            : videos.length === 1 && isNarrow
+            ? 640
+            : undefined,
+        margin:
+          videos.length === 1 && (isPortrait || isNarrow)
+            ? "0 auto"
+            : undefined,
+      }}
+    >
+      {videos.map((video) => (
+        <VideoPlayer
+          key={video.videoId}
+          videoId={video.videoId}
+          title={video.title}
+          description={video.description}
+          aspectRatio={video.aspectRatio || "16/9"}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** Renders image galleries */
+function GalleryBlock({ galleries }: { galleries: ImageGallery[] }) {
+  if (!galleries.length) return null
+  return (
+    <>
+      {galleries.map((gallery, gi) => (
+        <div key={gi} style={{ marginTop: 24 }}>
+          <p
+            style={{
+              fontSize: 11,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "rgba(255,255,255,0.45)",
+              marginBottom: 12,
+            }}
+          >
+            {gallery.title}
+          </p>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+              gap: 8,
+            }}
+          >
+            {gallery.images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`${gallery.title} ${i + 1}`}
+                loading="lazy"
+                style={{
+                  width: "100%",
+                  borderRadius: 6,
+                  display: "block",
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  )
+}
+
+/** Renders a single section within a multi-section project */
+function SectionBlock({ section, index }: { section: VideoSection; index: number }) {
+  return (
+    <div
+      style={{
+        marginTop: index === 0 ? 0 : 32,
+        paddingTop: index === 0 ? 0 : 24,
+        borderTop: index === 0 ? "none" : "1px solid rgba(255,255,255,0.1)",
+      }}
+    >
+      <div style={{ marginBottom: 16 }}>
+        <h4
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: 18,
+            fontWeight: 500,
+            letterSpacing: "-0.01em",
+            color: "#fff",
+            margin: "0 0 6px",
+          }}
+        >
+          {section.title}
+        </h4>
+        {section.description && (
+          <p
+            style={{
+              fontSize: 13,
+              lineHeight: 1.5,
+              color: "rgba(255,255,255,0.55)",
+              margin: "0 0 4px",
+            }}
+          >
+            {section.description}
+          </p>
+        )}
+        {section.role && (
+          <p
+            style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.4)",
+              fontStyle: "italic",
+              margin: 0,
+            }}
+          >
+            Role: {section.role}
+          </p>
+        )}
+        {section.credits && section.credits.length > 0 && (
+          <CreditsBlock credits={section.credits} />
+        )}
+      </div>
+
+      {section.videos.length > 0 ? (
+        <VideoGrid videos={section.videos} />
+      ) : (
+        <div
+          style={{
+            padding: "32px 16px",
+            border: "1px dashed rgba(255,255,255,0.15)",
+            borderRadius: 8,
+            textAlign: "center",
+            color: "rgba(255,255,255,0.3)",
+            fontSize: 13,
+          }}
+        >
+          Coming soon
+        </div>
+      )}
+
+      {section.galleries && section.galleries.length > 0 && (
+        <GalleryBlock galleries={section.galleries} />
+      )}
+    </div>
+  )
+}
+
+/**
+ * Full expanded view that replaces the card in-place.
+ * Shows metadata + video grid for projects, single video for singles.
+ * Supports sections for multi-campaign projects and optional image galleries.
+ */
+export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
+  const hasSections =
+    item.type === "project" && item.sections && item.sections.length > 0
+  const flatVideos =
+    item.type === "project" ? item.videos : [item.video]
 
   const role = item.role
   const credits = item.credits
@@ -134,47 +343,8 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
           </p>
         )}
 
-        {/* Credits */}
         {credits && credits.length > 0 && (
-          <details
-            style={{
-              marginTop: 12,
-              fontSize: 12,
-              color: "rgba(255,255,255,0.45)",
-            }}
-          >
-            <summary
-              style={{
-                cursor: "pointer",
-                color: "rgba(255,255,255,0.55)",
-                fontSize: 11,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: 6,
-              }}
-            >
-              Credits
-            </summary>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                gap: "3px 12px",
-                paddingTop: 4,
-              }}
-            >
-              {credits.map((credit: any, i: number) => (
-                <React.Fragment key={i}>
-                  <span style={{ color: "rgba(255,255,255,0.35)" }}>
-                    {credit.label}
-                  </span>
-                  <span style={{ color: "rgba(255,255,255,0.55)" }}>
-                    {credit.value}
-                  </span>
-                </React.Fragment>
-              ))}
-            </div>
-          </details>
+          <CreditsBlock credits={credits} />
         )}
 
         {/* Category badges */}
@@ -205,71 +375,25 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
         </div>
       </div>
 
-      {/* Video grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            videos.length === 1 && isPortrait
-              ? "1fr"
-              : videos.length === 1
-              ? "1fr"
-              : isPortrait
-              ? "repeat(auto-fill, minmax(min(100%, 280px), 1fr))"
-              : "repeat(auto-fill, minmax(min(100%, 400px), 1fr))",
-          gap: 12,
-          maxWidth: videos.length === 1 && isPortrait ? 360 : videos.length === 1 && isNarrow ? 640 : undefined,
-          margin: videos.length === 1 && (isPortrait || isNarrow) ? "0 auto" : undefined,
-        }}
-      >
-        {videos.map((video) => (
-          <VideoPlayer
-            key={video.videoId}
-            videoId={video.videoId}
-            title={video.title}
-            description={video.description}
-            aspectRatio={video.aspectRatio || "16/9"}
-          />
-        ))}
-      </div>
-
-      {/* Image galleries */}
-      {galleries && galleries.length > 0 && galleries.map((gallery, gi) => (
-        <div key={gi} style={{ marginTop: 24 }}>
-          <p
-            style={{
-              fontSize: 11,
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              color: "rgba(255,255,255,0.45)",
-              marginBottom: 12,
-            }}
-          >
-            {gallery.title}
-          </p>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
-              gap: 8,
-            }}
-          >
-            {gallery.images.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt={`${gallery.title} ${i + 1}`}
-                loading="lazy"
-                style={{
-                  width: "100%",
-                  borderRadius: 6,
-                  display: "block",
-                }}
-              />
+      {/* Sections mode (multi-campaign projects like Prize Picks) */}
+      {hasSections ? (
+        <div>
+          {item.type === "project" &&
+            item.sections!.map((section, si) => (
+              <SectionBlock key={si} section={section} index={si} />
             ))}
-          </div>
         </div>
-      ))}
+      ) : (
+        <>
+          {/* Flat video grid */}
+          <VideoGrid videos={flatVideos} />
+
+          {/* Image galleries */}
+          {galleries && galleries.length > 0 && (
+            <GalleryBlock galleries={galleries} />
+          )}
+        </>
+      )}
     </motion.div>
   )
 }

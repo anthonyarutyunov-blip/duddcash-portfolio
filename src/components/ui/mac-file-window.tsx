@@ -21,6 +21,7 @@ export default function MacFileWindow() {
   const saved = useRef<{ pos: Pos; size: Size } | null>(null)
   const windowRef = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
+  const didDrag = useRef(false)
   const resizing = useRef<string | null>(null)
   const d0 = useRef({ mx: 0, my: 0, wx: 0, wy: 0 })
   const r0 = useRef({ mx: 0, my: 0, wx: 0, wy: 0, w: 0, h: 0 })
@@ -35,9 +36,12 @@ export default function MacFileWindow() {
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (dragging.current) {
+        const dx = e.clientX - d0.current.mx
+        const dy = e.clientY - d0.current.my
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) didDrag.current = true
         setPos({
-          x: Math.max(0, d0.current.wx + e.clientX - d0.current.mx),
-          y: Math.max(0, d0.current.wy + e.clientY - d0.current.my),
+          x: Math.max(0, d0.current.wx + dx),
+          y: Math.max(0, d0.current.wy + dy),
         })
       }
       if (resizing.current) {
@@ -64,6 +68,7 @@ export default function MacFileWindow() {
     if (maximized) return
     e.preventDefault()
     dragging.current = true
+    didDrag.current = false
     d0.current = { mx: e.clientX, my: e.clientY, wx: pos.x, wy: pos.y }
   }
 
@@ -128,7 +133,7 @@ export default function MacFileWindow() {
   const headerTop = 24
   const posStyle: React.CSSProperties = ready
     ? { left: maximized ? 0 : pos.x, top: maximized ? 0 : pos.y }
-    : { right: 62, top: headerTop, visibility: "hidden" }
+    : { right: 24, top: 24, visibility: "hidden" }
 
   const btnBase: React.CSSProperties = {
     position: "relative", width: 12, height: 12, borderRadius: "50%",
@@ -158,6 +163,7 @@ export default function MacFileWindow() {
         {/* Title bar */}
         <div
           onMouseDown={startDrag}
+          onClick={() => { if (!didDrag.current && !maximized) setMinimized(m => !m) }}
           style={{
             height: TITLE_H, flexShrink: 0,
             display: "flex", alignItems: "center", padding: "0 12px",
@@ -199,9 +205,8 @@ export default function MacFileWindow() {
             </button>
           </div>
 
-          {/* "explorer" label — click to toggle minimize */}
+          {/* "explorer" label */}
           <span
-            onClick={(e) => { e.stopPropagation(); setMinimized(m => !m) }}
             style={{
               position: "absolute", left: "50%", transform: "translateX(-50%)",
               fontSize: 11, color: "#999", fontFamily: "monospace",

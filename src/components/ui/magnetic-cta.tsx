@@ -71,21 +71,11 @@ export function MagneticCTA({ href, children }: MagneticCTAProps) {
       {/* Text */}
       <span className="magnetic-cta__text">{children}</span>
 
-      {/* Arrow */}
-      <motion.span
-        className="magnetic-cta__arrow"
-        animate={{ x: hovered ? 4 : 0, opacity: hovered ? 1 : 0.5 }}
-        transition={{ duration: 0.3 }}
-      >
-        &rarr;
-      </motion.span>
-
       <style>{`
         .magnetic-cta {
           position: relative;
           display: inline-flex;
           align-items: center;
-          gap: 10px;
           padding: 18px 40px;
           border-radius: 60px;
           background: rgba(0, 0, 0, 0.03);
@@ -175,12 +165,6 @@ export function MagneticCTA({ href, children }: MagneticCTAProps) {
           color: var(--color-text);
         }
 
-        .magnetic-cta__arrow {
-          position: relative;
-          z-index: 1;
-          font-size: 18px;
-          color: var(--color-text);
-        }
       `}</style>
     </motion.a>
   )

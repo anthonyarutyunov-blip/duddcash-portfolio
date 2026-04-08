@@ -1,41 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MacFileWindow from '../components/ui/mac-file-window';
+import { BlurRevealText } from '../components/ui/blur-reveal-text';
+import { LiquidButton } from '../components/ui/liquid-glass-button';
 ---
 
 <BaseLayout title="Contact" description="Get in touch with Duddcash for your next video or photography project.">
   <MacFileWindow client:load />
 
-  <section class="contact section container">
-    <div class="contact__header" data-animate>
-      <h1>Let's Work Together</h1>
-      <p class="contact__sub">
-        Have a project in mind? Tell us about it and we'll get back to you within 24 hours.
-      </p>
-    </div>
+  <section class="contact">
+    <div class="contact__inner">
+      <!-- Header -->
+      <div class="contact__header">
+        <p class="contact__label">Contact</p>
+        <h1 class="contact__headline">
+          <BlurRevealText
+            client:visible
+            text="Let's Work."
+            charDelay={0.05}
+            charDuration={0.7}
+            blurAmount={14}
+            delay={0.3}
+          />
+        </h1>
+      </div>
 
-    <div class="contact__grid">
+      <!-- Form -->
       <form
         class="contact__form"
         name="contact"
         method="POST"
         data-netlify="true"
         netlify-honeypot="bot-field"
-        data-animate
       >
         <input type="hidden" name="form-name" value="contact" />
         <p class="sr-only">
           <label>Don't fill this out: <input name="bot-field" /></label>
         </p>
 
-        <div class="form-group">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" id="name" name="name" required class="form-input" />
-        </div>
-
-        <div class="form-group">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" id="email" name="email" required class="form-input" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" name="name" required class="form-input" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" required class="form-input" placeholder="you@email.com" />
+          </div>
         </div>
 
         <div class="form-group">
@@ -54,23 +65,32 @@ import MacFileWindow from '../components/ui/mac-file-window';
         </div>
 
         <div class="form-group">
-          <label for="message" class="form-label">Tell us about your project</label>
-          <textarea id="message" name="message" rows="5" required class="form-input"></textarea>
+          <label for="message" class="form-label">Message</label>
+          <textarea id="message" name="message" rows="4" required class="form-input" placeholder="Tell us about your project..."></textarea>
         </div>
 
-        <button type="submit" class="submit-btn"><span>Send Message</span></button>
+        <div class="submit-wrap">
+          <LiquidButton
+            client:load
+            type="submit"
+            size="lg"
+            style={{ fontFamily: "var(--font-display)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "12px", paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
+          >
+            Send Message
+          </LiquidButton>
+        </div>
       </form>
 
-      <div class="contact__info" data-animate>
-        <div class="contact__info-block">
-          <h3>Email</h3>
+      <!-- Footer info -->
+      <div class="contact__footer">
+        <div class="contact__footer-item">
+          <span class="contact__footer-label">Email</span>
           <a href="mailto:hello@duddcash.com">hello@duddcash.com</a>
         </div>
-        <div class="contact__info-block">
-          <h3>Follow Along</h3>
-          <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer">
-            Instagram
-          </a>
+        <div class="contact__footer-divider"></div>
+        <div class="contact__footer-item">
+          <span class="contact__footer-label">Instagram</span>
+          <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer">@duddcash</a>
         </div>
       </div>
     </div>
@@ -79,144 +99,166 @@ import MacFileWindow from '../components/ui/mac-file-window';
 
 <style>
   .contact {
-    padding-top: var(--space-3xl);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--space-3xl) + 60px) 3.9vw var(--space-3xl);
   }
 
+  .contact__inner {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* Header */
   .contact__header {
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-xl);
   }
 
-  .contact__sub {
-    font-size: var(--text-lg);
+  .contact__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
     color: var(--color-muted);
-    margin-top: var(--space-sm);
-    max-width: 500px;
+    margin-bottom: var(--space-sm);
   }
 
-  .contact__grid {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: var(--space-3xl);
-    align-items: start;
-  }
-
-  @media (max-width: 768px) {
-    .contact__grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-2xl);
-    }
+  .contact__headline {
+    font-family: var(--font-display);
+    font-size: max(5vw, 40px);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    color: var(--color-text);
   }
 
   /* Form */
+  .contact__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  @media (max-width: 520px) {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+
   .form-group {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
   }
 
   .form-label {
     display: block;
-    font-size: var(--text-sm);
+    font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.03em;
-    margin-bottom: var(--space-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 6px;
   }
 
   .form-input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 10px 0;
     font-family: var(--font-body);
     font-size: var(--text-base);
-    border: 1px solid var(--color-border);
-    border-radius: 2px;
-    background: var(--color-surface);
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    background: transparent;
     color: var(--color-text);
-    transition: border-color var(--transition-base);
+    border-radius: 0;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-input::placeholder {
+    color: var(--color-border);
   }
 
   .form-input:focus {
     outline: none;
-    border-color: var(--color-text);
+    border-bottom-color: var(--color-text);
   }
 
   textarea.form-input {
-    resize: vertical;
-    min-height: 120px;
+    resize: none;
+    min-height: 80px;
   }
 
   select.form-input {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23777' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
+    background-position: right 0 center;
+    padding-right: 20px;
+    cursor: pointer;
   }
 
-  .submit-btn {
+  /* Submit */
+  .submit-wrap {
+    margin-top: var(--space-xl);
+    align-self: flex-start;
+  }
+
+  /* Footer info */
+  .contact__footer {
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    width: 100%;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 16px 28px;
-    border-radius: 42px;
-    border: 1px solid #111;
-    color: #111;
-    background: none;
-    overflow: hidden;
-    cursor: pointer;
-    transition: color 0.6s var(--ease);
+    gap: var(--space-lg);
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
   }
 
-  .submit-btn span {
-    position: relative;
-    z-index: 1;
+  .contact__footer-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--color-border);
   }
 
-  .submit-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 60px;
-    height: 60px;
-    border-radius: 30px;
-    background: #111;
-    transform: translate(-150%, 50%) translateZ(0);
-    transition: transform 0.6s var(--ease);
-  }
-
-  .submit-btn:hover {
-    color: #fff;
-  }
-
-  .submit-btn:hover::before {
-    transform: translate(-50%, -50%) scale(6) translateZ(0);
-  }
-
-  /* Info sidebar */
-  .contact__info {
+  .contact__footer-item {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
+    gap: 4px;
   }
 
-  .contact__info-block h3 {
-    font-size: var(--text-sm);
+  .contact__footer-label {
+    font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
     color: var(--color-muted);
-    margin-bottom: var(--space-xs);
   }
 
-  .contact__info-block a {
-    font-size: var(--text-base);
-    transition: color var(--transition-base);
+  .contact__footer-item a {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    transition: color 0.25s ease;
   }
 
-  .contact__info-block a:hover {
+  .contact__footer-item a:hover {
     color: var(--color-muted);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 520px) {
+    .contact {
+      padding: var(--space-2xl) var(--space-lg);
+      align-items: flex-start;
+      padding-top: calc(var(--space-3xl) + 60px);
+    }
+
+    .contact__headline {
+      font-size: max(10vw, 36px);
+    }
   }
 </style>

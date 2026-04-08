@@ -156,6 +156,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         initLenis();
         initAnimations();
       });
+
+      // Track internal link clicks so the intro screen knows
+      // this is a same-site navigation (not a refresh or first visit).
+      // On refresh, no click fires, so the flag stays unset → intro plays.
+      document.addEventListener('click', (e: MouseEvent) => {
+        const link = (e.target as HTMLElement).closest('a');
+        if (link && link.href) {
+          try {
+            const url = new URL(link.href, window.location.origin);
+            if (url.origin === window.location.origin) {
+              sessionStorage.setItem('duddcash_nav', '1');
+            }
+          } catch {}
+        }
+      });
     </script>
   </body>
 </html>

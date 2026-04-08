@@ -31,6 +31,15 @@ export interface ImageGallery {
   images: string[]
 }
 
+export interface VideoSection {
+  title: string
+  description?: string
+  role?: string
+  credits?: Credit[]
+  videos: BunnyVideo[]
+  galleries?: ImageGallery[]
+}
+
 export interface PortfolioProject {
   id: string
   type: "project"
@@ -46,8 +55,10 @@ export interface PortfolioProject {
   thumbnailVideoId: string
   /** Optional custom thumbnail image URL (overrides Bunny auto-thumbnail) */
   customThumbnail?: string
-  /** All videos in this project */
+  /** All videos in this project (flat list for simple projects) */
   videos: BunnyVideo[]
+  /** Grouped sub-sections for multi-campaign projects (overrides flat videos) */
+  sections?: VideoSection[]
   /** Optional image gallery sections */
   galleries?: ImageGallery[]
 }
@@ -171,7 +182,7 @@ export const portfolioItems: PortfolioItem[] = [
     role: "Produced, Directed, Shot and Edited",
     categories: ["Featured", "Spec Creative"],
     featured: true,
-    order: 3,
+    order: 4,
     customThumbnail: "/gallery/nike-boxing.jpg",
     credits: [
       { label: "B-Cam", value: "@benjamingugick" },
@@ -252,7 +263,7 @@ export const portfolioItems: PortfolioItem[] = [
     ],
     categories: ["Branded & Social"],
     featured: false,
-    order: 4,
+    order: 5,
     thumbnailVideoId: "73e885fe-7c1b-49da-85d7-07ed7dd066eb",
     customThumbnail: "/gallery/academy-holiday.png",
     videos: [
@@ -291,7 +302,7 @@ export const portfolioItems: PortfolioItem[] = [
     description: "Fun social BTS cut.",
     categories: ["Branded & Social"],
     featured: false,
-    order: 7,
+    order: 8,
     customThumbnail: "/gallery/marine-layer.png",
     video: {
       videoId: "cfa37e9c-0e1e-48f9-9fff-2ae82a5fd91e",
@@ -319,7 +330,7 @@ export const portfolioItems: PortfolioItem[] = [
     ],
     categories: ["Branded & Social"],
     featured: false,
-    order: 5,
+    order: 6,
     thumbnailVideoId: "e3440c87-e6da-412a-ada7-7bbad2d8e7d8",
     customThumbnail: "/gallery/pringles.png",
     videos: [
@@ -344,7 +355,7 @@ export const portfolioItems: PortfolioItem[] = [
       "Short-form social piece capturing Evian's activation during F1 weekend in Las Vegas.",
     categories: ["Branded & Social"],
     featured: false,
-    order: 6,
+    order: 7,
     customThumbnail: "/gallery/evian.png",
     video: {
       videoId: "b4629515-6fef-4620-a465-2227b5daf5b0",
@@ -361,7 +372,7 @@ export const portfolioItems: PortfolioItem[] = [
     role: "Produced, Directed, Shot and Edited",
     categories: ["Spec Creative"],
     featured: false,
-    order: 8,
+    order: 9,
     customThumbnail: "/gallery/searching.png",
     video: {
       videoId: "55972f42-12e0-4b76-9354-c59ecc7c3045",
@@ -370,29 +381,97 @@ export const portfolioItems: PortfolioItem[] = [
     },
   },
   {
-    id: "festival-recap",
+    id: "la-hike",
     type: "single",
-    title: "Festival Recap",
-    description: "Live event coverage and crowd energy.",
-    categories: ["Events", "Entertainment"],
+    title: "LA Hike",
+    description: "A fun one from our time in LA",
+    role: "Shot and Edited",
+    categories: ["Travel"],
     featured: false,
-    order: 5,
+    order: 10,
+    customThumbnail: "/gallery/lasign.jpg",
     video: {
-      videoId: "placeholder-fest-1",
-      title: "Festival Recap 2025",
+      videoId: "ff8acedc-de95-46c5-9fb9-b3a25cd96e2f",
+      title: "LA Hike",
+      aspectRatio: "4/3",
     },
   },
   {
-    id: "travel-rome",
-    type: "single",
-    title: "Rome",
-    description: "Cinematic travel film shot across Rome.",
-    categories: ["Travel"],
+    id: "prizepicks",
+    type: "project",
+    title: "Prize Picks",
+    client: "Prize Picks",
+    description: "Ongoing partnership delivering social content across multiple campaigns.",
+    categories: ["Branded & Social"],
     featured: false,
-    order: 6,
-    video: {
-      videoId: "placeholder-rome-1",
-      title: "Rome Travel Film",
-    },
+    order: 3,
+    thumbnailVideoId: "c6550516-289e-4763-b91b-c15fcb56c011",
+    customThumbnail: "/gallery/pp.webp",
+    videos: [],
+    sections: [
+      {
+        title: "It's Good To Be Right 2025",
+        description: "40+ Assets delivered across social",
+        role: "Virtual Editors",
+        credits: [
+          { label: "Director", value: "Alexandra Gavillet" },
+          { label: "DP", value: "Tamara Santos" },
+          { label: "Agency", value: "Preacher" },
+          { label: "Production", value: "Yadayada Studio" },
+          { label: "Producer", value: "Gabe Figueroa" },
+          { label: "Editors", value: "Duddcash" },
+          { label: "2nd AC / DIT", value: "@caroliscolombo" },
+          { label: "Production Assistant", value: "@janeh.kim" },
+          { label: "Production Assistant", value: "@henryalexkelly" },
+        ],
+        videos: [
+          {
+            videoId: "c6550516-289e-4763-b91b-c15fcb56c011",
+            title: "Clutch Gene",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "3db203fb-120c-4744-9cbf-ce7f527f73b0",
+            title: "Gym Simple Gameplay",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "78e82815-b53e-410f-ad37-307619097416",
+            title: "Bookstore Fast Withdrawls",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "1cc59d5b-7492-46ad-88f0-c03eeb1b1e2b",
+            title: "Gym Availability",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "288aaf48-f631-4544-bf41-560e628935a2",
+            title: "Hot Tub $50 Offer",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "f2677e91-249c-427d-91cf-9e1ea3328db0",
+            title: "My Line-up Hit",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "d8d512c1-8d72-42b9-a054-3bfd7e2e6db1",
+            title: "Gym $50 Offer",
+            aspectRatio: "9/16",
+          },
+        ],
+      },
+      {
+        title: "Campaign 2",
+        description: "Coming soon",
+        videos: [],
+      },
+      {
+        title: "Campaign 3",
+        description: "Coming soon",
+        videos: [],
+      },
+    ],
   },
 ]

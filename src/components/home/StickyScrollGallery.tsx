@@ -39,7 +39,7 @@ const col1: Photo[] = [
   { src: "/gallery/plant-shadows.jpg", alt: "Plant with dramatic cast shadows in golden light", size: "lg" },
   { src: "/gallery/dscf1943.jpg", alt: "Performance with pink stage lighting", size: "lg" },
   { src: "/gallery/dscf3618.jpg", alt: "Aerial view of turquoise swimming pool", size: "xl" },
-  { src: "/gallery/dscf1218.jpg", alt: "Silhouette figure at sunset on water", size: "xl" },
+  { src: "/gallery/dscf1218.jpg", alt: "Silhouette figure at sunset on water", size: "xl", objectPosition: "67% 53%" },
   { src: "/gallery/lulu-neon.jpg", alt: "Lululemon Yet neon sign installation", size: "lg" },
   { src: "/gallery/ridge-sunset.jpg", alt: "Hillside ridge against dramatic orange sunset", size: "md" },
 ]
@@ -60,10 +60,10 @@ const col2: Photo[] = [
   { src: "/gallery/city-fence.jpg", alt: "City skyline through metal fence at sunset", size: "xl" },
   { src: "/gallery/tiff-10.jpg", alt: "Boxer with heavy bag in dramatic light", size: "md" },
   { src: "/gallery/dsc00477.jpg", alt: "Silhouette against warm golden lights", size: "xl" },
-  { src: "/gallery/redcarpet-1.jpg", alt: "Red carpet couple portrait at media event", size: "md" },
+  { src: "/gallery/redcarpet-1.jpg", alt: "Red carpet couple portrait at media event", size: "md", objectPosition: "51% 30%" },
   { src: "/gallery/new-2.jpg", alt: "Purple haze stage performance with crowd", size: "md" },
   { src: "/gallery/dscf3101.jpg", alt: "Night filming with camera rig under spotlight", size: "xl" },
-  { src: "/gallery/nyc-still-2.jpg", alt: "NYC building silhouette with teal sky", size: "md", objectPosition: "40% 40%" },
+  { src: "/gallery/nyc-still-2.jpg", alt: "NYC building silhouette with teal sky", size: "md", objectPosition: "42% 52%" },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -72,7 +72,7 @@ const col2: Photo[] = [
 
 const col3: Photo[] = [
   { src: "/gallery/dscf1841.jpg", alt: "Modern building facade with vegetation", size: "lg" },
-  { src: "/gallery/api-still-8.jpg", alt: "Golfer lifting trophy against blue sky", size: "lg" },
+  { src: "/gallery/api-still-8.jpg", alt: "Golfer lifting trophy against blue sky", size: "lg", objectPosition: "54% 65%" },
   { src: "/gallery/dscf3630.jpg", alt: "Modern waterfront venue", size: "lg" },
   { src: "/gallery/lulu-interior.jpg", alt: "Lululemon studio interior in purple and blue", size: "xl" },
   { src: "/gallery/feet-shadow.jpg", alt: "Silhouetted feet walking in amber light", size: "lg" },
@@ -85,7 +85,7 @@ const col3: Photo[] = [
   { src: "/gallery/dscf3500.jpg", alt: "Golden hillside overlooking distant city", size: "lg" },
   { src: "/gallery/dscf1981.jpg", alt: "Close-up silhouette with bokeh lights", size: "lg" },
   { src: "/gallery/dscf3636.jpg", alt: "Scene with warm atmospheric tones", size: "lg" },
-  { src: "/gallery/birds-sky.jpg", alt: "Two birds in flight against pale sky", size: "md" },
+  { src: "/gallery/birds-sky.jpg", alt: "Two birds in flight against pale sky", size: "md", objectPosition: "50% 32%" },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -96,19 +96,19 @@ const col4: Photo[] = [
   { src: "/gallery/dscf1559.jpg", alt: "Modern curved apartment building", size: "md" },
   { src: "/gallery/tiff-15.jpg", alt: "Nike boxing glove close-up with cross necklace", size: "lg" },
   { src: "/gallery/dscf1699.jpg", alt: "Ornate domed ceiling interior", size: "lg" },
-  { src: "/gallery/zara-19.jpg", alt: "Woman in blue against painted sky backdrop", size: "xl" },
-  { src: "/gallery/dscf1795.jpg", alt: "Ornate cathedral facade with palm trees", size: "md" },
+  { src: "/gallery/zara-19.jpg", alt: "Woman in blue against painted sky backdrop", size: "xl", objectPosition: "51% 7%" },
+  { src: "/gallery/dscf1795.jpg", alt: "Ornate cathedral facade with palm trees", size: "md", objectPosition: "52% 74%" },
   { src: "/gallery/rc25-graphic.jpg", alt: "Reserve Cup RC25 Miami event graphic", size: "md" },
   { src: "/gallery/lulu-lounge.jpg", alt: "Lululemon outdoor lounge in warm light", size: "xl" },
   { src: "/gallery/cover-main.jpg", alt: "Encore hotel EDC Week projection", size: "lg" },
-  { src: "/gallery/dscf2989.jpg", alt: "Chicago skyline panorama", size: "md" },
+  { src: "/gallery/dscf2989.jpg", alt: "Chicago skyline panorama", size: "md", objectPosition: "50% 60%" },
   { src: "/gallery/captain-stage.jpg", alt: "Performer in captain hat with megaphone on stage", size: "lg" },
   { src: "/gallery/dscf3026.jpg", alt: "Neoclassical colonnaded building", size: "md" },
   { src: "/gallery/dscf1653.jpg", alt: "Roman Colosseum facade", size: "lg" },
   { src: "/gallery/modern-palms.jpg", alt: "Modern building with palm trees at dusk", size: "md" },
   { src: "/gallery/aftermovie-3.jpg", alt: "Dark concert crowd with stage lights", size: "xl" },
   { src: "/gallery/canopy-light.jpg", alt: "Architectural canopy with golden illumination", size: "md" },
-  { src: "/gallery/dscf2429.jpg", alt: "Figure with Mitchell and Ness hat on dark stage", size: "md", objectPosition: "60% 30%" },
+  { src: "/gallery/dscf2429.jpg", alt: "Figure with Mitchell and Ness hat on dark stage", size: "md", objectPosition: "61% 85%" },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -120,16 +120,16 @@ const col5: Photo[] = [
   { src: "/gallery/tiff-19.jpg", alt: "Boxer throwing punch in blue and red light", size: "lg" },
   { src: "/gallery/dscf1809.jpg", alt: "Silhouettes against dusk sky", size: "lg" },
   { src: "/gallery/zara-37.jpg", alt: "Three people seated with ZARA text overlay", size: "xl" },
-  { src: "/gallery/fountain-night.jpg", alt: "Fountain with water droplets and blue green bokeh", size: "md" },
+  { src: "/gallery/fountain-night.jpg", alt: "Fountain with water droplets and blue green bokeh", size: "md", objectPosition: "44% 46%" },
   { src: "/gallery/lambo-badge.jpg", alt: "Lamborghini badge close-up with gold bokeh", size: "md" },
   { src: "/gallery/dscf0753.jpg", alt: "Silhouetted figure in a spotlight", size: "md" },
   { src: "/gallery/getlucked-2.jpg", alt: "Crowd surfing at GetLucked festival event", size: "xl" },
   { src: "/gallery/stone-texture.jpg", alt: "Stones lit through vertical bars in golden light", size: "xl" },
   { src: "/gallery/getlucked-1.jpg", alt: "GetLucked festival entrance with green balloons", size: "md" },
-  { src: "/gallery/green-spotlight.jpg", alt: "Solo performer under dramatic green spotlights", size: "lg" },
+  { src: "/gallery/green-spotlight.jpg", alt: "Solo performer under dramatic green spotlights", size: "lg", objectPosition: "42% 84%" },
   { src: "/gallery/tao-brand.jpg", alt: "TAO restaurant branding in dark red and gold", size: "md" },
   { src: "/gallery/new-4.jpg", alt: "Massive concert crowd from above", size: "xl" },
-  { src: "/gallery/bunt-title.jpg", alt: "BUNT text poster with silhouette figure", size: "sm" },
+  { src: "/gallery/bunt-title.jpg", alt: "BUNT text poster with silhouette figure", size: "sm", objectPosition: "50% 33%" },
   { src: "/gallery/dscf2961.jpg", alt: "Gym scene with friends and training equipment", size: "md" },
   { src: "/gallery/still2.jpg", alt: "Cinematic still frame", size: "md" },
 ]

@@ -2,8 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactCTA from '../components/home/ContactCTA.astro';
 import { Waves } from '../components/ui/wave-background';
-import { LiquidLink } from '../components/ui/liquid-glass-button';
-import MacFileWindow from '../components/ui/mac-file-window';
 import { ScrollIndicator } from '../components/ui/scroll-indicator';
 import StickyScrollGallery from '../components/home/StickyScrollGallery';
 import PortfolioGrid from '../components/home/PortfolioGrid';
@@ -21,20 +19,15 @@ import { IntroScreen } from '../components/ui/intro-screen';
     <div class="hero__fade-bottom"></div>
     <div class="hero__content">
       <h1 class="hero__headline">
-        The work speaks so<br />we don't have to.
+        The work speaks,<br />so we don't have to.
       </h1>
       <p class="hero__sub">
         for brands that move fast
       </p>
-      <div class="hero__cta">
-        <LiquidLink client:load href="/contact" size="lg">Start a Project</LiquidLink>
-      </div>
       <ScrollIndicator client:load />
     </div>
 
   </section>
-
-  <MacFileWindow client:load />
 
   <!-- Infinite Grid starts right after hero, wraps all remaining content -->
   <div class="grid-section">
@@ -55,11 +48,11 @@ import { IntroScreen } from '../components/ui/intro-screen';
     position: relative;
     min-height: 100vh;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     text-align: center;
     padding: 0 3.9vw;
-    padding-bottom: 8vh;
+    padding-top: 10vh;
   }
 
   .hero__fade-bottom {
@@ -76,13 +69,12 @@ import { IntroScreen } from '../components/ui/intro-screen';
   .hero__content {
     position: relative;
     z-index: 2;
-  }
-
-  .hero__content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-xl);
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero__headline {
@@ -101,12 +93,6 @@ import { IntroScreen } from '../components/ui/intro-screen';
     margin-top: calc(var(--space-md) * -0.5);
   }
 
-  .hero__cta {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-md);
-  }
-
   /* Staggered entrance after intro — only when intro played
      Intro: 5s loading + 0.25s pause + 0.15s flash + 0.9s settle ≈ 6.3s */
   .hero--with-intro .hero__headline {
@@ -119,7 +105,7 @@ import { IntroScreen } from '../components/ui/intro-screen';
     animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 5.9s forwards;
   }
 
-  .hero--with-intro .hero__cta {
+  .hero--with-intro .hero__scroll-indicator {
     opacity: 0;
     animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 6.2s forwards;
   }

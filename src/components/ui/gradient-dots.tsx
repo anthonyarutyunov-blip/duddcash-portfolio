@@ -19,10 +19,10 @@ export function GradientDots({
   className,
   style,
   colors = [
-    'rgba(190, 175, 150, 0.9)',   // warm sand
-    'rgba(170, 185, 165, 0.8)',   // sage green
-    'rgba(180, 170, 195, 0.7)',   // soft lavender
-    'rgba(195, 180, 160, 0.85)',  // warm taupe
+    'rgba(190, 175, 150, 0.9)',
+    'rgba(170, 185, 165, 0.8)',
+    'rgba(180, 170, 195, 0.7)',
+    'rgba(195, 180, 160, 0.85)',
   ],
 }: GradientDotsProps) {
   const hexSpacing = spacing * 1.732
@@ -56,6 +56,7 @@ export function GradientDots({
           0% 0%,
           0% 0px
         `,
+        transition: 'opacity 0.5s ease, filter 0.5s ease',
         ...style,
       }}
       animate={{

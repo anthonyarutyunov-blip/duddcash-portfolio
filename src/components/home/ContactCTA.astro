@@ -160,6 +160,13 @@ import { GradientDots } from '../ui/gradient-dots';
     border-radius: 27px;
     overflow: hidden;
     pointer-events: none;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+  }
+
+  /* Dots light up on card hover */
+  .contact-cta__card:hover .contact-cta__dots {
+    opacity: 1 !important;
+    filter: brightness(1.4) saturate(1.3);
   }
 
   /* Content sits above the dots */
