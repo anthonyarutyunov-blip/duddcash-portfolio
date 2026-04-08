@@ -1,5 +1,5 @@
-import React from "react"
-import { motion } from "motion/react"
+import React, { useState } from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { X } from "lucide-react"
 import { VideoPlayer } from "./VideoPlayer"
 import type { PortfolioItem, VideoSection, Credit, ImageGallery, BunnyVideo } from "../../data/portfolio"
@@ -150,29 +150,11 @@ function GalleryBlock({ galleries }: { galleries: ImageGallery[] }) {
   )
 }
 
-/** Renders a single section within a multi-section project */
-function SectionBlock({ section, index }: { section: VideoSection; index: number }) {
+/** Renders the content area for a single section (no tab chrome) */
+function SectionContent({ section }: { section: VideoSection }) {
   return (
-    <div
-      style={{
-        marginTop: index === 0 ? 0 : 32,
-        paddingTop: index === 0 ? 0 : 24,
-        borderTop: index === 0 ? "none" : "1px solid rgba(255,255,255,0.1)",
-      }}
-    >
+    <div>
       <div style={{ marginBottom: 16 }}>
-        <h4
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 18,
-            fontWeight: 500,
-            letterSpacing: "-0.01em",
-            color: "#fff",
-            margin: "0 0 6px",
-          }}
-        >
-          {section.title}
-        </h4>
         {section.description && (
           <p
             style={{
@@ -207,7 +189,7 @@ function SectionBlock({ section, index }: { section: VideoSection; index: number
       ) : (
         <div
           style={{
-            padding: "32px 16px",
+            padding: "40px 16px",
             border: "1px dashed rgba(255,255,255,0.15)",
             borderRadius: 8,
             textAlign: "center",
@@ -222,6 +204,79 @@ function SectionBlock({ section, index }: { section: VideoSection; index: number
       {section.galleries && section.galleries.length > 0 && (
         <GalleryBlock galleries={section.galleries} />
       )}
+    </div>
+  )
+}
+
+/** Tabbed section navigation for multi-campaign projects */
+function SectionTabs({ sections }: { sections: VideoSection[] }) {
+  const [activeTab, setActiveTab] = useState(0)
+
+  return (
+    <div>
+      {/* Tab bar */}
+      <div
+        style={{
+          display: "flex",
+          gap: 0,
+          borderBottom: "1px solid rgba(255,255,255,0.12)",
+          marginBottom: 20,
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {sections.map((section, i) => (
+          <button
+            key={i}
+            onClick={(e) => {
+              e.stopPropagation()
+              setActiveTab(i)
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              borderBottom: activeTab === i
+                ? "2px solid #fff"
+                : "2px solid transparent",
+              padding: "10px 18px",
+              fontSize: 13,
+              fontFamily: "var(--font-display)",
+              fontWeight: activeTab === i ? 500 : 400,
+              letterSpacing: "0.01em",
+              color: activeTab === i
+                ? "#fff"
+                : "rgba(255,255,255,0.4)",
+              cursor: "pointer",
+              transition: "color 0.2s ease, border-color 0.2s ease",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== i)
+                e.currentTarget.style.color = "rgba(255,255,255,0.65)"
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== i)
+                e.currentTarget.style.color = "rgba(255,255,255,0.4)"
+            }}
+          >
+            {section.title}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content with animation */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+        >
+          <SectionContent section={sections[activeTab]} />
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }
@@ -377,12 +432,7 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
 
       {/* Sections mode (multi-campaign projects like Prize Picks) */}
       {hasSections ? (
-        <div>
-          {item.type === "project" &&
-            item.sections!.map((section, si) => (
-              <SectionBlock key={si} section={section} index={si} />
-            ))}
-        </div>
+        <SectionTabs sections={item.type === "project" ? item.sections! : []} />
       ) : (
         <>
           {/* Flat video grid */}

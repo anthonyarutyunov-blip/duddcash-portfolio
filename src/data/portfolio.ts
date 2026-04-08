@@ -98,6 +98,23 @@ export const categories: ("All" | Category)[] = [
 
 // ─── Sample data (placeholder video IDs — replace with real Bunny.net GUIDs) ───
 
+/** Get the primary aspect ratio for a portfolio item's card display */
+export function getCardAspectRatio(item: PortfolioItem): string {
+  if (item.type === "single") {
+    return item.video.aspectRatio || "16/9"
+  }
+  // For projects with sections, use first section's first video
+  if (item.sections && item.sections.length > 0) {
+    const firstVideo = item.sections[0].videos[0]
+    if (firstVideo) return firstVideo.aspectRatio || "16/9"
+  }
+  // For flat video projects, use first video
+  if (item.videos.length > 0) {
+    return item.videos[0].aspectRatio || "16/9"
+  }
+  return "16/9"
+}
+
 export const portfolioItems: PortfolioItem[] = [
   {
     id: "wynn-year-of-excess",
@@ -406,11 +423,11 @@ export const portfolioItems: PortfolioItem[] = [
     featured: false,
     order: 3,
     thumbnailVideoId: "c6550516-289e-4763-b91b-c15fcb56c011",
-    customThumbnail: "/gallery/pp.webp",
+    customThumbnail: "/gallery/pp-still.png",
     videos: [],
     sections: [
       {
-        title: "It's Good To Be Right 2025",
+        title: "Its Good To Be Right NFL 25'",
         description: "40+ Assets delivered across social",
         role: "Virtual Editors",
         credits: [
@@ -463,15 +480,116 @@ export const portfolioItems: PortfolioItem[] = [
         ],
       },
       {
-        title: "Campaign 2",
-        description: "Coming soon",
-        videos: [],
+        title: "NBA 25'",
+        description:
+          "With a star studded line-up featuring Allen Iverson, Sam Richardson, Candace Parker, and Druski, Prize Picks rolls out an all new social campaign. Pairing one NBA player with one comedian, each asset has its fair share of laughs and product placement.",
+        role: "Virtual Editors",
+        videos: [
+          {
+            videoId: "962bcc9e-c79e-489c-ac50-502646bebbd3",
+            title: "Step Over",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "6f44fb2d-6ba5-450d-af35-f3bcdd74fc7f",
+            title: "Blooper Reel: Candace x Druski",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "96fefb77-a428-4a62-8151-246fae13b965",
+            title: "Predictions Candace",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "350ae4f2-e1d0-485e-9f01-0ea471bb17c4",
+            title: "99.9% Accuracy: AI x Sam",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "f4aad7dc-014e-4910-8a8c-4e72e290cd08",
+            title: "Pop a Shot Candace x Druski",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "b451f2ae-412b-4177-af56-a503ad0fa1c4",
+            title: "BTS: AI x Sam",
+            aspectRatio: "9/16",
+          },
+        ],
       },
       {
-        title: "Campaign 3",
-        description: "Coming soon",
-        videos: [],
+        title: "NFL Playoffs 25'",
+        description: "Back just in time for the NFL playoffs, with a new batch of 40+ assets across social",
+        role: "Virtual Editors",
+        credits: [
+          { label: "Director", value: "Henry Alexander Kelly" },
+          { label: "DP", value: "Rafael Gomez" },
+          { label: "Agency", value: "Preacher" },
+          { label: "Producer", value: "Gabe Figueroa" },
+          { label: "Editors", value: "Duddcash" },
+          { label: "Assistant Director", value: "Billy Jones" },
+          { label: "Sound Mixer", value: "Spencer Flynn" },
+          { label: "B Camera Operator", value: "Joseph Warner" },
+          { label: "Utility Manager", value: "Mauricio Cimino" },
+          { label: "Production Assistant", value: "Jane Kim" },
+        ],
+        videos: [
+          {
+            videoId: "b516cc92-38c8-40fe-8f90-9c9f17991bc0",
+            title: "Arm Chair Coach",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "b93ce324-0082-42e3-a41e-691c0956411e",
+            title: "Drop Everything",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "d72608f8-0b64-40e0-b3b1-cf740ff1f56c",
+            title: "The Offer",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "dbe4596c-b5c2-4097-b32f-e882c97a264c",
+            title: "Side Kick",
+            aspectRatio: "9/16",
+          },
+          {
+            videoId: "9acbe8e4-ef99-472f-a706-9462abf32689",
+            title: "Security Guard",
+            aspectRatio: "9/16",
+          },
+        ],
       },
     ],
+  },
+  {
+    id: "chipotle-behind-the-line",
+    type: "single",
+    title: "Chipotle Presents… Behind the Line",
+    client: "Chipotle",
+    description:
+      "New York Knicks stars Josh Hart and Mikal Bridges join forces to prepare and create their own personal Chipotle staples.",
+    role: "Virtual Editors",
+    credits: [
+      { label: "Client", value: "Chipotle" },
+      { label: "Producer", value: "Jeanette Bonner" },
+      { label: "Production", value: "Yadayada Studio" },
+      { label: "Cam Op", value: "Matt Chirico" },
+      { label: "Cam Op", value: "Chris Chu" },
+      { label: "Sound", value: "Rob Ellenberg" },
+      { label: "Editors", value: "Duddcash" },
+      { label: "PA", value: "Catriona Rubenis-Stevens" },
+      { label: "PA", value: "Grant Moyer" },
+    ],
+    categories: ["Branded & Social"],
+    featured: false,
+    order: 11,
+    customThumbnail: "/gallery/chipotle.png",
+    video: {
+      videoId: "44a352f6-ec7b-4050-b2ca-2a89d278504b",
+      title: "Chipotle Presents… Behind the Line",
+      aspectRatio: "9/16",
+    },
   },
 ]

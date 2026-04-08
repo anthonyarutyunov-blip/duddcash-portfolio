@@ -52,8 +52,8 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
       style={{
         position: 'relative',
         overflow: 'hidden',
-        borderRadius: 6,
-        border: '1px solid rgba(0,0,0,0.08)',
+        borderRadius: 12,
+        border: '1px solid rgba(255,255,255,0.08)',
         transition: 'border-color 0.3s ease',
         borderColor: isHovered ? `hsl(${base} 60% 60% / 0.3)` : 'rgba(0,0,0,0.08)',
       }}
@@ -65,7 +65,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
           inset: 0,
           background: `radial-gradient(
             300px 300px at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
-            hsl(${base} 80% 65% / 0.1),
+            hsl(${base} 80% 65% / 0.06),
             transparent 70%
           )`,
           opacity: isHovered && !disabled ? 1 : 0,

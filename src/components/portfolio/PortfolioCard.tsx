@@ -1,15 +1,15 @@
 import { useState, useRef, useCallback } from "react"
-import { AnimatePresence, motion } from "motion/react"
 import { Play } from "lucide-react"
 import { SpotlightCard } from "../ui/spotlight-card"
 import { CardPreview } from "./CardPreview"
 import { ExpandedProject } from "./ExpandedProject"
 import { thumbnailUrl } from "../../lib/bunny"
-import type { PortfolioItem } from "../../data/portfolio"
+import { getCardAspectRatio, type PortfolioItem } from "../../data/portfolio"
 
 interface PortfolioCardProps {
   item: PortfolioItem
   isExpanded: boolean
+  isBentoWide?: boolean
   onExpand: () => void
   onCollapse: () => void
 }
@@ -19,10 +19,12 @@ interface PortfolioCardProps {
  * - Static thumbnail by default
  * - Hover: plays short muted video preview (desktop only)
  * - Click: expands in-place to show full project
+ * - Bento: featured cards span 2 columns with ultrawide aspect ratio
  */
 export function PortfolioCard({
   item,
   isExpanded,
+  isBentoWide = false,
   onExpand,
   onCollapse,
 }: PortfolioCardProps) {
@@ -34,6 +36,7 @@ export function PortfolioCard({
   const primaryVideoId =
     item.type === "project" ? item.thumbnailVideoId : item.video.videoId
   const customThumb = item.customThumbnail
+  const nativeAspectRatio = getCardAspectRatio(item)
 
   // Debounced hover — 150ms delay to skip quick mouse-throughs
   const handleMouseEnter = useCallback(() => {
@@ -69,137 +72,96 @@ export function PortfolioCard({
   }, [onCollapse])
 
   return (
-    <motion.div
+    <div
       ref={cardRef}
-      layout
       style={{
         gridColumn: isExpanded ? "1 / -1" : undefined,
       }}
-      transition={{
-        layout: { type: "spring", damping: 25, stiffness: 200 },
-      }}
     >
       <SpotlightCard glowColor="blue" disabled={isExpanded}>
-        <AnimatePresence mode="wait" initial={false}>
-          {isExpanded ? (
-            <ExpandedProject
-              key="expanded"
-              item={item}
-              onClose={handleCollapse}
-            />
-          ) : (
-            <motion.div
-              key="collapsed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              onClick={handleClick}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-              role="button"
-              tabIndex={0}
-              aria-label={`View ${item.title}`}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  handleClick()
-                }
-              }}
+        {isExpanded ? (
+          <ExpandedProject item={item} onClose={handleCollapse} />
+        ) : (
+          <div
+            onClick={handleClick}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            role="button"
+            tabIndex={0}
+            aria-label={`View ${item.title}`}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                handleClick()
+              }
+            }}
+            style={{
+              cursor: "pointer",
+              overflow: "hidden",
+              position: "relative",
+              aspectRatio: nativeAspectRatio,
+              borderRadius: 12,
+            }}
+            className="portfolio-card"
+          >
+            {/* Static thumbnail */}
+            <img
+              src={customThumb || thumbnailUrl(primaryVideoId)}
+              alt={item.title}
+              loading="lazy"
               style={{
-                cursor: "pointer",
-                overflow: "hidden",
-                position: "relative",
-                aspectRatio: "1",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+                transition: "transform 0.5s ease",
               }}
-              className="portfolio-card"
-            >
-              {/* Static thumbnail */}
-              <img
-                src={customThumb || thumbnailUrl(primaryVideoId)}
-                alt={item.title}
-                loading="lazy"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                  transition: "transform 0.5s ease",
-                }}
+            />
+
+            {/* Hover video preview (desktop only) */}
+            <CardPreview videoId={primaryVideoId} active={hovered} />
+
+            {/* Layer 1: Always-visible bottom info */}
+            <div className="portfolio-card__info">
+              <span className="portfolio-card__title">{item.title}</span>
+              {item.client && (
+                <span className="portfolio-card__client">{item.client}</span>
+              )}
+            </div>
+
+            {/* Layer 2: Hover overlay with play + badges */}
+            <div className="portfolio-card__hover-overlay">
+              <Play
+                size={32}
+                style={{ color: "#fff" }}
+                fill="rgba(255,255,255,0.85)"
               />
-
-              {/* Hover video preview (desktop only) */}
-              <CardPreview videoId={primaryVideoId} active={hovered} />
-
-              {/* Hover overlay with info */}
-              <div className="portfolio-card__overlay">
-                <Play
-                  size={28}
-                  style={{ marginBottom: 8, color: "#fff" }}
-                  fill="rgba(255,255,255,0.9)"
-                />
-                <span
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 500,
-                    color: "#fff",
-                    marginBottom: 2,
-                    textAlign: "center",
-                    padding: "0 12px",
-                  }}
-                >
-                  {item.title}
-                </span>
-                {((item.type === "project" && item.client) ||
-                  (item.type === "single" && item.client)) && (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      color: "rgba(255,255,255,0.6)",
-                      marginBottom: 6,
-                    }}
-                  >
-                    {item.type === "project" ? item.client : item.client}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 4,
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                  marginTop: 8,
+                }}
+              >
+                {item.categories.slice(0, 2).map((cat) => (
+                  <span key={cat} className="portfolio-card__badge">
+                    {cat}
+                  </span>
+                ))}
+                {item.type === "project" && (
+                  <span className="portfolio-card__badge">
+                    {item.sections && item.sections.length > 0
+                      ? `${item.sections.length} campaigns`
+                      : `${item.videos.length} videos`}
                   </span>
                 )}
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "center" }}>
-                  {item.categories.slice(0, 2).map((cat) => (
-                    <span
-                      key={cat}
-                      style={{
-                        fontSize: 10,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em",
-                        color: "rgba(255,255,255,0.65)",
-                        border: "1px solid rgba(255,255,255,0.25)",
-                        borderRadius: 999,
-                        padding: "2px 8px",
-                      }}
-                    >
-                      {cat}
-                    </span>
-                  ))}
-                  {item.type === "project" && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em",
-                        color: "rgba(255,255,255,0.65)",
-                        border: "1px solid rgba(255,255,255,0.25)",
-                        borderRadius: 999,
-                        padding: "2px 8px",
-                      }}
-                    >
-                      {item.videos.length} videos
-                    </span>
-                  )}
-                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </div>
+        )}
       </SpotlightCard>
-    </motion.div>
+    </div>
   )
 }
