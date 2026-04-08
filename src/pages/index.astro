@@ -1,34 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CinematicText from '../components/home/CinematicText.astro';
 import ContactCTA from '../components/home/ContactCTA.astro';
 import { Waves } from '../components/ui/wave-background';
 import { LiquidLink } from '../components/ui/liquid-glass-button';
 import MacFileWindow from '../components/ui/mac-file-window';
-import { SpecialText } from '../components/ui/special-text';
+import { ScrollIndicator } from '../components/ui/scroll-indicator';
 import StickyScrollGallery from '../components/home/StickyScrollGallery';
 import PortfolioGrid from '../components/home/PortfolioGrid';
 import { InfiniteGrid } from '../components/ui/the-infinite-grid';
+import { IntroScreen } from '../components/ui/intro-screen';
 ---
 
 <BaseLayout title="Home" description="Duddcash — Creative agency for brands, artists, and events.">
+  <!-- Intro Screen -->
+  <IntroScreen client:load />
+
   <!-- Hero -->
-  <section class="hero">
+  <section class="hero" id="hero">
     <Waves client:load strokeColor="rgba(100, 90, 80, 0.15)" backgroundColor="transparent" />
     <div class="hero__fade-bottom"></div>
     <div class="hero__content">
       <h1 class="hero__headline">
-        <SpecialText client:load text="The work speaks so" speed={30} delay={0.7} />
-        <br />
-        <SpecialText client:load text="we don't have to." speed={30} delay={0.9} />
+        The work speaks so<br />we don't have to.
       </h1>
       <p class="hero__sub">
-        <SpecialText client:load text="for brands that move fast" speed={25} delay={1.9} />
+        for brands that move fast
       </p>
       <div class="hero__cta">
-        <LiquidLink client:load href="#portfolio" size="lg">See the Work</LiquidLink>
         <LiquidLink client:load href="/contact" size="lg">Start a Project</LiquidLink>
       </div>
+      <ScrollIndicator client:load />
     </div>
 
   </section>
@@ -43,7 +44,6 @@ import { InfiniteGrid } from '../components/ui/the-infinite-grid';
     </div>
     <div class="grid-section__content">
       <StickyScrollGallery client:visible />
-      <CinematicText />
       <PortfolioGrid client:visible />
       <ContactCTA />
     </div>
@@ -55,10 +55,11 @@ import { InfiniteGrid } from '../components/ui/the-infinite-grid';
     position: relative;
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     text-align: center;
     padding: 0 3.9vw;
+    padding-bottom: 8vh;
   }
 
   .hero__fade-bottom {
@@ -102,13 +103,29 @@ import { InfiniteGrid } from '../components/ui/the-infinite-grid';
 
   .hero__cta {
     display: flex;
+    justify-content: center;
     gap: var(--space-md);
-    opacity: 0;
-    animation: heroCtaIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 4.3s forwards;
   }
 
-  @keyframes heroCtaIn {
-    from { opacity: 0; transform: translateY(10px); }
+  /* Staggered entrance after intro — only when intro played
+     Intro: 5s loading + 0.25s pause + 0.15s flash + 0.9s settle ≈ 6.3s */
+  .hero--with-intro .hero__headline {
+    opacity: 0;
+    animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 5.6s forwards;
+  }
+
+  .hero--with-intro .hero__sub {
+    opacity: 0;
+    animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 5.9s forwards;
+  }
+
+  .hero--with-intro .hero__cta {
+    opacity: 0;
+    animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 6.2s forwards;
+  }
+
+  @keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
@@ -134,8 +151,8 @@ import { InfiniteGrid } from '../components/ui/the-infinite-grid';
     top: 0;
     left: 0;
     right: 0;
-    height: 200px;
-    background: linear-gradient(to bottom, var(--color-bg), transparent);
+    height: 250px;
+    background: linear-gradient(to bottom, var(--color-bg) 30%, transparent);
     z-index: 1;
     pointer-events: none;
   }
@@ -145,3 +162,18 @@ import { InfiniteGrid } from '../components/ui/the-infinite-grid';
     z-index: 1;
   }
 </style>
+
+<script is:inline>
+  // Match IntroScreen logic: play on first visit or refresh, skip on navigation.
+  // "duddcash_nav" is set by a click listener on internal links (in BaseLayout).
+  // On refresh no click happens, so the flag is absent → intro plays.
+  (function() {
+    var hero = document.getElementById("hero");
+    if (!hero) return;
+    var visited = sessionStorage.getItem("duddcash_visited");
+    var cameFromNav = sessionStorage.getItem("duddcash_nav");
+    if (!visited || !cameFromNav) {
+      hero.classList.add("hero--with-intro");
+    }
+  })();
+</script>

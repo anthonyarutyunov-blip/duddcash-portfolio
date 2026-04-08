@@ -38,6 +38,7 @@ export function Waves({
   const noiseRef = useRef<((x: number, y: number) => number) | null>(null)
   const rafRef = useRef<number | null>(null)
   const boundingRef = useRef<DOMRect | null>(null)
+  const visibleRef = useRef(true)
 
   useEffect(() => {
     if (!containerRef.current || !svgRef.current) return
@@ -46,18 +47,30 @@ export function Waves({
     setSize()
     setLines()
 
+    // Pause animation when hero is off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visibleRef.current = entry.isIntersecting
+        if (entry.isIntersecting && !rafRef.current) {
+          rafRef.current = requestAnimationFrame(tick)
+        }
+      },
+      { threshold: 0 }
+    )
+    observer.observe(containerRef.current)
+
     window.addEventListener('resize', onResize)
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
     containerRef.current.addEventListener('touchmove', onTouchMove, { passive: false })
 
     rafRef.current = requestAnimationFrame(tick)
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+      observer.disconnect()
       window.removeEventListener('resize', onResize)
       window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('scroll', onScroll)
       containerRef.current?.removeEventListener('touchmove', onTouchMove)
     }
   }, [])
@@ -77,8 +90,8 @@ export function Waves({
     pathsRef.current.forEach(path => path.remove())
     pathsRef.current = []
 
-    const xGap = 12
-    const yGap = 12
+    const xGap = 20
+    const yGap = 20
     const oWidth = width + 200
     const oHeight = height + 30
     const totalLines = Math.ceil(oWidth / xGap)
@@ -108,7 +121,6 @@ export function Waves({
   }
 
   const onResize = () => { setSize(); setLines() }
-  const onScroll = () => { if (containerRef.current) boundingRef.current = containerRef.current.getBoundingClientRect() }
 
   const onMouseMove = (e: MouseEvent) => updateMousePosition(e.clientX, e.clientY)
 
@@ -119,18 +131,17 @@ export function Waves({
   }
 
   const updateMousePosition = (x: number, y: number) => {
-    if (!boundingRef.current) return
+    if (!containerRef.current || !visibleRef.current) return
+    // Use cached bounding rect (updated on resize) instead of per-move getBoundingClientRect
+    const rect = boundingRef.current
+    if (!rect) return
     const mouse = mouseRef.current
-    mouse.x = x - boundingRef.current.left
-    mouse.y = y - boundingRef.current.top
+    mouse.x = x - rect.left
+    mouse.y = y - rect.top
     if (!mouse.set) {
       mouse.sx = mouse.x; mouse.sy = mouse.y
       mouse.lx = mouse.x; mouse.ly = mouse.y
       mouse.set = true
-    }
-    if (containerRef.current) {
-      containerRef.current.style.setProperty('--x', `${mouse.sx}px`)
-      containerRef.current.style.setProperty('--y', `${mouse.sy}px`)
     }
   }
 
@@ -196,6 +207,12 @@ export function Waves({
   }
 
   const tick = (time: number) => {
+    // Stop looping when off-screen
+    if (!visibleRef.current) {
+      rafRef.current = null
+      return
+    }
+
     const { current: mouse } = mouseRef
     mouse.sx += (mouse.x - mouse.sx) * 0.1
     mouse.sy += (mouse.y - mouse.sy) * 0.1
