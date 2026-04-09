@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "motion/react"
 import { X, Plus, GripVertical, Link } from "lucide-react"
 import {
@@ -754,8 +755,8 @@ function VideoGrid({
         />
       )}
 
-      {/* Confirm remove modal */}
-      {confirmRemoveId && (
+      {/* Confirm remove modal — portaled to body to escape stacking context */}
+      {confirmRemoveId && createPortal(
         <div
           style={{
             position: "fixed",
@@ -847,7 +848,8 @@ function VideoGrid({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

@@ -6,6 +6,7 @@
  */
 
 import { useState, useRef, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { X } from "lucide-react"
 import { thumbnailUrl } from "../../lib/bunny"
 import {
@@ -87,11 +88,13 @@ export function AddVideoForm({
     }
 
     saveOverrides(ov)
+    // Notify all components that content changed
+    window.dispatchEvent(new CustomEvent("editmode:content-changed"))
     onAdded()
     onClose()
   }
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -305,7 +308,8 @@ export function AddVideoForm({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

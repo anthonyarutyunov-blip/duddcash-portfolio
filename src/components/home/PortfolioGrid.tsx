@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react"
 import { useState, useEffect, useCallback, useRef } from "react"
+import { createPortal } from "react-dom"
 import { GripVertical, Plus, FolderPlus, Film } from "lucide-react"
 import {
   DndContext,
@@ -546,7 +547,6 @@ export default function PortfolioGrid() {
         .portfolio-card-wrapper {
           transition: transform 0.5s cubic-bezier(.165, .84, .44, 1),
                       box-shadow 0.5s cubic-bezier(.165, .84, .44, 1);
-          will-change: transform;
           border-radius: 12px;
           position: relative;
         }
@@ -749,6 +749,7 @@ function AddProjectModal({
       aspectRatio,
     })
     saveOverrides(ov)
+    window.dispatchEvent(new CustomEvent("editmode:content-changed"))
     onAdded()
   }
 
@@ -760,7 +761,7 @@ function AddProjectModal({
     { value: "1/1", label: "1:1" },
   ]
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -876,7 +877,8 @@ function AddProjectModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

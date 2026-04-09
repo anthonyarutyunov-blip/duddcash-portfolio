@@ -760,4 +760,136 @@ export const portfolioItems: PortfolioItem[] = [
       aspectRatio: "9/16",
     },
   },
+
+  // ── Events ──────────────────────────────────────────────────────
+
+  // Standalone singles
+  {
+    id: "quincy-basketball",
+    type: "single",
+    title: "Quincy",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 11,
+    video: {
+      videoId: "b3237e6e-8b3a-457c-8359-1d37a8ea0662",
+      title: "Quincy",
+      aspectRatio: "4/3",
+    },
+  },
+  {
+    id: "final-gain",
+    type: "single",
+    title: "Final Gain",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 12,
+    video: {
+      videoId: "762725e2-e1a5-44f4-b93c-94a3c12ee313",
+      title: "Final Gain",
+      aspectRatio: "4/5",
+    },
+  },
+  {
+    id: "rr-grammys",
+    type: "single",
+    title: "RR Grammys Afterparty",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 13,
+    video: {
+      videoId: "48d993d5-b7b7-4faf-aaec-8eeee835225b",
+      title: "RR Grammys Afterparty",
+      aspectRatio: "9/16",
+    },
+  },
+
+  // Projects
+  {
+    id: "reserve-cup-2025",
+    type: "project",
+    title: "Reserve Cup 2025",
+    client: "Reserve Cup",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 14,
+    thumbnailVideoId: "2b348f0d-0bca-46ed-a518-a9706775e099",
+    videos: [
+      {
+        videoId: "2b348f0d-0bca-46ed-a518-a9706775e099",
+        title: "Aftermovie",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "dc4c3253-0030-40d5-ab56-9467dc268c62",
+        title: "Daily 1",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "c3886483-70ac-4995-b22f-588762758c0c",
+        title: "Daily 2",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "a5fee1c4-69a8-4801-b1c7-2a38acd73f92",
+        title: "Daily 3",
+        aspectRatio: "4/5",
+      },
+    ],
+  },
+  {
+    id: "wynn-f1-race-week",
+    type: "project",
+    title: "Wynn x F1 Race Week",
+    client: "Wynn",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 15,
+    thumbnailVideoId: "2ecb2e2c-0e4e-4d81-b6c8-4ba0e2f9e882",
+    videos: [
+      {
+        videoId: "2ecb2e2c-0e4e-4d81-b6c8-4ba0e2f9e882",
+        title: "Aftermovie",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "bafc174a-f89b-4e69-b9be-fa195c46bdd6",
+        title: "Day 3",
+        aspectRatio: "9/16",
+      },
+    ],
+  },
+  {
+    id: "arnold-palmer-mastercard",
+    type: "project",
+    title: "Arnold Palmer Invitational x MasterCard",
+    client: "MasterCard",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 16,
+    thumbnailVideoId: "6ca571d6-6c0b-4b33-9435-a59333041df8",
+    videos: [
+      {
+        videoId: "6ca571d6-6c0b-4b33-9435-a59333041df8",
+        title: "Director's Cut",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "1bc5acea-1a93-4b74-8076-a64756e45a14",
+        title: "Jazz",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "16cfb3b8-cfbb-420d-9f07-a5e89481adc7",
+        title: "Video 6",
+        aspectRatio: "9/16",
+      },
+    ],
+  },
 ]
