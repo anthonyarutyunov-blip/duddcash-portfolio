@@ -892,4 +892,112 @@ export const portfolioItems: PortfolioItem[] = [
       },
     ],
   },
+  {
+    id: "modball",
+    type: "project",
+    title: "Modball",
+    client: "Modball",
+    description: "",
+    categories: ["Events"],
+    featured: false,
+    order: 17,
+    thumbnailVideoId: "9321db06-a3cb-4bec-aee7-2dc33bd00e1a",
+    videos: [
+      {
+        videoId: "9321db06-a3cb-4bec-aee7-2dc33bd00e1a",
+        title: "Ibiza Finish Line",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "c60b40c3-9abc-48eb-8858-cb639b6c9248",
+        title: "St Tropez 1",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "da08655d-147f-4444-b336-0c3edf8a05db",
+        title: "St Tropez 2",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "ece25347-ee29-4a3a-9a31-6ef2000ceabc",
+        title: "St Tropez 3",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "b029fc00-d940-47fd-910c-f10e5c2d05ec",
+        title: "St Tropez 4",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "cc1befe1-feb2-436f-b3d5-b301b73e830a",
+        title: "St Tropez 5",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "c2cc6852-a7bf-4f05-9525-8d1479e33bbc",
+        title: "St Tropez 6",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "64d93c7e-fd21-4b61-827e-3451bbc947d5",
+        title: "St Tropez 7",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "61630c88-24db-458c-9f48-445308823116",
+        title: "BW Creative Venice #2",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "166bf9c4-637e-4356-a386-3fbd5ab89be9",
+        title: "BW Creative Venice #1",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "9eec7900-02ed-4487-9187-b10bdfac30b5",
+        title: "Rome Car Showcase",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "c946cc77-3ee5-438d-aa2f-0625905de27b",
+        title: "Slow Motion Recap",
+        aspectRatio: "16/9",
+      },
+      {
+        videoId: "dd634711-8e7e-45c9-ba07-9b15f92a1062",
+        title: "Boomerang",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "ab725a2c-1761-4028-811d-6a6297e0e371",
+        title: "How to Sign Up",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "ff1b3eaf-720c-48b5-924a-375888e85c9a",
+        title: "December",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "d2446fc9-76ef-498d-939d-8766887d863a",
+        title: "Levitating Car",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "d5023e53-8382-4781-8d8e-34f57fe7b5f3",
+        title: "Matchcuts",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "f38de959-4b03-40a5-891d-ef5a57ae9c14",
+        title: "1",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "5e15d127-2b93-45d8-8762-da75ff754ad1",
+        title: "Barcelona Sunset Vibes",
+        aspectRatio: "4/5",
+      },
+    ],
+  },
 ]
