@@ -1161,4 +1161,75 @@ export const portfolioItems: PortfolioItem[] = [
       },
     ],
   },
+
+  // ── Travel ──────────────────────────────────────────────────────
+
+  // Standalone singles
+  {
+    id: "hyper-montage-rome",
+    type: "single",
+    title: "Hyper Montage Rome",
+    description: "",
+    categories: ["Travel"],
+    featured: false,
+    order: 26,
+    video: {
+      videoId: "d8a4b789-1c3b-4786-9395-01245f015405",
+      title: "Hyper Montage Rome",
+      aspectRatio: "16/9",
+    },
+  },
+  {
+    id: "nyc-edit",
+    type: "single",
+    title: "NYC Edit",
+    description: "",
+    categories: ["Travel"],
+    featured: false,
+    order: 27,
+    video: {
+      videoId: "5090168a-7ac0-4bfe-8e07-0e3239f5239c",
+      title: "NYC Edit",
+      aspectRatio: "4/5",
+    },
+  },
+  {
+    id: "santino-car",
+    type: "single",
+    title: "Santino Car",
+    description: "",
+    categories: ["Travel"],
+    featured: false,
+    order: 28,
+    video: {
+      videoId: "d89c62f1-a102-4de1-b8c1-67e8ac77be7c",
+      title: "Santino Car",
+      aspectRatio: "9/16",
+    },
+  },
+
+  // Projects
+  {
+    id: "costa-rica",
+    type: "project",
+    title: "Costa Rica",
+    client: "",
+    description: "",
+    categories: ["Travel"],
+    featured: false,
+    order: 29,
+    thumbnailVideoId: "a21e6c86-c6c9-4eeb-bb9e-da895535cba8",
+    videos: [
+      {
+        videoId: "a21e6c86-c6c9-4eeb-bb9e-da895535cba8",
+        title: "Documentary",
+        aspectRatio: "4/5",
+      },
+      {
+        videoId: "336f2236-f800-41df-8739-020e9e1cdf5d",
+        title: "Post Card Edit",
+        aspectRatio: "16/9",
+      },
+    ],
+  },
 ]
