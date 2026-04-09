@@ -325,3 +325,20 @@ p + p {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ============================================
+   Video grid responsive — collapse on mobile
+   ============================================ */
+@media (max-width: 640px) {
+  /* On mobile, make all video grid items at least half-width */
+  .video-grid-item {
+    grid-column: span 6 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  /* On very small screens, all videos go full-width */
+  .video-grid-item {
+    grid-column: span 12 !important;
+  }
+}

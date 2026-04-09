@@ -69,6 +69,7 @@ function SortableVideoItem({
   return (
     <div
       ref={setNodeRef}
+      className="video-grid-item"
       style={{
         transform: CSS.Transform.toString(transform),
         transition: undefined,
@@ -444,48 +445,21 @@ function VideoGrid({
 
   if (!orderedVideos.length && !editMode) return null
 
-  // Grid style depends on edit mode
-  const gridStyle: React.CSSProperties = editMode
-    ? {
-        display: "grid",
-        gridTemplateColumns: "repeat(12, 1fr)",
-        gap: 12,
-        alignItems: "start",
-        gridAutoFlow: "dense",
-      }
-    : (() => {
-        const isPortrait = orderedVideos.some(
-          (v) => v.aspectRatio === "9/16" || v.aspectRatio === "4/5"
-        )
-        const isNarrow = orderedVideos.some(
-          (v) => v.aspectRatio === "4/3" || v.aspectRatio === "1/1"
-        )
-        return {
-          display: "grid",
-          gridTemplateColumns:
-            orderedVideos.length === 1 && isPortrait
-              ? "1fr"
-              : orderedVideos.length === 1
-                ? "1fr"
-                : isPortrait
-                  ? "repeat(auto-fill, minmax(min(100%, 280px), 1fr))"
-                  : "repeat(auto-fill, minmax(min(100%, 400px), 1fr))",
-          gap: 12,
-          maxWidth:
-            orderedVideos.length === 1 && isPortrait
-              ? 360
-              : orderedVideos.length === 1 && isNarrow
-                ? 640
-                : undefined,
-          margin:
-            orderedVideos.length === 1 && (isPortrait || isNarrow)
-              ? "0 auto"
-              : undefined,
-        }
-      })()
+  // Always use 12-column grid so visitor layout matches editor layout.
+  // On mobile (<640px), switch to 6-column so videos stay usable.
+  const gridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "repeat(12, 1fr)",
+    gap: 12,
+    alignItems: "start",
+    gridAutoFlow: "dense",
+  }
 
   const videoElements = orderedVideos.map((video) => {
-    const size = videoSizes[video.videoId] || "m"
+    // Default size: landscape → L (2 per row), portrait/square → M (4 per row)
+    const defaultSize: SizeTier =
+      video.aspectRatio === "16/9" ? "l" : "m"
+    const size = videoSizes[video.videoId] || defaultSize
     const colSpan = SIZE_TO_SPAN[size]
 
     // Load custom thumbnail from video edits
@@ -495,12 +469,12 @@ function VideoGrid({
     )?.value
 
     const player = (
-      <div style={{ position: "relative" }} data-video-id={video.videoId}>
+      <div style={{ position: "relative", overflow: "hidden", borderRadius: 8 }} data-video-id={video.videoId}>
         <VideoPlayer
           key={video.videoId}
           videoId={video.videoId}
-          title={video.title}
-          description={video.description}
+          title={editMode ? undefined : video.title}
+          description={editMode ? undefined : video.description}
           aspectRatio={video.aspectRatio || "16/9"}
           customThumbnail={customThumb}
         />
@@ -672,7 +646,9 @@ function VideoGrid({
     }
 
     return (
-      <React.Fragment key={video.videoId}>{content}</React.Fragment>
+      <div key={video.videoId} className="video-grid-item" style={{ gridColumn: `span ${colSpan}` }}>
+        {content}
+      </div>
     )
   })
 
