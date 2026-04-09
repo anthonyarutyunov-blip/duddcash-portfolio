@@ -8,6 +8,7 @@ interface VideoPlayerProps {
   title?: string
   description?: string
   aspectRatio?: string
+  customThumbnail?: string
 }
 
 /**
@@ -21,6 +22,7 @@ export function VideoPlayer({
   title,
   description,
   aspectRatio = "16/9",
+  customThumbnail,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -57,8 +59,21 @@ export function VideoPlayer({
     if (!video) return
 
     if (isVisible && !userPausedRef.current) {
-      video.play().catch(() => {})
-      setIsPaused(false)
+      // If video has enough data, play immediately; otherwise wait for canplay
+      if (video.readyState >= 3) {
+        video.play().catch(() => {})
+        setIsPaused(false)
+      } else {
+        const onReady = () => {
+          if (!userPausedRef.current) {
+            video.play().catch(() => {})
+            setIsPaused(false)
+          }
+          video.removeEventListener("canplay", onReady)
+        }
+        video.addEventListener("canplay", onReady)
+        return () => video.removeEventListener("canplay", onReady)
+      }
     } else {
       video.pause()
     }
@@ -217,6 +232,7 @@ export function VideoPlayer({
   return (
     <div
       ref={containerRef}
+      data-video-id={videoId}
       onClick={handleClick}
       onMouseMove={showBar}
       onMouseEnter={showBar}
@@ -233,11 +249,11 @@ export function VideoPlayer({
       <video
         ref={videoRef}
         src={videoUrl(videoId, "1080p")}
-        poster={thumbnailUrl(videoId)}
+        poster={customThumbnail || thumbnailUrl(videoId)}
         muted
         loop
         playsInline
-        preload="none"
+        preload="metadata"
         style={{
           width: "100%",
           height: "100%",

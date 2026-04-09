@@ -1,19 +1,266 @@
-import React, { useState } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { X } from "lucide-react"
+import { X, Plus, GripVertical, Link } from "lucide-react"
+import {
+  DndContext,
+  DragOverlay,
+  closestCorners,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  rectSortingStrategy,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import { VideoPlayer } from "./VideoPlayer"
-import type { PortfolioItem, VideoSection, Credit, ImageGallery, BunnyVideo } from "../../data/portfolio"
+import type {
+  PortfolioItem,
+  VideoSection,
+  Credit,
+  ImageGallery,
+  BunnyVideo,
+} from "../../data/portfolio"
+import { useEditMode } from "../../lib/edit-mode"
+import {
+  loadOverrides,
+  saveOverrides,
+  setVideoLayout,
+  setVideoSize,
+  setVideoEdit,
+  setContentEdit,
+  removeVideo,
+  type SizeTier,
+} from "../../lib/layout-store"
+import { getMergedVideos, SIZE_TO_SPAN } from "../../lib/layout-merge"
+import { SizeSelector } from "../admin/SizeSelector"
+import { AddVideoForm } from "../admin/AddVideoForm"
+import { InlineEdit } from "../admin/InlineEdit"
 
 interface ExpandedProjectProps {
   item: PortfolioItem
   onClose: () => void
 }
 
-/** Renders a credits block */
-function CreditsBlock({ credits }: { credits: Credit[] }) {
-  if (!credits.length) return null
+/** Sortable video wrapper — drag handle only */
+function SortableVideoItem({
+  id,
+  children,
+  gridColumn,
+}: {
+  id: string
+  children: React.ReactNode
+  gridColumn?: string
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    isDragging,
+  } = useSortable({ id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition: undefined,
+        opacity: isDragging ? 0.3 : 1,
+        outline: isDragging ? "2px dashed rgba(255,255,255,0.2)" : "none",
+        zIndex: isDragging ? 100 : undefined,
+        position: "relative",
+        gridColumn,
+      }}
+      {...attributes}
+    >
+      {children}
+      {/* Drag handle */}
+      <div
+        ref={setActivatorNodeRef}
+        {...listeners}
+        style={{
+          position: "absolute",
+          top: 6,
+          right: 6,
+          width: 24,
+          height: 24,
+          borderRadius: 6,
+          background: "rgba(0,0,0,0.7)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "rgba(255,255,255,0.5)",
+          zIndex: 5,
+          cursor: "grab",
+        }}
+      >
+        <GripVertical size={12} />
+      </div>
+    </div>
+  )
+}
+
+/** Renders a credits block — editable in edit mode */
+function CreditsBlock({
+  credits,
+  editMode,
+  itemId,
+  sectionTitle,
+}: {
+  credits: Credit[]
+  editMode: boolean
+  itemId: string
+  sectionTitle?: string
+}) {
+  const [localCredits, setLocalCredits] = useState<Credit[]>(credits)
+  const [isOpen, setIsOpen] = useState(false)
+
+  // Sync localCredits when parent passes updated credits (e.g., after content-changed event)
+  useEffect(() => {
+    setLocalCredits(credits)
+  }, [credits])
+
+  const field = sectionTitle
+    ? `section:${sectionTitle}:credits`
+    : "credits"
+
+  const saveCredits = useCallback(
+    (updated: Credit[]) => {
+      setLocalCredits(updated)
+      const ov = loadOverrides()
+      setContentEdit(ov, itemId, field, JSON.stringify(updated))
+      saveOverrides(ov)
+      window.dispatchEvent(new CustomEvent("editmode:content-changed"))
+    },
+    [itemId, field]
+  )
+
+  const handleLabelChange = (index: number, label: string) => {
+    const updated = [...localCredits]
+    updated[index] = { ...updated[index], label }
+    saveCredits(updated)
+  }
+
+  const handleValueChange = (index: number, value: string) => {
+    const updated = [...localCredits]
+    updated[index] = { ...updated[index], value }
+    saveCredits(updated)
+  }
+
+  const handleRemove = (index: number) => {
+    const updated = localCredits.filter((_, i) => i !== index)
+    saveCredits(updated)
+  }
+
+  const handleAdd = () => {
+    const updated = [...localCredits, { label: "", value: "" }]
+    saveCredits(updated)
+  }
+
+  if (!localCredits.length && !editMode) return null
+
+  // Edit mode — render editable credit rows
+  if (editMode) {
+    return (
+      <div style={{ marginTop: 12 }}>
+        <p
+          style={{
+            fontSize: 11,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            color: "rgba(255,255,255,0.55)",
+            marginBottom: 8,
+            fontWeight: 600,
+          }}
+        >
+          Credits
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {localCredits.map((credit, i) => (
+            <div
+              key={i}
+              style={{ display: "flex", gap: 6, alignItems: "center" }}
+            >
+              <input
+                type="text"
+                value={credit.label}
+                onChange={(e) => handleLabelChange(i, e.target.value)}
+                placeholder="Role..."
+                style={{
+                  ...creditInputStyle,
+                  width: 120,
+                  flexShrink: 0,
+                }}
+              />
+              <input
+                type="text"
+                value={credit.value}
+                onChange={(e) => handleValueChange(i, e.target.value)}
+                placeholder="Name..."
+                style={{ ...creditInputStyle, flex: 1 }}
+              />
+              <button
+                onClick={() => handleRemove(i)}
+                style={{
+                  background: "rgba(255,80,80,0.15)",
+                  border: "none",
+                  borderRadius: 4,
+                  width: 24,
+                  height: 24,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "rgba(255,80,80,0.7)",
+                  flexShrink: 0,
+                }}
+              >
+                <X size={10} />
+              </button>
+            </div>
+          ))}
+          <button
+            onClick={handleAdd}
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px dashed rgba(74,222,128,0.3)",
+              borderRadius: 6,
+              padding: "6px 12px",
+              color: "rgba(74,222,128,0.7)",
+              fontSize: 11,
+              fontWeight: 500,
+              cursor: "pointer",
+              transition: "all 0.15s ease",
+              alignSelf: "flex-start",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "rgba(74,222,128,0.6)"
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"
+              e.currentTarget.style.background = "rgba(255,255,255,0.04)"
+            }}
+          >
+            + Add Credit
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // View mode — collapsible credits
   return (
     <details
+      open={isOpen}
+      onToggle={(e) => setIsOpen((e.target as HTMLDetailsElement).open)}
       style={{
         marginTop: 12,
         fontSize: 12,
@@ -40,7 +287,7 @@ function CreditsBlock({ credits }: { credits: Credit[] }) {
           paddingTop: 4,
         }}
       >
-        {credits.map((credit, i) => (
+        {localCredits.map((credit, i) => (
           <React.Fragment key={i}>
             <span style={{ color: "rgba(255,255,255,0.35)" }}>
               {credit.label}
@@ -55,52 +302,578 @@ function CreditsBlock({ credits }: { credits: Credit[] }) {
   )
 }
 
-/** Renders a video grid */
-function VideoGrid({ videos }: { videos: BunnyVideo[] }) {
-  if (!videos.length) return null
+const creditInputStyle: React.CSSProperties = {
+  padding: "5px 8px",
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 4,
+  color: "#fff",
+  fontSize: 12,
+  outline: "none",
+  fontFamily: "inherit",
+  boxSizing: "border-box",
+}
 
-  const isPortrait = videos.some(
-    (v) => v.aspectRatio === "9/16" || v.aspectRatio === "4/5"
+/** Video grid with DnD, size selectors, inline editing, share, and thumbnails in edit mode */
+function VideoGrid({
+  videos,
+  projectId,
+  sectionTitle,
+}: {
+  videos: BunnyVideo[]
+  projectId: string
+  sectionTitle?: string
+}) {
+  const { editMode } = useEditMode()
+  const [orderedVideos, setOrderedVideos] = useState(() =>
+    getMergedVideos(projectId, sectionTitle, videos)
   )
-  const isNarrow = videos.some(
-    (v) => v.aspectRatio === "4/3" || v.aspectRatio === "1/1"
+  const [videoSizes, setVideoSizes] = useState<Record<string, SizeTier>>(
+    () => {
+      const ov = loadOverrides()
+      const layout = ov.videoLayouts.find(
+        (v) =>
+          v.projectId === projectId &&
+          (v.sectionTitle || undefined) === sectionTitle
+      )
+      const sizes: Record<string, SizeTier> = {}
+      if (layout) {
+        for (const v of layout.videos) {
+          if (v.size) sizes[v.videoId] = v.size
+        }
+      }
+      return sizes
+    }
+  )
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null)
+  const [copiedVideoId, setCopiedVideoId] = useState<string | null>(null)
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
+
+  // Refresh videos from overrides whenever content changes (e.g., inline edits, adds, removes)
+  useEffect(() => {
+    const handler = () => {
+      setOrderedVideos(getMergedVideos(projectId, sectionTitle, videos))
+      // Also refresh video sizes
+      const ov = loadOverrides()
+      const layout = ov.videoLayouts.find(
+        (v) =>
+          v.projectId === projectId &&
+          (v.sectionTitle || undefined) === sectionTitle
+      )
+      if (layout) {
+        const sizes: Record<string, SizeTier> = {}
+        for (const v of layout.videos) {
+          if (v.size) sizes[v.videoId] = v.size
+        }
+        setVideoSizes(sizes)
+      }
+    }
+    window.addEventListener("editmode:content-changed", handler)
+    return () => window.removeEventListener("editmode:content-changed", handler)
+  }, [projectId, sectionTitle, videos])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   )
 
-  return (
-    <div
-      style={{
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
+
+      const oldIndex = orderedVideos.findIndex(
+        (v) => v.videoId === active.id
+      )
+      const newIndex = orderedVideos.findIndex(
+        (v) => v.videoId === over.id
+      )
+      if (oldIndex < 0 || newIndex < 0) return
+
+      const reordered = arrayMove(orderedVideos, oldIndex, newIndex)
+      setOrderedVideos(reordered)
+
+      const ov = loadOverrides()
+      setVideoLayout(
+        ov,
+        projectId,
+        sectionTitle,
+        reordered.map((v, i) => ({
+          videoId: v.videoId,
+          order: i,
+          size: videoSizes[v.videoId],
+        }))
+      )
+      saveOverrides(ov)
+    },
+    [orderedVideos, projectId, sectionTitle, videoSizes]
+  )
+
+  const handleVideoSizeChange = useCallback(
+    (videoId: string, size: SizeTier) => {
+      setVideoSizes((prev) => ({ ...prev, [videoId]: size }))
+      const ov = loadOverrides()
+      setVideoSize(ov, projectId, sectionTitle, videoId, size)
+      saveOverrides(ov)
+    },
+    [projectId, sectionTitle]
+  )
+
+  const handleShare = useCallback(
+    (videoId: string) => {
+      const url = `${window.location.origin}/?project=${projectId}&video=${videoId}`
+      navigator.clipboard.writeText(url).then(() => {
+        setCopiedVideoId(videoId)
+        setTimeout(() => setCopiedVideoId(null), 2000)
+      })
+    },
+    [projectId]
+  )
+
+  const handleRemoveVideo = useCallback(
+    (videoId: string) => {
+      const ov = loadOverrides()
+      removeVideo(ov, videoId)
+      saveOverrides(ov)
+      setOrderedVideos((prev) => prev.filter((v) => v.videoId !== videoId))
+      setConfirmRemoveId(null)
+      window.dispatchEvent(new CustomEvent("editmode:content-changed"))
+    },
+    []
+  )
+
+  if (!orderedVideos.length && !editMode) return null
+
+  // Grid style depends on edit mode
+  const gridStyle: React.CSSProperties = editMode
+    ? {
         display: "grid",
-        gridTemplateColumns:
-          videos.length === 1 && isPortrait
-            ? "1fr"
-            : videos.length === 1
-            ? "1fr"
-            : isPortrait
-            ? "repeat(auto-fill, minmax(min(100%, 280px), 1fr))"
-            : "repeat(auto-fill, minmax(min(100%, 400px), 1fr))",
+        gridTemplateColumns: "repeat(12, 1fr)",
         gap: 12,
-        maxWidth:
-          videos.length === 1 && isPortrait
-            ? 360
-            : videos.length === 1 && isNarrow
-            ? 640
-            : undefined,
-        margin:
-          videos.length === 1 && (isPortrait || isNarrow)
-            ? "0 auto"
-            : undefined,
-      }}
-    >
-      {videos.map((video) => (
+        alignItems: "start",
+        gridAutoFlow: "dense",
+      }
+    : (() => {
+        const isPortrait = orderedVideos.some(
+          (v) => v.aspectRatio === "9/16" || v.aspectRatio === "4/5"
+        )
+        const isNarrow = orderedVideos.some(
+          (v) => v.aspectRatio === "4/3" || v.aspectRatio === "1/1"
+        )
+        return {
+          display: "grid",
+          gridTemplateColumns:
+            orderedVideos.length === 1 && isPortrait
+              ? "1fr"
+              : orderedVideos.length === 1
+                ? "1fr"
+                : isPortrait
+                  ? "repeat(auto-fill, minmax(min(100%, 280px), 1fr))"
+                  : "repeat(auto-fill, minmax(min(100%, 400px), 1fr))",
+          gap: 12,
+          maxWidth:
+            orderedVideos.length === 1 && isPortrait
+              ? 360
+              : orderedVideos.length === 1 && isNarrow
+                ? 640
+                : undefined,
+          margin:
+            orderedVideos.length === 1 && (isPortrait || isNarrow)
+              ? "0 auto"
+              : undefined,
+        }
+      })()
+
+  const videoElements = orderedVideos.map((video) => {
+    const size = videoSizes[video.videoId] || "m"
+    const colSpan = SIZE_TO_SPAN[size]
+
+    // Load custom thumbnail from video edits
+    const ov = loadOverrides()
+    const customThumb = (ov.videoEdits || []).find(
+      (e) => e.videoId === video.videoId && e.field === "customThumbnail"
+    )?.value
+
+    const player = (
+      <div style={{ position: "relative" }} data-video-id={video.videoId}>
         <VideoPlayer
           key={video.videoId}
           videoId={video.videoId}
           title={video.title}
           description={video.description}
           aspectRatio={video.aspectRatio || "16/9"}
+          customThumbnail={customThumb}
         />
-      ))}
-    </div>
+        {/* Size selector on each video in edit mode */}
+        {editMode && (
+          <SizeSelector
+            currentSize={size}
+            onChange={(s) => handleVideoSizeChange(video.videoId, s)}
+          />
+        )}
+
+        {/* Share button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            handleShare(video.videoId)
+          }}
+          style={{
+            position: "absolute",
+            bottom: 40,
+            left: 8,
+            zIndex: 10,
+            width: 28,
+            height: 28,
+            borderRadius: 7,
+            background:
+              copiedVideoId === video.videoId
+                ? "rgba(74,222,128,0.9)"
+                : "rgba(0,0,0,0.6)",
+            backdropFilter: "blur(8px)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            color:
+              copiedVideoId === video.videoId ? "#000" : "rgba(255,255,255,0.6)",
+            transition: "all 0.2s ease",
+            padding: 0,
+          }}
+          title="Copy share link"
+          onMouseEnter={(e) => {
+            if (copiedVideoId !== video.videoId) {
+              e.currentTarget.style.background = "rgba(0,0,0,0.85)"
+              e.currentTarget.style.color = "#fff"
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (copiedVideoId !== video.videoId) {
+              e.currentTarget.style.background = "rgba(0,0,0,0.6)"
+              e.currentTarget.style.color = "rgba(255,255,255,0.6)"
+            }
+          }}
+        >
+          {copiedVideoId === video.videoId ? (
+            <span style={{ fontSize: 9, fontWeight: 700 }}>OK</span>
+          ) : (
+            <Link size={12} />
+          )}
+        </button>
+
+        {/* Remove video button (edit mode only) */}
+        {editMode && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setConfirmRemoveId(video.videoId)
+            }}
+            style={{
+              position: "absolute",
+              top: 6,
+              left: 6,
+              zIndex: 10,
+              width: 22,
+              height: 22,
+              borderRadius: 6,
+              background: "rgba(255,60,60,0.8)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "#fff",
+              transition: "all 0.15s ease",
+              padding: 0,
+            }}
+            title="Remove video"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255,40,40,1)"
+              e.currentTarget.style.transform = "scale(1.1)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255,60,60,0.8)"
+              e.currentTarget.style.transform = "scale(1)"
+            }}
+          >
+            <X size={12} />
+          </button>
+        )}
+      </div>
+    )
+
+    const content = (
+      <>
+        {player}
+
+        {/* Inline title/description editing in edit mode */}
+        {editMode && (
+          <div style={{ padding: "6px 2px 0" }}>
+            <InlineEdit
+              value={video.title}
+              field="title"
+              itemId={video.videoId}
+              editMode
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "#fff",
+                display: "block",
+                lineHeight: 1.3,
+              }}
+              placeholder="Video title..."
+              onSave={(val) => {
+                const o = loadOverrides()
+                setVideoEdit(o, video.videoId, "title", val)
+                saveOverrides(o)
+                window.dispatchEvent(
+                  new CustomEvent("editmode:content-changed")
+                )
+              }}
+            />
+            <InlineEdit
+              value={video.description || ""}
+              field="description"
+              itemId={video.videoId}
+              editMode
+              style={{
+                fontSize: 11,
+                color: "rgba(255,255,255,0.5)",
+                display: "block",
+                marginTop: 2,
+                lineHeight: 1.4,
+              }}
+              placeholder="Description..."
+              onSave={(val) => {
+                const o = loadOverrides()
+                setVideoEdit(o, video.videoId, "description", val)
+                saveOverrides(o)
+                window.dispatchEvent(
+                  new CustomEvent("editmode:content-changed")
+                )
+              }}
+            />
+          </div>
+        )}
+      </>
+    )
+
+    if (editMode) {
+      return (
+        <SortableVideoItem
+          key={video.videoId}
+          id={video.videoId}
+          gridColumn={`span ${colSpan}`}
+        >
+          {content}
+        </SortableVideoItem>
+      )
+    }
+
+    return (
+      <React.Fragment key={video.videoId}>{content}</React.Fragment>
+    )
+  })
+
+  return (
+    <>
+      {editMode ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={(e: DragStartEvent) =>
+            setActiveVideoId(e.active.id as string)
+          }
+          onDragEnd={(e: DragEndEvent) => {
+            setActiveVideoId(null)
+            handleDragEnd(e)
+          }}
+          onDragCancel={() => setActiveVideoId(null)}
+        >
+          <SortableContext
+            items={orderedVideos.map((v) => v.videoId)}
+            strategy={rectSortingStrategy}
+          >
+            <div style={gridStyle}>{videoElements}</div>
+          </SortableContext>
+
+          <DragOverlay adjustScale={false} dropAnimation={null}>
+            {activeVideoId
+              ? (() => {
+                  const found = orderedVideos.find(
+                    (v) => v.videoId === activeVideoId
+                  )
+                  if (!found) return null
+                  return (
+                    <div
+                      style={{
+                        opacity: 1,
+                        boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+                        transform: "scale(1.03)",
+                        borderRadius: 8,
+                        overflow: "hidden",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <VideoPlayer
+                        videoId={found.videoId}
+                        title={found.title}
+                        aspectRatio={found.aspectRatio || "16/9"}
+                      />
+                    </div>
+                  )
+                })()
+              : null}
+          </DragOverlay>
+        </DndContext>
+      ) : (
+        <div style={gridStyle}>{videoElements}</div>
+      )}
+
+      {editMode && (
+        <button
+          onClick={() => setShowAddForm(true)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            width: "100%",
+            padding: "14px 16px",
+            marginTop: 12,
+            background: "rgba(255,255,255,0.04)",
+            border: "2px dashed rgba(74,222,128,0.3)",
+            borderRadius: 8,
+            color: "rgba(74,222,128,0.7)",
+            fontSize: 13,
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.06)"
+            e.currentTarget.style.borderColor = "rgba(74,222,128,0.5)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.04)"
+            e.currentTarget.style.borderColor = "rgba(74,222,128,0.3)"
+          }}
+        >
+          <Plus size={16} />
+          Add Video
+        </button>
+      )}
+
+      {showAddForm && (
+        <AddVideoForm
+          projectId={projectId}
+          sectionTitle={sectionTitle}
+          onClose={() => setShowAddForm(false)}
+          onAdded={() => {
+            setOrderedVideos(
+              getMergedVideos(projectId, sectionTitle, videos)
+            )
+          }}
+        />
+      )}
+
+      {/* Confirm remove modal */}
+      {confirmRemoveId && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,0.7)",
+            backdropFilter: "blur(6px)",
+          }}
+          onClick={() => setConfirmRemoveId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#1c1c1e",
+              borderRadius: 14,
+              padding: "28px 24px",
+              width: "min(380px, 88vw)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+              textAlign: "center",
+            }}
+          >
+            <p
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: 500,
+                margin: "0 0 8px",
+                fontFamily: "var(--font-display)",
+              }}
+            >
+              Remove this video?
+            </p>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.45)",
+                fontSize: 13,
+                margin: "0 0 24px",
+                lineHeight: 1.5,
+              }}
+            >
+              "{orderedVideos.find((v) => v.videoId === confirmRemoveId)?.title || "Untitled"}" will be removed from this project. You can restore it by discarding changes.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                justifyContent: "center",
+              }}
+            >
+              <button
+                onClick={() => setConfirmRemoveId(null)}
+                style={{
+                  padding: "9px 20px",
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: 8,
+                  color: "rgba(255,255,255,0.5)",
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleRemoveVideo(confirmRemoveId)}
+                style={{
+                  padding: "9px 20px",
+                  background: "rgba(255,60,60,0.9)",
+                  border: "none",
+                  borderRadius: 8,
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "background 0.15s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "rgba(255,40,40,1)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "rgba(255,60,60,0.9)")
+                }
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
@@ -136,11 +909,7 @@ function GalleryBlock({ galleries }: { galleries: ImageGallery[] }) {
                 src={src}
                 alt={`${gallery.title} ${i + 1}`}
                 loading="lazy"
-                style={{
-                  width: "100%",
-                  borderRadius: 6,
-                  display: "block",
-                }}
+                style={{ width: "100%", borderRadius: 6, display: "block" }}
               />
             ))}
           </div>
@@ -150,42 +919,95 @@ function GalleryBlock({ galleries }: { galleries: ImageGallery[] }) {
   )
 }
 
-/** Renders the content area for a single section (no tab chrome) */
-function SectionContent({ section }: { section: VideoSection }) {
+/** Section content */
+function SectionContent({
+  section,
+  projectId,
+  editMode,
+  itemId,
+}: {
+  section: VideoSection
+  projectId: string
+  editMode: boolean
+  itemId: string
+}) {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        {section.description && (
-          <p
+        {editMode ? (
+          <InlineEdit
+            value={section.description || ""}
+            field={`section:${section.title}:description`}
+            itemId={itemId}
+            editMode
+            as="textarea"
             style={{
               fontSize: 13,
               lineHeight: 1.5,
               color: "rgba(255,255,255,0.55)",
+              display: "block",
               margin: "0 0 4px",
             }}
-          >
-            {section.description}
-          </p>
+            placeholder="Section description..."
+          />
+        ) : (
+          section.description && (
+            <p
+              style={{
+                fontSize: 13,
+                lineHeight: 1.5,
+                color: "rgba(255,255,255,0.55)",
+                margin: "0 0 4px",
+              }}
+            >
+              {section.description}
+            </p>
+          )
         )}
-        {section.role && (
-          <p
+        {editMode ? (
+          <InlineEdit
+            value={section.role || ""}
+            field={`section:${section.title}:role`}
+            itemId={itemId}
+            editMode
             style={{
               fontSize: 12,
               color: "rgba(255,255,255,0.4)",
               fontStyle: "italic",
-              margin: 0,
+              display: "block",
             }}
-          >
-            Role: {section.role}
-          </p>
+            placeholder="Role..."
+          />
+        ) : (
+          section.role && (
+            <p
+              style={{
+                fontSize: 12,
+                color: "rgba(255,255,255,0.4)",
+                fontStyle: "italic",
+                margin: 0,
+              }}
+            >
+              Role: {section.role}
+            </p>
+          )
         )}
-        {section.credits && section.credits.length > 0 && (
-          <CreditsBlock credits={section.credits} />
+        {(section.credits?.length || editMode) && (
+          <CreditsBlock
+            credits={section.credits || []}
+            editMode={editMode}
+            itemId={itemId}
+            sectionTitle={section.title}
+          />
         )}
       </div>
 
       {section.videos.length > 0 ? (
-        <VideoGrid videos={section.videos} />
+        <VideoGrid
+          videos={section.videos}
+          projectId={projectId}
+          sectionTitle={section.title}
+        />
       ) : (
         <div
           style={{
@@ -208,13 +1030,22 @@ function SectionContent({ section }: { section: VideoSection }) {
   )
 }
 
-/** Tabbed section navigation for multi-campaign projects */
-function SectionTabs({ sections }: { sections: VideoSection[] }) {
+/** Tabbed sections */
+function SectionTabs({
+  sections,
+  projectId,
+  editMode,
+  itemId,
+}: {
+  sections: VideoSection[]
+  projectId: string
+  editMode: boolean
+  itemId: string
+}) {
   const [activeTab, setActiveTab] = useState(0)
 
   return (
     <div>
-      {/* Tab bar */}
       <div
         style={{
           display: "flex",
@@ -235,17 +1066,17 @@ function SectionTabs({ sections }: { sections: VideoSection[] }) {
             style={{
               background: "none",
               border: "none",
-              borderBottom: activeTab === i
-                ? "2px solid #fff"
-                : "2px solid transparent",
+              borderBottom:
+                activeTab === i
+                  ? "2px solid #fff"
+                  : "2px solid transparent",
               padding: "10px 18px",
               fontSize: 13,
               fontFamily: "var(--font-display)",
               fontWeight: activeTab === i ? 500 : 400,
               letterSpacing: "0.01em",
-              color: activeTab === i
-                ? "#fff"
-                : "rgba(255,255,255,0.4)",
+              color:
+                activeTab === i ? "#fff" : "rgba(255,255,255,0.4)",
               cursor: "pointer",
               transition: "color 0.2s ease, border-color 0.2s ease",
               whiteSpace: "nowrap",
@@ -265,7 +1096,6 @@ function SectionTabs({ sections }: { sections: VideoSection[] }) {
         ))}
       </div>
 
-      {/* Tab content with animation */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
@@ -274,24 +1104,24 @@ function SectionTabs({ sections }: { sections: VideoSection[] }) {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
         >
-          <SectionContent section={sections[activeTab]} />
+          <SectionContent
+            section={sections[activeTab]}
+            projectId={projectId}
+            editMode={editMode}
+            itemId={projectId}
+          />
         </motion.div>
       </AnimatePresence>
     </div>
   )
 }
 
-/**
- * Full expanded view that replaces the card in-place.
- * Shows metadata + video grid for projects, single video for singles.
- * Supports sections for multi-campaign projects and optional image galleries.
- */
+/** Full expanded view */
 export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
+  const { editMode } = useEditMode()
   const hasSections =
     item.type === "project" && item.sections && item.sections.length > 0
-  const flatVideos =
-    item.type === "project" ? item.videos : [item.video]
-
+  const flatVideos = item.type === "project" ? item.videos : [item.video]
   const role = item.role
   const credits = item.credits
   const galleries = item.galleries
@@ -309,7 +1139,6 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
         position: "relative",
       }}
     >
-      {/* Close button */}
       <button
         onClick={(e) => {
           e.stopPropagation()
@@ -343,73 +1172,140 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
         <X size={16} />
       </button>
 
-      {/* Header: metadata */}
+      {/* Project header — inline editable in edit mode */}
       <div style={{ marginBottom: 20, maxWidth: 600 }}>
-        {item.client && (
-          <p
-            style={{
-              fontSize: 11,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "rgba(255,255,255,0.45)",
-              marginBottom: 6,
-            }}
-          >
-            {item.client}
-          </p>
+        {item.client != null && (
+          editMode ? (
+            <InlineEdit
+              value={typeof item.client === "string" ? item.client : ""}
+              field="client"
+              itemId={item.id}
+              editMode
+              style={{
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "rgba(255,255,255,0.45)",
+                display: "block",
+                marginBottom: 6,
+              }}
+              placeholder="Client name..."
+            />
+          ) : (
+            <p
+              style={{
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "rgba(255,255,255,0.45)",
+                marginBottom: 6,
+              }}
+            >
+              {item.client}
+            </p>
+          )
         )}
 
-        <h3
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 24,
-            fontWeight: 500,
-            letterSpacing: "-0.02em",
-            color: "#fff",
-            margin: "0 0 8px",
-          }}
-        >
-          {item.title}
-        </h3>
+        {editMode ? (
+          <InlineEdit
+            value={item.title}
+            field="title"
+            itemId={item.id}
+            editMode
+            tag="h3"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: 24,
+              fontWeight: 500,
+              letterSpacing: "-0.02em",
+              color: "#fff",
+              margin: "0 0 8px",
+              display: "block",
+            }}
+          />
+        ) : (
+          <h3
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: 24,
+              fontWeight: 500,
+              letterSpacing: "-0.02em",
+              color: "#fff",
+              margin: "0 0 8px",
+            }}
+          >
+            {item.title}
+          </h3>
+        )}
 
-        {item.description && (
-          <p
+        {editMode ? (
+          <InlineEdit
+            value={item.description || ""}
+            field="description"
+            itemId={item.id}
+            editMode
+            as="textarea"
             style={{
               fontSize: 14,
               lineHeight: 1.6,
               color: "rgba(255,255,255,0.65)",
+              display: "block",
               margin: "0 0 8px",
             }}
-          >
-            {item.description}
-          </p>
+            placeholder="Project description..."
+          />
+        ) : (
+          item.description && (
+            <p
+              style={{
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.65)",
+                margin: "0 0 8px",
+              }}
+            >
+              {item.description}
+            </p>
+          )
         )}
 
-        {role && (
-          <p
+        {editMode ? (
+          <InlineEdit
+            value={role || ""}
+            field="role"
+            itemId={item.id}
+            editMode
             style={{
               fontSize: 12,
               color: "rgba(255,255,255,0.4)",
               fontStyle: "italic",
-              margin: 0,
+              display: "block",
             }}
-          >
-            Role: {role}
-          </p>
+            placeholder="Role (e.g. Cam Op, Editor)..."
+          />
+        ) : (
+          role && (
+            <p
+              style={{
+                fontSize: 12,
+                color: "rgba(255,255,255,0.4)",
+                fontStyle: "italic",
+                margin: 0,
+              }}
+            >
+              Role: {role}
+            </p>
+          )
         )}
 
-        {credits && credits.length > 0 && (
-          <CreditsBlock credits={credits} />
-        )}
+        <CreditsBlock
+          credits={credits || []}
+          editMode={editMode}
+          itemId={item.id}
+        />
 
-        {/* Category badges */}
         <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            marginTop: 12,
-          }}
+          style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}
         >
           {item.categories.map((cat) => (
             <span
@@ -430,15 +1326,16 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
         </div>
       </div>
 
-      {/* Sections mode (multi-campaign projects like Prize Picks) */}
       {hasSections ? (
-        <SectionTabs sections={item.type === "project" ? item.sections! : []} />
+        <SectionTabs
+          sections={item.type === "project" ? item.sections! : []}
+          projectId={item.id}
+          editMode={editMode}
+          itemId={item.id}
+        />
       ) : (
         <>
-          {/* Flat video grid */}
-          <VideoGrid videos={flatVideos} />
-
-          {/* Image galleries */}
+          <VideoGrid videos={flatVideos} projectId={item.id} />
           {galleries && galleries.length > 0 && (
             <GalleryBlock galleries={galleries} />
           )}

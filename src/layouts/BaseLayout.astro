@@ -7,6 +7,7 @@ import Header from '../components/global/Header.astro';
 import Footer from '../components/global/Footer.astro';
 import { BackgroundGradientAnimation } from '../components/ui/background-gradient-animation';
 import SpotlightBackground from '../components/ui/spotlight-background';
+import { AdminGate } from '../components/admin/AdminGate';
 
 interface Props {
   title: string;
@@ -108,6 +109,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       </main>
       <Footer />
     </div>
+
+    <!-- Admin panel — triple-click footer copyright to activate -->
+    <AdminGate client:load />
 
     <script>
       import Lenis from 'lenis';
