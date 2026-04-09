@@ -1016,4 +1016,149 @@ export const portfolioItems: PortfolioItem[] = [
       },
     ],
   },
+
+  // ── Entertainment ───────────────────────────────────────────────
+
+  // Standalone singles
+  {
+    id: "tw-announcement",
+    type: "single",
+    title: "TW Announcement",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 18,
+    video: {
+      videoId: "d6fec50c-f910-4cb4-a9e8-d5fa4d40048d",
+      title: "TW Announcement",
+      aspectRatio: "9/16",
+    },
+  },
+  {
+    id: "sound-design-v2",
+    type: "single",
+    title: "Sound Design V2",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 19,
+    video: {
+      videoId: "056b8204-8a8c-4b80-9abd-0cfc7d440afe",
+      title: "Sound Design V2",
+      aspectRatio: "9/16",
+    },
+  },
+  {
+    id: "rose-bts",
+    type: "single",
+    title: "Rose BTS",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 20,
+    video: {
+      videoId: "7dc2d9a6-1dc3-417e-9c54-9fa48bfcb703",
+      title: "Rose BTS",
+      aspectRatio: "16/9",
+    },
+  },
+  {
+    id: "denzel-promo",
+    type: "single",
+    title: "Denzel Promo",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 21,
+    video: {
+      videoId: "3388ab25-a291-4c07-9ebe-3828622edd11",
+      title: "Denzel Promo",
+      aspectRatio: "9/16",
+    },
+  },
+  {
+    id: "andor-disney-fyc",
+    type: "single",
+    title: "Andor",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 22,
+    video: {
+      videoId: "e5310b69-ec28-48c9-a216-44bd0ba77805",
+      title: "Andor",
+      aspectRatio: "16/9",
+    },
+  },
+
+  // Projects
+  {
+    id: "dwayne-johnson",
+    type: "project",
+    title: "Dwayne Johnson",
+    client: "Dwayne Johnson",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 23,
+    thumbnailVideoId: "7a4e6ecd-5d57-4e82-9fa9-4c5395fffeb2",
+    videos: [
+      {
+        videoId: "7a4e6ecd-5d57-4e82-9fa9-4c5395fffeb2",
+        title: "RDO Tour London",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "0a69ebca-da5a-4ebd-b9f9-5f9a94cb3cb4",
+        title: "Rock Wardrobe",
+        aspectRatio: "9/16",
+      },
+    ],
+  },
+  {
+    id: "movie-premier-work",
+    type: "project",
+    title: "Movie Premier Work",
+    client: "",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 24,
+    thumbnailVideoId: "494299f2-ffbc-4afe-8e82-3eeab8cfc8e8",
+    videos: [
+      {
+        videoId: "494299f2-ffbc-4afe-8e82-3eeab8cfc8e8",
+        title: "Berlin",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "df7910d8-8bd3-4be9-ba08-3fcf80b26e76",
+        title: "Fall Guy",
+        aspectRatio: "9/16",
+      },
+      {
+        videoId: "87b7783d-fa30-4ae8-9b5d-9048fa1ea2c8",
+        title: "Final Cut",
+        aspectRatio: "16/9",
+      },
+    ],
+  },
+  {
+    id: "sebestian",
+    type: "project",
+    title: "Sebestian",
+    client: "Sebestian",
+    description: "",
+    categories: ["Entertainment"],
+    featured: false,
+    order: 25,
+    thumbnailVideoId: "25b0a96a-abb3-4dfa-8972-83d4ed91b030",
+    videos: [
+      {
+        videoId: "25b0a96a-abb3-4dfa-8972-83d4ed91b030",
+        title: "Nashville Recap",
+        aspectRatio: "9/16",
+      },
+    ],
+  },
 ]
