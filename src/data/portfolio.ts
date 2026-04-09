@@ -9,6 +9,7 @@ export type Category =
   | "Branded & Social"
   | "Spec Creative"
   | "Travel"
+  | "Culinary"
 
 export interface BunnyVideo {
   /** Bunny.net Stream video GUID */
@@ -94,6 +95,7 @@ export const categories: ("All" | Category)[] = [
   "Branded & Social",
   "Spec Creative",
   "Travel",
+  "Culinary",
 ]
 
 // ─── Sample data (placeholder video IDs — replace with real Bunny.net GUIDs) ───
@@ -1229,6 +1231,77 @@ export const portfolioItems: PortfolioItem[] = [
         videoId: "336f2236-f800-41df-8739-020e9e1cdf5d",
         title: "Post Card Edit",
         aspectRatio: "16/9",
+      },
+    ],
+  },
+
+  // ── Culinary ────────────────────────────────────────────────────
+
+  // Standalone singles
+  {
+    id: "video-2-tv-ad",
+    type: "single",
+    title: "Video 2 TV Ad",
+    description: "",
+    categories: ["Culinary"],
+    featured: false,
+    order: 30,
+    video: {
+      videoId: "e5a26794-5a40-4b83-8862-164e8185602a",
+      title: "Video 2 TV Ad",
+      aspectRatio: "9/16",
+    },
+  },
+  {
+    id: "magazine",
+    type: "single",
+    title: "Magazine",
+    description: "",
+    categories: ["Culinary"],
+    featured: false,
+    order: 31,
+    video: {
+      videoId: "7ef5bc9d-d68c-4a73-b527-8da898c23b14",
+      title: "Magazine",
+      aspectRatio: "9/16",
+    },
+  },
+  {
+    id: "cinematic-collage",
+    type: "single",
+    title: "Cinematic Collage",
+    description: "",
+    categories: ["Culinary"],
+    featured: false,
+    order: 32,
+    video: {
+      videoId: "05590db5-d109-46ee-88f9-84ae16a7945e",
+      title: "Cinematic Collage",
+      aspectRatio: "9/16",
+    },
+  },
+
+  // Projects
+  {
+    id: "tao",
+    type: "project",
+    title: "TAO",
+    client: "TAO",
+    description: "",
+    categories: ["Culinary"],
+    featured: false,
+    order: 33,
+    thumbnailVideoId: "d427c6ba-48f8-430d-8905-52b89d38bf4e",
+    videos: [
+      {
+        videoId: "d427c6ba-48f8-430d-8905-52b89d38bf4e",
+        title: "Edit V2",
+        aspectRatio: "4/3",
+      },
+      {
+        videoId: "e0ba1b22-c35c-4de3-9451-556e041ed7aa",
+        title: "TAO Couple Date Night",
+        aspectRatio: "4/3",
       },
     ],
   },
