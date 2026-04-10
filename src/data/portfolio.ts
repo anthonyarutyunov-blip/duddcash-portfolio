@@ -1178,7 +1178,7 @@ export const portfolioItems: PortfolioItem[] = [
     video: {
       videoId: "d8a4b789-1c3b-4786-9395-01245f015405",
       title: "Hyper Montage Rome",
-      aspectRatio: "16/9",
+      aspectRatio: "4/3",
     },
   },
   {
@@ -1200,7 +1200,7 @@ export const portfolioItems: PortfolioItem[] = [
     type: "single",
     title: "Santino Car",
     description: "",
-    categories: ["Travel"],
+    categories: [],
     featured: false,
     order: 28,
     video: {

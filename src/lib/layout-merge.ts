@@ -117,7 +117,26 @@ export function getMergedItems(
     } as any
   })
 
-  const allItems = [...editedItems, ...newProjectItems]
+  // Apply content edits to new projects too (same logic as base items)
+  const editedNewItems = newProjectItems.map((item) => {
+    const edits = ov.contentEdits.filter((e) => e.itemId === item.id)
+    if (edits.length === 0) return item
+
+    const clone = { ...item } as any
+    for (const edit of edits) {
+      if (edit.field === "title") clone.title = edit.value
+      else if (edit.field === "description") clone.description = edit.value
+      else if (edit.field === "role") clone.role = edit.value
+      else if (edit.field === "client" && "client" in clone) clone.client = edit.value
+      else if (edit.field === "customThumbnail") clone.customThumbnail = edit.value || undefined
+      else if (edit.field === "credits") {
+        try { clone.credits = JSON.parse(edit.value) } catch {}
+      }
+    }
+    return clone as PortfolioItem
+  })
+
+  const allItems = [...editedItems, ...editedNewItems]
 
   // Filter items for this tab
   const filtered =

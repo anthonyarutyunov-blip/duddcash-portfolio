@@ -70,7 +70,13 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
         </p>
       </div>
 
-      <div style={{ position: "relative" }}>
+      <div
+        style={{
+          position: "relative",
+          maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+        }}
+      >
         <Carousel
           opts={{ loop: true, dragFree: true }}
           plugins={[AutoScroll({ playOnInit: true, speed: 1.2, stopOnInteraction: false })]}
@@ -119,32 +125,6 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
             ))}
           </CarouselContent>
         </Carousel>
-
-        {/* Fade edges — wide and soft */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            width: "clamp(80px, 12vw, 220px)",
-            background: `linear-gradient(to right, ${fadeBg} 0%, transparent 100%)`,
-            pointerEvents: "none",
-            zIndex: 2,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            right: 0,
-            width: "clamp(80px, 12vw, 220px)",
-            background: `linear-gradient(to left, ${fadeBg} 0%, transparent 100%)`,
-            pointerEvents: "none",
-            zIndex: 2,
-          }}
-        />
       </div>
     </section>
   )

@@ -86,20 +86,59 @@ export function createEmptyOverrides(): LayoutOverrides {
   }
 }
 
-/** Load overrides from localStorage (or return empty) */
+/** Ensure backward-compat fields exist */
+function ensureFields(parsed: LayoutOverrides): LayoutOverrides {
+  if (!parsed.videoEdits) parsed.videoEdits = []
+  if (!parsed.removedVideos) parsed.removedVideos = []
+  if (!parsed.newProjects) parsed.newProjects = []
+  if (!parsed.newVideos) parsed.newVideos = []
+  return parsed
+}
+
+/** Cache for the fetched default overrides */
+let _defaultOverridesCache: LayoutOverrides | null = null
+let _defaultOverridesFetching = false
+
+/**
+ * Fetch default overrides from /layout-overrides.json (served from public/).
+ * Seeds localStorage so it only fetches once.
+ */
+export async function loadDefaultOverrides(): Promise<LayoutOverrides> {
+  if (_defaultOverridesCache) return _defaultOverridesCache
+  try {
+    const res = await fetch("/layout-overrides.json")
+    if (res.ok) {
+      const data = (await res.json()) as LayoutOverrides
+      if (data.version === 1) {
+        const result = ensureFields(data)
+        _defaultOverridesCache = result
+        // Seed into localStorage so subsequent sync loads work
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(result))
+        return result
+      }
+    }
+  } catch {}
+  return createEmptyOverrides()
+}
+
+/** Load overrides from localStorage (sync — returns empty if not yet seeded) */
 export function loadOverrides(): LayoutOverrides {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as LayoutOverrides
       if (parsed.version === 1) {
-        // Backward compat: older overrides may lack newer fields
-        if (!parsed.videoEdits) parsed.videoEdits = []
-        if (!parsed.removedVideos) parsed.removedVideos = []
-        return parsed
+        return ensureFields(parsed)
       }
     }
   } catch {}
+
+  // Kick off async fetch to seed localStorage for next load
+  if (!_defaultOverridesFetching && typeof window !== "undefined") {
+    _defaultOverridesFetching = true
+    loadDefaultOverrides()
+  }
+
   return createEmptyOverrides()
 }
 
@@ -241,6 +280,16 @@ export function setContentEdit(
   field: string,
   value: string
 ) {
+  // If editing a new project, update the source entry directly too
+  const newProj = overrides.newProjects.find((p) => p.id === itemId)
+  if (newProj) {
+    if (field === "title") newProj.title = value
+    else if (field === "description") newProj.description = value
+    else if (field === "role") newProj.role = value
+    else if (field === "client") newProj.client = value
+    else if (field === "customThumbnail") newProj.customThumbnail = value || undefined
+  }
+
   const existing = overrides.contentEdits.find(
     (e) => e.itemId === itemId && e.field === field
   )

@@ -29,6 +29,7 @@ import {
 import { useEditMode } from "../../lib/edit-mode"
 import {
   loadOverrides,
+  loadDefaultOverrides,
   saveOverrides,
   setTabItems,
   setItemSize,
@@ -126,7 +127,13 @@ export default function PortfolioGrid() {
 
   // Load overrides on mount and when edit mode changes
   useEffect(() => {
-    setOverrides(loadOverrides())
+    const ov = loadOverrides()
+    // If localStorage was empty, loadOverrides returns empty — fetch defaults
+    if (Object.keys(ov.tabLayouts).length === 0) {
+      loadDefaultOverrides().then((defaults) => setOverrides(defaults))
+    } else {
+      setOverrides(ov)
+    }
   }, [editMode])
 
   // Reload overrides when content is edited
@@ -140,17 +147,29 @@ export default function PortfolioGrid() {
   useEffect(() => {
     const el = headingRef.current
     if (!el) return
+
+    // If already visible in viewport on mount, reveal immediately
+    const rect = el.getBoundingClientRect()
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setHeadingVisible(true)
+      return
+    }
+
+    // Safety fallback — never stay stuck on outline
+    const fallback = setTimeout(() => setHeadingVisible(true), 2000)
+
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setHeadingVisible(true)
+          clearTimeout(fallback)
           obs.unobserve(el)
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 }
     )
     obs.observe(el)
-    return () => obs.disconnect()
+    return () => { obs.disconnect(); clearTimeout(fallback) }
   }, [])
 
   // Read filter and project/video from URL query params
@@ -363,7 +382,7 @@ export default function PortfolioGrid() {
           ref={headingRef}
           className={`portfolio-heading ${headingVisible ? "portfolio-heading--revealed" : ""}`}
         >
-          Our Work
+          OUR WORK
         </h2>
 
         <div className="portfolio-filter-bar">
@@ -475,7 +494,7 @@ export default function PortfolioGrid() {
           font-family: var(--font-display);
           font-size: max(5.5vw, 44px);
           font-weight: 500;
-          letter-spacing: -0.03em;
+          letter-spacing: 0.05em;
           line-height: 1.0;
           text-align: center;
           margin: 0 0 var(--space-xl);

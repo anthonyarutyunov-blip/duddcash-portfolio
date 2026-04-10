@@ -2,15 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TrustedByCarousel from '../components/home/TrustedByCarousel';
 import GlobeSection from '../components/home/GlobeSection';
-import MacFileWindow from '../components/ui/mac-file-window';
 import { MagneticCTA } from '../components/ui/magnetic-cta';
 import { TextReveal } from '../components/ui/text-reveal';
 import { BackgroundMesh } from '../components/ui/background-paper-shaders';
 ---
 
 <BaseLayout title="About" description="Meet the team behind Duddcash — video & photo production for brands, artists, and events.">
-  <MacFileWindow client:load />
-
   <section class="about section">
     <div class="about__inner">
       <div class="about__header" data-animate>
