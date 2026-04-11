@@ -50,28 +50,35 @@ export const BackgroundGradientAnimation = ({
     document.body.style.setProperty("--blending-value", blendingValue);
   }, []);
 
-  // Animation loop using refs — no stale closures
+  // Animation loop using refs — stops when pointer converges (idle)
   useEffect(() => {
     if (!interactive) return;
 
     function animate() {
       const cur = curRef.current;
       const tg = tgRef.current;
-      cur.x += (tg.x - cur.x) / 20;
-      cur.y += (tg.y - cur.y) / 20;
+      const dx = tg.x - cur.x;
+      const dy = tg.y - cur.y;
+      cur.x += dx / 20;
+      cur.y += dy / 20;
 
       if (interactiveRef.current) {
         interactiveRef.current.style.transform = `translate(${Math.round(cur.x)}px, ${Math.round(cur.y)}px)`;
       }
 
+      // Stop RAF when position converges (mouse idle)
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+        rafRef.current = 0;
+        return;
+      }
       rafRef.current = requestAnimationFrame(animate);
     }
 
     rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [interactive]);
 
-  // Global mouse listener — works even when parent has pointer-events: none
+  // Global mouse listener — restarts RAF when mouse moves
   useEffect(() => {
     if (!interactive) return;
 
@@ -80,6 +87,26 @@ export const BackgroundGradientAnimation = ({
         const rect = interactiveRef.current.getBoundingClientRect();
         tgRef.current.x = e.clientX - rect.left;
         tgRef.current.y = e.clientY - rect.top;
+      }
+      // Restart RAF loop if it was idle
+      if (rafRef.current === 0) {
+        function animate() {
+          const cur = curRef.current;
+          const tg = tgRef.current;
+          const dx = tg.x - cur.x;
+          const dy = tg.y - cur.y;
+          cur.x += dx / 20;
+          cur.y += dy / 20;
+          if (interactiveRef.current) {
+            interactiveRef.current.style.transform = `translate(${Math.round(cur.x)}px, ${Math.round(cur.y)}px)`;
+          }
+          if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+            rafRef.current = 0;
+            return;
+          }
+          rafRef.current = requestAnimationFrame(animate);
+        }
+        rafRef.current = requestAnimationFrame(animate);
       }
     };
 
@@ -126,7 +153,7 @@ export const BackgroundGradientAnimation = ({
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:center_center]`,
             `animate-first`,
-            `opacity-100`
+            `opacity-100 [will-change:transform]`
           )}
         />
         <div
@@ -135,7 +162,7 @@ export const BackgroundGradientAnimation = ({
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:calc(50%-400px)]`,
             `animate-second`,
-            `opacity-100`
+            `opacity-100 [will-change:transform]`
           )}
         />
         <div
@@ -144,7 +171,7 @@ export const BackgroundGradientAnimation = ({
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:calc(50%+400px)]`,
             `animate-third`,
-            `opacity-100`
+            `opacity-100 [will-change:transform]`
           )}
         />
         <div
@@ -153,7 +180,7 @@ export const BackgroundGradientAnimation = ({
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:calc(50%-200px)]`,
             `animate-fourth`,
-            `opacity-70`
+            `opacity-70 [will-change:transform]`
           )}
         />
         <div
@@ -162,7 +189,7 @@ export const BackgroundGradientAnimation = ({
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:calc(50%-800px)_calc(50%+800px)]`,
             `animate-fifth`,
-            `opacity-100`
+            `opacity-100 [will-change:transform]`
           )}
         />
 

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import AutoScroll from "embla-carousel-auto-scroll"
 import {
   Carousel,
@@ -30,6 +31,7 @@ interface TrustedByCarouselProps {
 }
 
 export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouselProps) {
+  const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
   const fadeBg = darkMode ? "rgba(0,0,0,0.95)" : "var(--color-bg)"
   const textColor = darkMode ? "rgba(255,255,255,0.92)" : "var(--color-text)"
   const mutedColor = darkMode ? "rgba(255,255,255,0.4)" : "var(--color-muted)"
@@ -79,9 +81,9 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
       >
         <Carousel
           opts={{ loop: true, dragFree: true }}
-          plugins={[AutoScroll({ playOnInit: true, speed: 1.2, stopOnInteraction: false })]}
+          plugins={[AutoScroll({ playOnInit: true, speed: isMobile ? 0.6 : 1.2, stopOnInteraction: false })]}
         >
-          <CarouselContent className="ml-0">
+          <CarouselContent className="ml-0" style={isMobile ? { willChange: "transform", transform: "translateZ(0)" } : undefined}>
             {brands.map((brand, i) => (
               <CarouselItem
                 key={i}

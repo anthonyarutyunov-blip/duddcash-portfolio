@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react"
 import { useState, useEffect, useCallback, useRef } from "react"
+import { BlurRevealText } from "../ui/blur-reveal-text"
 import { createPortal } from "react-dom"
 import { GripVertical, Plus, FolderPlus, Film } from "lucide-react"
 import {
@@ -118,12 +119,28 @@ export default function PortfolioGrid() {
   const [filter, setFilter] = useState<"All" | Category>("Featured")
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
-  const [headingVisible, setHeadingVisible] = useState(false)
+  const filterBarRef = useRef<HTMLDivElement>(null)
+  const filterHintRef = useRef<HTMLDivElement>(null)
   const { editMode } = useEditMode()
   const [overrides, setOverrides] = useState<LayoutOverrides | null>(null)
   const [showAddVideo, setShowAddVideo] = useState(false)
   const [showAddProject, setShowAddProject] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [isMobileGrid] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
+
+  // Handle filter change with mobile scroll management
+  const handleFilterChange = useCallback((cat: "All" | Category) => {
+    if (cat === filter) return
+    setFilter(cat)
+
+    // On mobile, use native scroll to filter bar (bypass Lenis)
+    if (isMobileGrid && filterBarRef.current) {
+      requestAnimationFrame(() => {
+        filterBarRef.current!.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
+        window.scrollBy(0, -20)
+      })
+    }
+  }, [filter, isMobileGrid])
 
   // Load overrides on mount and when edit mode changes
   useEffect(() => {
@@ -143,34 +160,6 @@ export default function PortfolioGrid() {
     return () => window.removeEventListener("editmode:content-changed", handler)
   }, [])
 
-  // Heading stroke-fill reveal on scroll
-  useEffect(() => {
-    const el = headingRef.current
-    if (!el) return
-
-    // If already visible in viewport on mount, reveal immediately
-    const rect = el.getBoundingClientRect()
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      setHeadingVisible(true)
-      return
-    }
-
-    // Safety fallback — never stay stuck on outline
-    const fallback = setTimeout(() => setHeadingVisible(true), 2000)
-
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHeadingVisible(true)
-          clearTimeout(fallback)
-          obs.unobserve(el)
-        }
-      },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => { obs.disconnect(); clearTimeout(fallback) }
-  }, [])
 
   // Read filter and project/video from URL query params
   useEffect(() => {
@@ -180,7 +169,10 @@ export default function PortfolioGrid() {
       setFilter(urlFilter as "All" | Category)
       setTimeout(() => {
         const el = document.getElementById("portfolio")
-        if (el) el.scrollIntoView({ behavior: "smooth" })
+        const lenis = (window as any).__lenis
+        if (el && lenis) {
+          lenis.scrollTo(el, { offset: -40, duration: 1.0 })
+        }
       }, 300)
     }
 
@@ -200,7 +192,10 @@ export default function PortfolioGrid() {
               const videoEl = document.querySelector(
                 `[data-video-id="${videoParam}"]`
               )
-              videoEl?.scrollIntoView({ behavior: "smooth", block: "center" })
+              const lenis = (window as any).__lenis
+              if (videoEl && lenis) {
+                lenis.scrollTo(videoEl, { offset: -200, duration: 1.0 })
+              }
             }, 600)
           }
         }, 400)
@@ -212,6 +207,22 @@ export default function PortfolioGrid() {
   useEffect(() => {
     setExpandedId(null)
   }, [filter])
+
+  // Hide filter scroll hint once user scrolls the bar
+  useEffect(() => {
+    const bar = filterBarRef.current
+    const hint = filterHintRef.current
+    if (!bar || !hint) return
+    const onScroll = () => {
+      if (bar.scrollLeft > 20) {
+        hint.style.opacity = "0"
+        hint.style.transition = "opacity 0.3s ease"
+        bar.removeEventListener("scroll", onScroll)
+      }
+    }
+    bar.addEventListener("scroll", onScroll, { passive: true })
+    return () => bar.removeEventListener("scroll", onScroll)
+  }, [])
 
   // Get merged items (applies overrides to base data)
   const mergedItems: MergedItem[] = getMergedItems(
@@ -327,7 +338,7 @@ export default function PortfolioGrid() {
     return (
       <div
         key={item.id}
-        className="portfolio-card-wrapper"
+        className={`portfolio-card-wrapper${expandedId === item.id ? " portfolio-card-wrapper--expanded" : ""}`}
         style={{ gridColumn: gridCol }}
       >
         {card}
@@ -337,12 +348,12 @@ export default function PortfolioGrid() {
 
   const gridElement = (
     <motion.div
-      key={`${filter}-${expandedId || "grid"}`}
+      key={filter}
       className={`portfolio-bento-grid${activeId ? " portfolio-grid--dragging" : ""}`}
-      initial={{ opacity: 0 }}
+      initial={isMobileGrid ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
+      exit={isMobileGrid ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: isMobileGrid ? 0 : 0.15 }}
     >
       {gridContent}
 
@@ -378,26 +389,37 @@ export default function PortfolioGrid() {
       }}
     >
       <div className="portfolio-container">
-        <h2
-          ref={headingRef}
-          className={`portfolio-heading ${headingVisible ? "portfolio-heading--revealed" : ""}`}
-        >
-          OUR WORK
+        <h2 ref={headingRef} className="portfolio-heading">
+          <BlurRevealText
+            text="OUR WORK"
+            charDelay={0.05}
+            charDuration={0.7}
+            blurAmount={14}
+            delay={0.3}
+          />
         </h2>
 
-        <div className="portfolio-filter-bar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`portfolio-filter-pill ${filter === cat ? "portfolio-filter-pill--active" : ""}`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="portfolio-filter-wrap">
+          <div className="portfolio-filter-bar" ref={filterBarRef}>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleFilterChange(cat)}
+                className={`portfolio-filter-pill ${filter === cat ? "portfolio-filter-pill--active" : ""}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          {/* Scroll hint arrow — mobile only */}
+          <div className="portfolio-filter-hint" ref={filterHintRef} aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </div>
         </div>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode={isMobileGrid ? "sync" : "wait"}>
           {editMode && !expandedId ? (
             <DndContext
               sensors={sensors}
@@ -498,20 +520,16 @@ export default function PortfolioGrid() {
           line-height: 1.0;
           text-align: center;
           margin: 0 0 var(--space-xl);
-          -webkit-text-stroke: 1.5px #fff;
-          color: transparent;
-          background: linear-gradient(to right, #fff 50%, transparent 50%);
-          background-size: 200% 100%;
-          background-position: 100% 0;
-          -webkit-background-clip: text;
-          background-clip: text;
-          transition: background-position 1.2s cubic-bezier(.165, .84, .44, 1),
-                      -webkit-text-stroke 0.4s ease 0.8s;
+          color: #fff;
         }
 
-        .portfolio-heading--revealed {
-          background-position: 0% 0;
-          -webkit-text-stroke: 0px transparent;
+        .portfolio-filter-wrap {
+          position: relative;
+          margin-bottom: var(--space-xl);
+        }
+
+        .portfolio-filter-hint {
+          display: none;
         }
 
         .portfolio-filter-bar {
@@ -519,7 +537,6 @@ export default function PortfolioGrid() {
           flex-wrap: wrap;
           justify-content: center;
           gap: 8px;
-          margin-bottom: var(--space-xl);
         }
 
         .portfolio-filter-pill {
@@ -694,30 +711,46 @@ export default function PortfolioGrid() {
           .portfolio-container {
             margin: 0 12px;
             border-radius: 20px;
-            padding: 32px 16px 16px;
+            padding: 36px 16px 20px;
           }
 
           .portfolio-bento-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
           }
 
+          /* Force single column, but allow expanded cards to span full */
           .portfolio-card-wrapper {
             grid-column: span 1 !important;
+          }
+
+          .portfolio-card-wrapper--expanded {
+            grid-column: 1 / -1 !important;
+          }
+
+          /* Reduce container padding when project is expanded */
+          .portfolio-container:has(.portfolio-card-wrapper--expanded) {
+            padding: 12px 6px 6px;
           }
 
           .portfolio-add-btn {
             grid-column: span 1 !important;
           }
 
+          .portfolio-filter-wrap {
+            margin-bottom: 20px;
+          }
+
+          /* Wrapped grid of all categories — no scrolling */
           .portfolio-filter-bar {
-            flex-wrap: nowrap;
-            justify-content: flex-start;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 8px;
-            mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 24px), transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 24px), transparent 100%);
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+          }
+
+          /* Hide scroll hint arrow */
+          .portfolio-filter-hint {
+            display: none !important;
           }
 
           .portfolio-card__hover-overlay {
@@ -727,6 +760,38 @@ export default function PortfolioGrid() {
           .portfolio-card-wrapper:hover {
             transform: none;
             box-shadow: none;
+          }
+
+          .portfolio-filter-pill {
+            padding: 6px 14px;
+            font-size: 10px;
+            min-height: unset;
+            border: 1px solid rgba(255,255,255,0.08);
+          }
+
+          .portfolio-filter-pill--active {
+            border-color: transparent;
+          }
+
+          .portfolio-card__info {
+            padding: 28px 10px 10px;
+          }
+
+          .portfolio-card__title {
+            font-size: 13px;
+          }
+
+          .portfolio-card__client {
+            font-size: 10px;
+          }
+
+          .portfolio-heading {
+            font-size: max(9vw, 32px);
+            margin-bottom: 20px;
+          }
+
+          #portfolio {
+            padding-bottom: 1.5rem !important;
           }
         }
       `}</style>

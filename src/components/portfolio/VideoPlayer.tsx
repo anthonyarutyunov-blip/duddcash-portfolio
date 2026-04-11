@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { motion } from "motion/react"
-import { Volume2, VolumeX, Play, Pause } from "lucide-react"
+import { Volume2, VolumeX, Play, Pause, Maximize } from "lucide-react"
 import { videoUrl, thumbnailUrl } from "../../lib/bunny"
 
 interface VideoPlayerProps {
@@ -28,17 +28,34 @@ export function VideoPlayer({
   const containerRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
   const fillRef = useRef<HTMLDivElement>(null)
+  const mobileFillRef = useRef<HTMLDivElement>(null)
   const handleDotRef = useRef<HTMLDivElement>(null)
   const [isMuted, setIsMuted] = useState(true)
   const [isPaused, setIsPaused] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const [showPlayIcon, setShowPlayIcon] = useState(false)
+  const [readyToShow, setReadyToShow] = useState(false)
   const iconTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const rafRef = useRef<number | null>(null)
   const seekingRef = useRef(false)
   const userPausedRef = useRef(false)
   const instanceId = useRef(`vp-${videoId}-${Math.random().toString(36).slice(2, 8)}`)
+  const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
+
+  // Fullscreen handler (mobile only)
+  const handleFullscreen = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    const video = videoRef.current
+    if (!video) return
+    if (video.requestFullscreen) {
+      video.requestFullscreen()
+    } else if ((video as any).webkitEnterFullscreen) {
+      ;(video as any).webkitEnterFullscreen()
+    } else if ((video as any).webkitRequestFullscreen) {
+      ;(video as any).webkitRequestFullscreen()
+    }
+  }, [])
 
   // Intersection Observer — only autoplay when visible
   useEffect(() => {
@@ -59,6 +76,12 @@ export function VideoPlayer({
     if (!video) return
 
     if (isVisible && !userPausedRef.current) {
+      const onPlaying = () => {
+        setReadyToShow(true)
+        video.removeEventListener("playing", onPlaying)
+      }
+      video.addEventListener("playing", onPlaying)
+
       // If video has enough data, play immediately; otherwise wait for canplay
       if (video.readyState >= 3) {
         video.play().catch(() => {})
@@ -72,32 +95,55 @@ export function VideoPlayer({
           video.removeEventListener("canplay", onReady)
         }
         video.addEventListener("canplay", onReady)
-        return () => video.removeEventListener("canplay", onReady)
+        return () => {
+          video.removeEventListener("canplay", onReady)
+          video.removeEventListener("playing", onPlaying)
+        }
       }
+      return () => video.removeEventListener("playing", onPlaying)
     } else {
       video.pause()
+      setReadyToShow(false)
     }
   }, [isVisible])
 
-  // Track progress — direct DOM updates, no React state
+  // Track progress — direct DOM updates, only when playing
   useEffect(() => {
     const video = videoRef.current
     const fill = fillRef.current
+    const mobileFill = mobileFillRef.current
     const handle = handleDotRef.current
-    if (!video || !fill) return
+    if (!video || (!fill && !mobileFill)) return
 
     const tick = () => {
       if (video.duration && !seekingRef.current) {
         const pct = (video.currentTime / video.duration) * 100
-        fill.style.width = `${pct}%`
+        if (fill) fill.style.width = `${pct}%`
         if (handle) handle.style.left = `${pct}%`
+        if (mobileFill) mobileFill.style.width = `${pct}%`
       }
       rafRef.current = requestAnimationFrame(tick)
     }
 
-    rafRef.current = requestAnimationFrame(tick)
+    const startTick = () => {
+      if (!rafRef.current) rafRef.current = requestAnimationFrame(tick)
+    }
+    const stopTick = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
+    }
+
+    video.addEventListener("play", startTick)
+    video.addEventListener("pause", stopTick)
+    // Start immediately if already playing
+    if (!video.paused) startTick()
+
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      stopTick()
+      video.removeEventListener("play", startTick)
+      video.removeEventListener("pause", stopTick)
     }
   }, [])
 
@@ -249,7 +295,6 @@ export function VideoPlayer({
       <video
         ref={videoRef}
         src={videoUrl(videoId, "1080p")}
-        poster={customThumbnail || thumbnailUrl(videoId)}
         muted
         loop
         playsInline
@@ -259,6 +304,22 @@ export function VideoPlayer({
           height: "100%",
           objectFit: "cover",
           display: "block",
+        }}
+      />
+      {/* Thumbnail overlay — hides black flash before first frame decodes */}
+      <img
+        src={customThumbnail || thumbnailUrl(videoId)}
+        alt=""
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          opacity: readyToShow ? 0 : 1,
+          transition: "opacity 0.3s ease",
+          pointerEvents: "none",
+          zIndex: 1,
         }}
       />
 
@@ -278,8 +339,8 @@ export function VideoPlayer({
           background: "rgba(0,0,0,0.5)",
           backdropFilter: "blur(8px)",
           borderRadius: "50%",
-          width: 56,
-          height: 56,
+          width: isMobile ? 40 : 56,
+          height: isMobile ? 40 : 56,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -288,88 +349,148 @@ export function VideoPlayer({
           zIndex: 3,
         }}
       >
-        {isPaused ? <Play size={24} fill="#fff" /> : <Pause size={24} />}
+        {isPaused ? <Play size={isMobile ? 18 : 24} fill="#fff" /> : <Pause size={isMobile ? 18 : 24} />}
       </motion.div>
 
-      {/* Mute/unmute button (bottom-right corner, always clickable) */}
+      {/* Bottom-right controls row: fullscreen (mobile only) + mute */}
       <div
-        onClick={handleMuteToggle}
-        role="button"
-        aria-label={isMuted ? "Unmute" : "Mute"}
         style={{
           position: "absolute",
-          bottom: 40,
+          bottom: isMobile ? 32 : 40,
           right: 8,
-          background: "rgba(0,0,0,0.5)",
-          borderRadius: "50%",
-          width: 32,
-          height: 32,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
+          gap: 6,
           zIndex: 4,
-          transition: "background 0.2s ease",
         }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.background = "rgba(0,0,0,0.7)")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.background = "rgba(0,0,0,0.5)")
-        }
+        onClick={(e) => e.stopPropagation()}
       >
-        {isMuted ? (
-          <VolumeX size={15} color="#fff" />
-        ) : (
-          <Volume2 size={15} color="#fff" />
+        {/* Fullscreen button — mobile only */}
+        {isMobile && (
+          <div
+            onClick={handleFullscreen}
+            role="button"
+            aria-label="Fullscreen"
+            style={{
+              background: "rgba(0,0,0,0.5)",
+              borderRadius: "50%",
+              width: 28,
+              height: 28,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              transition: "background 0.2s ease",
+            }}
+          >
+            <Maximize size={13} color="#fff" />
+          </div>
         )}
+
+        {/* Mute/unmute button */}
+        <div
+          onClick={handleMuteToggle}
+          role="button"
+          aria-label={isMuted ? "Unmute" : "Mute"}
+          style={{
+            background: "rgba(0,0,0,0.5)",
+            borderRadius: "50%",
+            width: isMobile ? 28 : 32,
+            height: isMobile ? 28 : 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "background 0.2s ease",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(0,0,0,0.7)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "rgba(0,0,0,0.5)")
+          }
+        >
+          {isMuted ? (
+            <VolumeX size={isMobile ? 13 : 15} color="#fff" />
+          ) : (
+            <Volume2 size={isMobile ? 13 : 15} color="#fff" />
+          )}
+        </div>
       </div>
 
-      {/* Seek / progress bar */}
-      <div
-        ref={barRef}
-        onMouseDown={handleSeekStart}
-        onTouchStart={handleSeekStart}
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          background: "rgba(255,255,255,0.15)",
-          cursor: "pointer",
-          transition: "height 0.2s ease",
-          zIndex: 5,
-        }}
-      >
+      {/* Desktop: interactive seek bar with dot */}
+      {!isMobile && (
         <div
-          ref={fillRef}
-          style={{
-            height: "100%",
-            width: "0%",
-            background: "rgba(255,255,255,0.75)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          ref={handleDotRef}
+          ref={barRef}
+          onMouseDown={handleSeekStart}
+          onTouchStart={handleSeekStart}
+          onClick={(e) => e.stopPropagation()}
           style={{
             position: "absolute",
-            top: "50%",
-            left: "0%",
-            transform: "translate(-50%, -50%)",
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            background: "#fff",
-            boxShadow: "0 0 4px rgba(0,0,0,0.3)",
-            opacity: 0,
-            transition: "opacity 0.2s ease",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: "rgba(255,255,255,0.15)",
+            cursor: "pointer",
+            transition: "height 0.2s ease",
+            zIndex: 5,
+          }}
+        >
+          <div
+            ref={fillRef}
+            style={{
+              height: "100%",
+              width: "0%",
+              background: "rgba(255,255,255,0.75)",
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            ref={handleDotRef}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "0%",
+              transform: "translate(-50%, -50%)",
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#fff",
+              boxShadow: "0 0 4px rgba(0,0,0,0.3)",
+              opacity: 0,
+              transition: "opacity 0.2s ease",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Mobile: always-visible thin white progress bar */}
+      {isMobile && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            background: "rgba(255,255,255,0.2)",
+            zIndex: 5,
             pointerEvents: "none",
           }}
-        />
-      </div>
+        >
+          <div
+            ref={mobileFillRef}
+            style={{
+              height: "100%",
+              width: "0%",
+              background: "#fff",
+              borderRadius: 1,
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+      )}
 
       {/* Title + description overlay at bottom */}
       {title && (
@@ -379,17 +500,17 @@ export function VideoPlayer({
             bottom: 0,
             left: 0,
             right: 0,
-            padding: "24px 12px 14px",
+            padding: isMobile ? "18px 8px 10px" : "24px 12px 14px",
             background:
               "linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
             pointerEvents: "none",
           }}
         >
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: isMobile ? 4 : 8, flexWrap: "wrap" }}>
             <p
               style={{
                 color: "#fff",
-                fontSize: 13,
+                fontSize: isMobile ? 11 : 13,
                 fontWeight: 500,
                 margin: 0,
               }}
@@ -400,7 +521,7 @@ export function VideoPlayer({
               <p
                 style={{
                   color: "rgba(255,255,255,0.5)",
-                  fontSize: 11,
+                  fontSize: isMobile ? 9 : 11,
                   fontStyle: "italic",
                   margin: 0,
                 }}

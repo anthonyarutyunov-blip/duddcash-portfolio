@@ -136,7 +136,10 @@ export function getMergedItems(
     return clone as PortfolioItem
   })
 
-  const allItems = [...editedItems, ...editedNewItems]
+  // Deduplicate: if a newProject's ID already exists in base data, skip it
+  const baseIds = new Set(editedItems.map((item) => item.id))
+  const dedupedNewItems = editedNewItems.filter((item) => !baseIds.has(item.id))
+  const allItems = [...editedItems, ...dedupedNewItems]
 
   // Filter items for this tab
   const filtered =
@@ -196,8 +199,12 @@ export function getMergedVideos(
       aspectRatio: nv.aspectRatio,
     }))
 
+  // Deduplicate: if a newVideo's ID already exists in base data, skip it
+  const baseVideoIds = new Set(baseVideos.map((v) => v.videoId))
+  const dedupedNewVideos = newVideos.filter((v) => !baseVideoIds.has(v.videoId))
+
   // Filter out removed videos and combine with new videos
-  const allVideos = [...baseVideos, ...newVideos].filter(
+  const allVideos = [...baseVideos, ...dedupedNewVideos].filter(
     (v) => !removed.has(v.videoId)
   )
 

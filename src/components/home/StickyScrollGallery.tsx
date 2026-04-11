@@ -155,6 +155,78 @@ const col5_top = col5.slice(0, 8)
 const col5_bottom = col5.slice(8)
 
 /* ------------------------------------------------------------------ */
+/*  Mobile 3-column layout — curated row-by-row for color/mood flow   */
+/*  Each row of 3 shares a visual theme across the columns            */
+/* ------------------------------------------------------------------ */
+//  Row theme                       Col A           Col B                Col C
+//  1  Cool / urban               col1[0]  marina   col2[0]  cityscape   col3[0]  building green
+//  2  Dramatic / dark             col1[1]  teal sil col2[1]  night tree  col3[1]  golfer blue
+//  3  Nature / foliage           col1[2]  branches col2[2]  foliage     col3[2]  waterfront
+//  4  Editorial / fashion        col1[3]  clock    col2[3]  fashion     col5[3]  ZARA text
+//  5  Warm tones                 col1[4]  pier     col2[4]  vintage     col3[4]  feet amber
+//  6  Minimal / monochrome       col1[5]  venice   col3[6]  moon        col5[0]  shadows
+//  7  Sports / dark              col1[6]  golf     col2[5]  golfer      col4[1]  boxing
+//  8  Deep blue                  col1[7]  ocean    col2[7]  backlight   col3[3]  lulu purple
+//  9  Sunset / silhouette        col1[8]  tree     col2[8]  fence       col3[8]  sunset prof
+//  10 Warm / tropical            col1[9]  tropics  col2[6]  lulu ext    col4[4]  cathedral
+//  11 Golden                     col1[10] plant    col3[5]  riverside   col3[11] hillside
+//  12 Stage / performance        col1[11] pink     col2[12] purple      col3[9]  red LED
+//  13 Electric / vibrant         col1[12] pool     col4[6]  lounge      col4[7]  EDC
+//  ---- editorial break ----
+//  14 Golden / silhouette        col1[13] sunset   col2[10] golden      col3[12] bokeh
+//  15 Neon / golden              col1[14] neon     col4[14] canopy      col5[8]  stone
+//  16 Sky / horizon              col1[15] ridge    col2[14] NYC         col3[14] birds
+//  17 Architecture               col4[0]  curved   col4[8]  chicago     col4[10] neoclassic
+//  18 Architecture 2             col4[2]  dome     col4[11] colosseum   col4[12] mod palms
+//  19 Editorial / blue           col4[3]  woman    col4[5]  RC25        col5[1]  boxer
+//  20 Dark / dramatic            col5[2]  dusk sil col2[9]  heavy bag   col5[6]  spotlight
+//  21 Luxury / night             col5[4]  fountain col5[5]  lambo       col5[11] tao
+//  22 Live performance           col5[7]  crowd    col4[9]  captain     col5[10] green spot
+//  23 Event / crowd              col5[9]  getLucked col5[12] concert    col4[13] aftermovie
+//  24 Red / warm                 col2[11] carpet   col3[10] cocktail    col3[13] warm
+//  25 Dark / introspective       col2[13] filming  col3[7]  polaroids   col4[15] mitchell
+//  26 Neutral / end              col5[13] bunt     col5[14] gym         col5[15] still
+
+const mobileColA: Photo[] = [
+  // top half (13) — cool/urban → warm progression
+  col1[0], col1[1], col1[2], col1[3], col1[4], col1[5],
+  col1[6], col1[7], col1[8], col1[9], col1[10], col1[11],
+  col1[12],
+  // bottom half (12) — golden → events
+  col1[13], col1[14], col1[15], col4[0], col4[2],
+  col5[2], col2[13], col5[4], col4[3], col5[7],
+  col5[9], col3[12],
+]
+const mobileColB: Photo[] = [
+  // top half (13)
+  col2[0], col2[1], col2[2], col2[3], col2[4], col3[6],
+  col2[5], col2[7], col2[8], col2[6], col3[5], col2[12],
+  col4[6],
+  // bottom half (14) — architecture → dark middle → bright ending
+  col2[10], col4[14], col2[14], col4[8], col4[11],
+  col4[5], col3[7], col5[14], col2[9], col5[5],
+  col5[12], col4[9], col3[10], col2[11],
+]
+const mobileColC: Photo[] = [
+  // top half (13)
+  col3[0], col3[1], col3[2], col5[3], col3[4], col5[0],
+  col4[1], col3[3], col3[8], col4[4], col3[11], col3[9],
+  col4[7],
+  // bottom half (13) — BUNT under EDC → architecture → dark middle → bright ending
+  col5[13], col5[8], col3[14], col4[10], col4[12],
+  col5[1], col4[15], col5[15], col5[6], col4[13],
+  col5[11], col3[13], col5[10],
+]
+
+// Split mobile columns at editorial break (13 top, variable bottom)
+const mobileColA_top = mobileColA.slice(0, 13)
+const mobileColA_bottom = mobileColA.slice(13)
+const mobileColB_top = mobileColB.slice(0, 13)
+const mobileColB_bottom = mobileColB.slice(13)
+const mobileColC_top = mobileColC.slice(0, 13)
+const mobileColC_bottom = mobileColC.slice(13)
+
+/* ------------------------------------------------------------------ */
 /*  Blur + Slide animation variants for the editorial text             */
 /* ------------------------------------------------------------------ */
 
@@ -318,48 +390,53 @@ function EditorialBreak() {
 /* ------------------------------------------------------------------ */
 
 export default function StickyScrollGallery() {
+  const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 640)
+
   return (
     <section className="gallery-container">
-      {/* Top half of photo grid */}
-      <div className="sticky-gallery-grid">
-        <div className="gallery-cell">
-          <PhotoColumn photos={col1_top} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col2_top} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col3_top} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col4_top} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col5_top} />
-        </div>
-      </div>
+      {isMobile ? (
+        <>
+          {/* Mobile: 3 curated columns — top half (13 rows) */}
+          <div className="sticky-gallery-grid">
+            <div className="gallery-cell"><PhotoColumn photos={mobileColA_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColB_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColC_top} /></div>
+          </div>
 
-      {/* Editorial break — cinematic statement */}
-      <EditorialBreak />
+          {/* Editorial break */}
+          <EditorialBreak />
 
-      {/* Bottom half of photo grid */}
-      <div className="sticky-gallery-grid">
-        <div className="gallery-cell">
-          <PhotoColumn photos={col1_bottom} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col2_bottom} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col3_bottom} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col4_bottom} />
-        </div>
-        <div className="gallery-cell">
-          <PhotoColumn photos={col5_bottom} />
-        </div>
-      </div>
+          {/* Mobile: 3 curated columns — bottom half (13 rows) */}
+          <div className="sticky-gallery-grid">
+            <div className="gallery-cell"><PhotoColumn photos={mobileColA_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColB_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColC_bottom} /></div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Desktop: 5 columns — top half */}
+          <div className="sticky-gallery-grid">
+            <div className="gallery-cell"><PhotoColumn photos={col1_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col2_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col3_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col4_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col5_top} /></div>
+          </div>
+
+          {/* Editorial break — cinematic statement */}
+          <EditorialBreak />
+
+          {/* Desktop: 5 columns — bottom half */}
+          <div className="sticky-gallery-grid">
+            <div className="gallery-cell"><PhotoColumn photos={col1_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col2_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col3_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col4_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={col5_bottom} /></div>
+          </div>
+        </>
+      )}
 
       <style>{`
         /* ---- Dark container ---- */
@@ -447,34 +524,53 @@ export default function StickyScrollGallery() {
           .gallery-cell:nth-child(5) { order: 6; grid-column: span 3; }
         }
 
-        /* ---- Responsive: Mobile ---- */
+        /* ---- Responsive: Mobile — 3-column curated layout ---- */
         @media (max-width: 640px) {
           .gallery-container {
-            margin: 0 12px;
-            border-radius: 20px;
-            padding: 24px 12px 12px;
+            margin: 0 8px;
+            border-radius: 16px;
+            padding: 6px 4px 4px;
+            overflow: hidden;
           }
 
           .sticky-gallery-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
           }
 
-          /* Reset tablet span overrides */
           .gallery-cell {
+            display: block !important;
             grid-column: span 1 !important;
             order: unset !important;
           }
 
+          .gallery-col {
+            gap: 3px;
+            height: 100%;
+          }
+
+          .gallery-img-wrap:last-child {
+            flex: 1;
+          }
+
           .editorial-break {
-            min-height: 50vh;
+            min-height: 28vh;
+            padding: 32px 12px;
+          }
+
+          .editorial-break__text {
+            font-size: clamp(14px, 4.5vw, 20px) !important;
           }
 
           .gallery-img-wrap {
             height: auto !important;
+            border-radius: 3px;
+            background: transparent;
           }
 
           .gallery-img-wrap img {
-            height: 120px;
+            height: 100%;
+            object-fit: cover;
           }
         }
       `}</style>

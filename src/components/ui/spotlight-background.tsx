@@ -1,38 +1,44 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const SpotlightBackground = () => {
-  const [mouse, setMouse] = useState({ x: -999, y: -999 });
-  const [isMoving, setIsMoving] = useState(false);
+  const spotRef = useRef<HTMLDivElement>(null);
   const moveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      setMouse({ x: e.clientX, y: e.clientY });
-      setIsMoving(true);
+      const el = spotRef.current;
+      if (!el) return;
+      el.style.left = `${e.clientX}px`;
+      el.style.top = `${e.clientY}px`;
+      el.style.width = el.style.height = "180px";
 
       if (moveTimeout.current) clearTimeout(moveTimeout.current);
       moveTimeout.current = setTimeout(() => {
-        setIsMoving(false);
+        if (spotRef.current) {
+          spotRef.current.style.width = spotRef.current.style.height = "220px";
+        }
       }, 150);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-[2]">
       <div
+        ref={spotRef}
         className="absolute rounded-full pointer-events-none"
         style={{
-          left: mouse.x,
-          top: mouse.y,
-          width: isMoving ? "180px" : "220px",
-          height: isMoving ? "180px" : "220px",
+          left: -999,
+          top: -999,
+          width: "220px",
+          height: "220px",
           transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, rgba(210, 185, 155, 0.08) 0%, transparent 70%)",
           transition: "width 0.4s ease, height 0.4s ease",
           mixBlendMode: "soft-light" as const,
+          willChange: "left, top",
         }}
       />
     </div>

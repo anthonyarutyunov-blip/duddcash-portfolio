@@ -21,9 +21,6 @@ import { IntroScreen } from '../components/ui/intro-screen';
       <h1 class="hero__headline">
         The work speaks,<br />so we don't have to.
       </h1>
-      <p class="hero__sub">
-        for brands that move fast
-      </p>
       <ScrollIndicator client:load />
     </div>
 
@@ -33,6 +30,7 @@ import { IntroScreen } from '../components/ui/intro-screen';
   <div class="grid-section">
     <div class="grid-section__bg">
       <div class="grid-section__fade-in"></div>
+      <div class="grid-section__fade-out"></div>
       <InfiniteGrid client:visible height="100%" speedX={0.3} speedY={0.3} spotlightSize={350} />
     </div>
     <div class="grid-section__content">
@@ -139,6 +137,17 @@ import { IntroScreen } from '../components/ui/intro-screen';
     right: 0;
     height: 250px;
     background: linear-gradient(to bottom, var(--color-bg) 30%, transparent);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .grid-section__fade-out {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 300px;
+    background: linear-gradient(to top, var(--color-bg) 20%, transparent);
     z-index: 1;
     pointer-events: none;
   }

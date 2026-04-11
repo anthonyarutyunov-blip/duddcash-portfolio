@@ -10,7 +10,8 @@ const navLinks = [
 const socialLinks = [
   { href: 'https://instagram.com/duddcash', label: 'Instagram' },
   { href: 'https://www.linkedin.com/in/anthony-arutyunov-0284a32a2/', label: 'LinkedIn' },
-  { href: 'mailto:hi@duddcashstudios.com', label: 'Email' },
+  { href: 'mailto:action@duddcashstudios.com', label: 'Email' },
+  { href: 'https://patreon.com/DuddCash', label: 'Patreon' },
 ];
 
 const baseCities = ['CHI', 'CLE'];
@@ -389,18 +390,34 @@ const baseCities = ['CHI', 'CLE'];
   }
 
   @media (max-width: 768px) {
+    .footer {
+      padding: 48px 20px 24px;
+    }
+
     .footer__top {
       flex-direction: column;
-      gap: var(--space-2xl);
+      gap: var(--space-xl);
+      padding-bottom: var(--space-xl);
     }
 
     .footer__links {
-      gap: var(--space-2xl);
+      gap: var(--space-xl);
+    }
+
+    .footer__nav-col {
+      gap: 10px;
+      min-width: 100px;
+    }
+
+    .footer__nav-link {
+      font-size: 14px;
     }
 
     .footer__cta-row {
       flex-wrap: wrap;
       gap: 12px;
+      padding: var(--space-lg) 0;
+      margin-bottom: var(--space-md);
     }
 
     .footer__cta-squiggle {
@@ -409,8 +426,9 @@ const baseCities = ['CHI', 'CLE'];
 
     .footer__bottom {
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       align-items: flex-start;
+      padding-top: var(--space-lg);
     }
   }
 </style>

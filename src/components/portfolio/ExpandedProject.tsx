@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "motion/react"
 import { X, Plus, GripVertical, Link } from "lucide-react"
@@ -352,6 +352,52 @@ function VideoGrid({
   const [copiedVideoId, setCopiedVideoId] = useState<string | null>(null)
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
 
+  // Pagination — only render a subset of videos at a time
+  // On mobile, videos go full-width so show fewer per page
+  const [isMobileView] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
+  const VIDEOS_PER_PAGE = isMobileView ? 4 : 6
+  const [currentPage, setCurrentPage] = useState(0)
+  const totalPages = Math.ceil(orderedVideos.length / VIDEOS_PER_PAGE)
+  const needsPagination = orderedVideos.length > VIDEOS_PER_PAGE && !editMode
+  const gridContainerRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  const handlePageChange = useCallback((page: number) => {
+    const grid = gridRef.current
+    const lenis = (window as any).__lenis
+
+    // Lock the grid height at its current value to prevent scroll jump
+    if (grid) {
+      grid.style.minHeight = `${grid.offsetHeight}px`
+    }
+
+    setCurrentPage(page)
+
+    // After React commits new videos, scroll to top of grid container and unlock.
+    requestAnimationFrame(() => {
+      if (isMobileView && gridContainerRef.current) {
+        // Mobile: use native scrollIntoView — bypasses Lenis resize issues.
+        // Lenis on touch delegates to native anyway, but lenis.scrollTo +
+        // lenis.resize can fight each other and cause jumps.
+        gridContainerRef.current.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
+        window.scrollBy(0, -20)
+        // Release height lock after a generous delay so thumbnails settle
+        setTimeout(() => {
+          if (grid) grid.style.minHeight = ""
+        }, 200)
+      } else {
+        // Desktop: Lenis handles everything
+        if (lenis && gridContainerRef.current) {
+          lenis.scrollTo(gridContainerRef.current, { offset: -20, immediate: true })
+        }
+        setTimeout(() => {
+          if (grid) grid.style.minHeight = ""
+          if (lenis) lenis.resize()
+        }, 100)
+      }
+    })
+  }, [isMobileView])
+
   // Refresh videos from overrides whenever content changes (e.g., inline edits, adds, removes)
   useEffect(() => {
     const handler = () => {
@@ -447,16 +493,21 @@ function VideoGrid({
   if (!orderedVideos.length && !editMode) return null
 
   // Always use 12-column grid so visitor layout matches editor layout.
-  // On mobile (<640px), switch to 6-column so videos stay usable.
+  // On mobile, reduce gap for tighter layout.
+  const isMobileGrid = typeof window !== 'undefined' && window.innerWidth <= 768
   const gridStyle: React.CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(12, 1fr)",
-    gap: 12,
+    gap: isMobileGrid ? 6 : 12,
     alignItems: "start",
     gridAutoFlow: "dense",
   }
 
-  const videoElements = orderedVideos.map((video) => {
+  const displayedVideos = needsPagination
+    ? orderedVideos.slice(currentPage * VIDEOS_PER_PAGE, (currentPage + 1) * VIDEOS_PER_PAGE)
+    : orderedVideos
+
+  const videoElements = displayedVideos.map((video) => {
     // Default size: landscape → L (2 per row), portrait/square → M (4 per row)
     const defaultSize: SizeTier =
       video.aspectRatio === "16/9" ? "l" : "m"
@@ -705,7 +756,49 @@ function VideoGrid({
           </DragOverlay>
         </DndContext>
       ) : (
-        <div style={gridStyle}>{videoElements}</div>
+        <div ref={gridContainerRef}>
+          {needsPagination && totalPages > 1 && (
+            <div
+              style={{
+                display: "flex",
+                gap: 0,
+                borderBottom: "1px solid rgba(255,255,255,0.12)",
+                marginBottom: isMobileView ? 14 : 20,
+              }}
+            >
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handlePageChange(i)
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    borderBottom:
+                      currentPage === i
+                        ? "2px solid #fff"
+                        : "2px solid transparent",
+                    padding: isMobileView ? "8px 14px" : "10px 18px",
+                    fontSize: isMobileView ? 12 : 13,
+                    fontFamily: "var(--font-display)",
+                    fontWeight: currentPage === i ? 500 : 400,
+                    letterSpacing: "0.01em",
+                    color: currentPage === i ? "#fff" : "rgba(255,255,255,0.4)",
+                    cursor: "pointer",
+                    transition: "color 0.2s ease, border-color 0.2s ease",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                  }}
+                >
+                  Page {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+          <div ref={gridRef} style={gridStyle}>{videoElements}</div>
+        </div>
       )}
 
       {editMode && (
@@ -1021,17 +1114,36 @@ function SectionTabs({
   itemId: string
 }) {
   const [activeTab, setActiveTab] = useState(0)
+  const [isMobileTabs] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const tabBarRef = useRef<HTMLDivElement>(null)
+
+  // Handle tab switch — on mobile, use native scroll (bypass Lenis)
+  const handleTabSwitch = useCallback((tabIndex: number) => {
+    if (tabIndex === activeTab) return
+    setActiveTab(tabIndex)
+
+    if (isMobileTabs && tabBarRef.current) {
+      requestAnimationFrame(() => {
+        tabBarRef.current!.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
+        window.scrollBy(0, -20)
+      })
+    }
+  }, [activeTab, isMobileTabs])
 
   return (
     <div>
       <div
+        ref={tabBarRef}
         style={{
           display: "flex",
           gap: 0,
           borderBottom: "1px solid rgba(255,255,255,0.12)",
-          marginBottom: 20,
+          marginBottom: isMobileTabs ? 14 : 20,
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
       >
         {sections.map((section, i) => (
@@ -1039,7 +1151,7 @@ function SectionTabs({
             key={i}
             onClick={(e) => {
               e.stopPropagation()
-              setActiveTab(i)
+              handleTabSwitch(i)
             }}
             style={{
               background: "none",
@@ -1048,8 +1160,8 @@ function SectionTabs({
                 activeTab === i
                   ? "2px solid #fff"
                   : "2px solid transparent",
-              padding: "10px 18px",
-              fontSize: 13,
+              padding: isMobileTabs ? "8px 12px" : "10px 18px",
+              fontSize: isMobileTabs ? 11 : 13,
               fontFamily: "var(--font-display)",
               fontWeight: activeTab === i ? 500 : 400,
               letterSpacing: "0.01em",
@@ -1074,22 +1186,24 @@ function SectionTabs({
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-        >
-          <SectionContent
-            section={sections[activeTab]}
-            projectId={projectId}
-            editMode={editMode}
-            itemId={projectId}
-          />
-        </motion.div>
-      </AnimatePresence>
+      <div ref={contentRef}>
+        <AnimatePresence mode={isMobileTabs ? "sync" : "wait"}>
+          <motion.div
+            key={activeTab}
+            initial={isMobileTabs ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={isMobileTabs ? { opacity: 1 } : { opacity: 0, y: -8 }}
+            transition={{ duration: isMobileTabs ? 0 : 0.2 }}
+          >
+            <SectionContent
+              section={sections[activeTab]}
+              projectId={projectId}
+              editMode={editMode}
+              itemId={projectId}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
@@ -1106,10 +1220,10 @@ export function ExpandedProject({ item, onClose }: ExpandedProjectProps) {
 
   return (
     <motion.div
+      className="expanded-project"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.12 }}
       style={{
         padding: "28px 24px 24px",
         background: "#111",

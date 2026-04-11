@@ -1,11 +1,11 @@
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect, useLayoutEffect } from "react"
 import { Play, Pencil, FolderOpen } from "lucide-react"
 import { SpotlightCard } from "../ui/spotlight-card"
 import { CardPreview } from "./CardPreview"
 import { ExpandedProject } from "./ExpandedProject"
 import { thumbnailUrl } from "../../lib/bunny"
 import { type PortfolioItem } from "../../data/portfolio"
-import { getMergedCardAspectRatio } from "../../lib/layout-merge"
+import { getMergedCardAspectRatio, getMergedVideos } from "../../lib/layout-merge"
 import { SizeSelector } from "../admin/SizeSelector"
 import { ContentEditor } from "../admin/ContentEditor"
 import type { SizeTier } from "../../lib/layout-store"
@@ -42,6 +42,7 @@ export function PortfolioCard({
   const [showEditor, setShowEditor] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
+  const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
 
   // Get the video ID for thumbnail/preview
   const primaryVideoId =
@@ -59,39 +60,135 @@ export function PortfolioCard({
     setHovered(false)
   }, [])
 
-  const handleClick = useCallback(() => {
-    if (editMode) return // In edit mode, use the Open button instead
-    if (!isExpanded) {
-      onExpand()
-      setTimeout(() => {
-        cardRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        })
-        ;(window as any).__lenis?.resize()
-      }, 400)
-    }
-  }, [isExpanded, onExpand, editMode])
+  // ── Expand / Collapse scroll management ──
+  //
+  // The problem: when a card expands, all OTHER cards are removed from the DOM
+  // (displayItems filters to just the expanded one). This can shrink page height
+  // drastically. If the user's scroll position is now beyond the new page bottom,
+  // the browser clamps to the footer.
+  //
+  // The fix: LOCK the portfolio section's height before React removes cards,
+  // then use useLayoutEffect (runs before browser paint) to scroll to the
+  // card's new position, then release the height lock.
 
-  // Separate expand handler for edit mode (via the Open button)
+  const lockHeight = useCallback(() => {
+    const section = document.getElementById("portfolio")
+    if (section) section.style.minHeight = `${section.offsetHeight}px`
+  }, [])
+
+  const handleClick = useCallback(() => {
+    if (editMode) return
+    if (!isExpanded) {
+      lockHeight()
+      onExpand()
+    }
+  }, [isExpanded, onExpand, editMode, lockHeight])
+
   const handleEditModeExpand = useCallback(() => {
+    lockHeight()
     onExpand()
-    setTimeout(() => {
-      cardRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      })
-      ;(window as any).__lenis?.resize()
-    }, 400)
-  }, [onExpand])
+  }, [onExpand, lockHeight])
+
+  // Runs synchronously AFTER React commits DOM changes but BEFORE browser paints.
+  // This eliminates the single visible frame at the wrong scroll position.
+  //
+  // IMPORTANT: Lenis IS active on mobile too, so we must check isMobile FIRST.
+  // On mobile we scroll to the stable #portfolio section (not the card, whose
+  // position is unreliable during the DOM churn of expand/collapse).
+  useLayoutEffect(() => {
+    if (!isExpanded || !cardRef.current) return
+    const section = document.getElementById("portfolio")
+
+    if (isMobile && section) {
+      // Mobile: bypass Lenis entirely — use native scroll to #portfolio section.
+      // lenis.resize() on mobile causes secondary scroll corrections = jumps.
+      section.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
+      // Release height lock after DOM settles (no lenis.resize on mobile)
+      const unlockTimer = setTimeout(() => {
+        if (section) section.style.minHeight = ""
+      }, 200)
+      return () => {
+        clearTimeout(unlockTimer)
+        if (section) section.style.minHeight = ""
+      }
+    }
+
+    // Desktop: use Lenis
+    const lenis = (window as any).__lenis
+    if (lenis) {
+      lenis.resize()
+      lenis.scrollTo(cardRef.current, { offset: -100, immediate: true })
+    }
+    const unlockTimer = setTimeout(() => {
+      if (section) section.style.minHeight = ""
+      if (lenis) lenis.resize()
+    }, 60)
+    return () => {
+      clearTimeout(unlockTimer)
+      if (section) section.style.minHeight = ""
+    }
+  }, [isExpanded, isMobile])
+
+  // Keep Lenis synced as expanded content loads (videos, images change height).
+  // SKIP on mobile — Lenis delegates to native scroll on touch devices, which
+  // handles resize automatically. Calling lenis.resize() on mobile during content
+  // loading causes scroll-position corrections that manifest as scroll jumps.
+  const resizeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (!isExpanded || !cardRef.current || isMobile) return
+    const lenis = (window as any).__lenis
+    if (!lenis) return
+
+    const ro = new ResizeObserver(() => {
+      if (resizeTimer.current) clearTimeout(resizeTimer.current)
+      resizeTimer.current = setTimeout(() => lenis.resize(), 80)
+    })
+    ro.observe(cardRef.current)
+
+    const timer = setTimeout(() => ro.disconnect(), 3000)
+    return () => {
+      ro.disconnect()
+      clearTimeout(timer)
+      if (resizeTimer.current) clearTimeout(resizeTimer.current)
+    }
+  }, [isExpanded, isMobile])
 
   const handleCollapse = useCallback(() => {
+    // On collapse, page gets TALLER (all cards return) — no height clamping risk.
+    // Lock height so the transition is smooth, then scroll to card in grid.
+    lockHeight()
     onCollapse()
-    // Re-sync Lenis after collapse
-    setTimeout(() => {
-      ;(window as any).__lenis?.resize()
-    }, 400)
-  }, [onCollapse])
+  }, [onCollapse, lockHeight])
+
+  // Collapse scroll management — same isMobile-first pattern.
+  const prevExpandedRef = useRef(isExpanded)
+  useLayoutEffect(() => {
+    const wasExpanded = prevExpandedRef.current
+    prevExpandedRef.current = isExpanded
+
+    if (wasExpanded && !isExpanded) {
+      const section = document.getElementById("portfolio")
+
+      if (isMobile && section) {
+        // Mobile: bypass Lenis — native scroll to #portfolio section
+        section.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
+        setTimeout(() => {
+          if (section) section.style.minHeight = ""
+        }, 200)
+      } else {
+        // Desktop: use Lenis to scroll to card's grid position
+        const lenis = (window as any).__lenis
+        if (lenis && cardRef.current) {
+          lenis.resize()
+          lenis.scrollTo(cardRef.current, { offset: -100, immediate: true })
+        }
+        setTimeout(() => {
+          if (section) section.style.minHeight = ""
+          if (lenis) lenis.resize()
+        }, 60)
+      }
+    }
+  }, [isExpanded, isMobile])
 
   return (
     <div
@@ -263,8 +360,8 @@ export function PortfolioCard({
                   {item.type === "project" && (
                     <span className="portfolio-card__badge">
                       {item.sections && item.sections.length > 0
-                        ? `${item.sections.length} campaigns`
-                        : `${item.videos.length} videos`}
+                        ? `${item.sections.reduce((total, s) => total + getMergedVideos(item.id, s.title, s.videos).length, 0)} videos`
+                        : `${getMergedVideos(item.id, undefined, item.videos).length} videos`}
                     </span>
                   )}
                 </div>

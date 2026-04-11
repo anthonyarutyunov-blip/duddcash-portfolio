@@ -73,6 +73,9 @@ export default function GlobeSection() {
   const thetaOffsetRef = useRef(0)
   const isPausedRef = useRef(false)
   const currentPhiRef = useRef(0)
+  const sectionVisibleRef = useRef(true)
+  const animateFnRef = useRef<(() => void) | null>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
   const [visibleCities, setVisibleCities] = useState<string[]>([])
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -109,9 +112,29 @@ export default function GlobeSection() {
     }
   }, [handlePointerUp])
 
+  // Pause globe when off-screen
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const wasVisible = sectionVisibleRef.current
+        sectionVisibleRef.current = entry.isIntersecting
+        // Restart RAF loop when coming back into view
+        if (!wasVisible && entry.isIntersecting && animateFnRef.current) {
+          requestAnimationFrame(animateFnRef.current)
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   // Update visible city labels periodically
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!sectionVisibleRef.current) return
       const phi = currentPhiRef.current
       const theta = 0.25 + thetaOffsetRef.current + dragOffset.current.theta
       const visible = cities
@@ -154,6 +177,7 @@ export default function GlobeSection() {
       })
 
       function animate() {
+        if (!sectionVisibleRef.current) return
         if (!isPausedRef.current) phi += 0.002
         const currentPhi = phi + phiOffsetRef.current + dragOffset.current.phi
         currentPhiRef.current = currentPhi
@@ -163,6 +187,7 @@ export default function GlobeSection() {
         })
         animationId = requestAnimationFrame(animate)
       }
+      animateFnRef.current = animate
       animate()
       setTimeout(() => canvas && (canvas.style.opacity = "1"))
     }
@@ -186,7 +211,7 @@ export default function GlobeSection() {
   }, [])
 
   return (
-    <section className="globe-section">
+    <section ref={sectionRef} className="globe-section">
       <div className="globe-section__inner">
         <div className="globe-section__header">
           <p className="globe-section__eyebrow">Global Reach</p>
@@ -335,6 +360,20 @@ export default function GlobeSection() {
           text-transform: uppercase;
           letter-spacing: 0.1em;
           color: rgba(255,255,255,0.4);
+        }
+
+        @media (max-width: 768px) {
+          .globe-section {
+            padding: 2rem 3.9vw;
+          }
+
+          .globe-section__inner {
+            gap: 1.25rem;
+          }
+
+          .globe-section__eyebrow {
+            margin-bottom: 0.5rem;
+          }
         }
       `}</style>
     </section>

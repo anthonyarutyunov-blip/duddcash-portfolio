@@ -327,6 +327,15 @@ p + p {
 }
 
 /* ============================================
+   Mobile — prevent white bleed / horizontal overflow
+   ============================================ */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* ============================================
    Video grid responsive — collapse on mobile
    ============================================ */
 @media (max-width: 640px) {
@@ -339,6 +348,35 @@ p + p {
 @media (max-width: 420px) {
   /* On very small screens, all videos go full-width */
   .video-grid-item {
+    grid-column: span 12 !important;
+  }
+}
+
+/* ============================================
+   Expanded project — mobile tightening
+   ============================================ */
+@media (max-width: 768px) {
+  .expanded-project {
+    padding: 16px 6px 12px !important;
+    border-radius: 4px !important;
+  }
+
+  .expanded-project h3 {
+    font-size: 18px !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .expanded-project p {
+    font-size: 12px !important;
+  }
+
+  .expanded-project details {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .expanded-project .video-grid-item {
     grid-column: span 12 !important;
   }
 }

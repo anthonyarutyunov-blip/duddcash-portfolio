@@ -93,7 +93,7 @@ import { BlurRevealText } from '../components/ui/blur-reveal-text';
       <div class="contact__footer">
         <div class="contact__footer-item">
           <span class="contact__footer-label">Email</span>
-          <a href="mailto:hi@duddcashstudios.com">hi@duddcashstudios.com</a>
+          <a href="mailto:action@duddcashstudios.com">action@duddcashstudios.com</a>
         </div>
         <div class="contact__footer-divider"></div>
         <div class="contact__footer-item">
@@ -301,15 +301,48 @@ import { BlurRevealText } from '../components/ui/blur-reveal-text';
   }
 
   /* Mobile adjustments */
-  @media (max-width: 520px) {
+  @media (max-width: 768px) {
     .contact {
       padding: var(--space-2xl) var(--space-lg);
       align-items: flex-start;
       padding-top: calc(var(--space-3xl) + 60px);
     }
 
+    .contact__label {
+      display: none;
+    }
+
     .contact__headline {
       font-size: max(10vw, 36px);
+    }
+
+    .contact__header {
+      margin-bottom: var(--space-lg);
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .form-group {
+      margin-bottom: var(--space-sm);
+    }
+
+    .submit-wrap {
+      margin-top: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .contact__footer {
+      flex-direction: column;
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .contact__footer-divider {
+      width: 40px;
+      height: 1px;
     }
   }
 </style>
