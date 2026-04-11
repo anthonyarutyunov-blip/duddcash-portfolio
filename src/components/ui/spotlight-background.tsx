@@ -21,17 +21,18 @@ const SpotlightBackground = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none">
+    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-[2]">
       <div
         className="absolute rounded-full pointer-events-none"
         style={{
           left: mouse.x,
           top: mouse.y,
-          width: isMoving ? "320px" : "400px",
-          height: isMoving ? "320px" : "400px",
+          width: isMoving ? "180px" : "220px",
+          height: isMoving ? "180px" : "220px",
           transform: "translate(-50%, -50%)",
-          background: "radial-gradient(circle, rgba(210, 185, 155, 0.55) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(210, 185, 155, 0.08) 0%, transparent 70%)",
           transition: "width 0.4s ease, height 0.4s ease",
+          mixBlendMode: "soft-light" as const,
         }}
       />
     </div>
