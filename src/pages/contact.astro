@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { BlurRevealText } from '../components/ui/blur-reveal-text';
-import { LiquidButton } from '../components/ui/liquid-glass-button';
+
 ---
 
 <BaseLayout title="Contact" description="Get in touch with Duddcash for your next video or photography project.">
@@ -37,44 +37,55 @@ import { LiquidButton } from '../components/ui/liquid-glass-button';
 
         <div class="form-row">
           <div class="form-group">
-            <label for="name" class="form-label">Name</label>
+            <label for="name" class="form-label">Name *</label>
             <input type="text" id="name" name="name" required class="form-input" placeholder="Your name" />
           </div>
           <div class="form-group">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" name="email" required class="form-input" placeholder="you@email.com" />
+            <label for="organization" class="form-label">Organization *</label>
+            <input type="text" id="organization" name="organization" required class="form-input" placeholder="Company or brand" />
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="project-type" class="form-label">Project Type</label>
-          <select id="project-type" name="project-type" required class="form-input">
-            <option value="" disabled selected>Select a type</option>
-            <option value="social">Social Content</option>
-            <option value="commercial">Commercial / Brand</option>
-            <option value="event">Event Coverage</option>
-            <option value="music">Music Video</option>
-            <option value="photo">Photo Shoot</option>
-            <option value="sports">Sports</option>
-            <option value="spec-ad">Spec Ad</option>
-            <option value="other">Other</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input type="email" id="email" name="email" required class="form-input" placeholder="you@email.com" />
+          </div>
+          <div class="form-group form-group--optional">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="tel" id="phone" name="phone" class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group form-group--optional">
+            <label for="budget" class="form-label">Estimated Budget</label>
+            <input type="text" id="budget" name="budget" class="form-input" placeholder="$" />
+          </div>
+          <div class="form-group form-group--optional">
+            <label for="timeline" class="form-label">Timeline</label>
+            <input type="text" id="timeline" name="timeline" class="form-input" placeholder="e.g. ASAP, 2 weeks, flexible" />
+          </div>
+        </div>
+
+        <div class="form-group form-group--optional">
+          <label for="referral" class="form-label">How'd you find us?</label>
+          <input type="text" id="referral" name="referral" class="form-input" placeholder="Instagram, referral, Google..." />
         </div>
 
         <div class="form-group">
-          <label for="message" class="form-label">Message</label>
+          <label for="message" class="form-label">Message *</label>
           <textarea id="message" name="message" rows="4" required class="form-input" placeholder="Tell us about your project..."></textarea>
         </div>
 
         <div class="submit-wrap">
-          <LiquidButton
-            client:load
-            type="submit"
-            size="lg"
-            style={{ fontFamily: "var(--font-display)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "12px", paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
-          >
-            Send Message
-          </LiquidButton>
+          <button type="submit" class="submit-btn">
+            <span class="submit-btn__text">Send Message</span>
+            <svg class="submit-btn__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
         </div>
       </form>
 
@@ -82,7 +93,7 @@ import { LiquidButton } from '../components/ui/liquid-glass-button';
       <div class="contact__footer">
         <div class="contact__footer-item">
           <span class="contact__footer-label">Email</span>
-          <a href="mailto:hello@duddcash.com">hello@duddcash.com</a>
+          <a href="mailto:hi@duddcashstudios.com">hi@duddcashstudios.com</a>
         </div>
         <div class="contact__footer-divider"></div>
         <div class="contact__footer-item">
@@ -165,13 +176,18 @@ import { LiquidButton } from '../components/ui/liquid-glass-button';
     margin-bottom: 6px;
   }
 
+  .form-group--optional .form-label {
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+
   .form-input {
     width: 100%;
-    padding: 10px 0;
+    padding: 12px 0;
     font-family: var(--font-body);
     font-size: var(--text-base);
     border: none;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1.5px solid rgba(0, 0, 0, 0.25);
     background: transparent;
     color: var(--color-text);
     border-radius: 0;
@@ -179,7 +195,7 @@ import { LiquidButton } from '../components/ui/liquid-glass-button';
   }
 
   .form-input::placeholder {
-    color: var(--color-border);
+    color: rgba(0, 0, 0, 0.3);
   }
 
   .form-input:focus {
@@ -204,14 +220,51 @@ import { LiquidButton } from '../components/ui/liquid-glass-button';
   /* Submit */
   .submit-wrap {
     margin-top: var(--space-xl);
-    align-self: flex-start;
+  }
+
+  .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+    padding: 18px 32px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #111;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease, gap 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    background: #333;
+    gap: 18px;
+  }
+
+  .submit-btn:active {
+    transform: scale(0.98);
+  }
+
+  .submit-btn__arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .submit-btn:hover .submit-btn__arrow {
+    transform: translateX(4px);
   }
 
   /* Footer info */
   .contact__footer {
     display: flex;
     align-items: center;
-    gap: var(--space-lg);
+    justify-content: center;
+    gap: var(--space-xl);
     margin-top: var(--space-3xl);
     padding-top: var(--space-lg);
     border-top: 1px solid var(--color-border);
@@ -226,6 +279,7 @@ import { LiquidButton } from '../components/ui/liquid-glass-button';
   .contact__footer-item {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 4px;
   }
 

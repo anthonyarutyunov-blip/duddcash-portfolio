@@ -66,7 +66,7 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
             letterSpacing: "0.04em",
           }}
         >
-          50+ projects. 16 brands. One standard.
+          300+ projects.
         </p>
       </div>
 

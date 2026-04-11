@@ -6,6 +6,7 @@ interface TextRevealProps {
   style?: React.CSSProperties
   staggerDelay?: number
   initialDelay?: number
+  animateOnMount?: boolean
 }
 
 export function TextReveal({
@@ -14,6 +15,7 @@ export function TextReveal({
   style,
   staggerDelay = 0.08,
   initialDelay = 0.2,
+  animateOnMount = false,
 }: TextRevealProps) {
   if (!text) return null
   const words = text.split(" ")
@@ -25,8 +27,10 @@ export function TextReveal({
           <motion.span
             style={{ display: "inline-block" }}
             initial={{ y: "100%", opacity: 0 }}
-            whileInView={{ y: "0%", opacity: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
+            {...(animateOnMount
+              ? { animate: { y: "0%", opacity: 1 } }
+              : { whileInView: { y: "0%", opacity: 1 }, viewport: { once: true, margin: "-50px" } }
+            )}
             transition={{
               duration: 0.6,
               delay: initialDelay + i * staggerDelay,

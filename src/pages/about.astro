@@ -9,30 +9,62 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
 
 <BaseLayout title="About" description="Meet the team behind Duddcash — video & photo production for brands, artists, and events.">
   <section class="about section">
-    <!-- Floating 3D icons -->
-    <div class="film-icon film-icon--1">
-      <img src="/icons/camera.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--2">
-      <img src="/icons/film-camera.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--3">
-      <img src="/icons/clapperboard.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--4">
-      <img src="/icons/director-chair.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--5">
-      <img src="/icons/film-camera.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--6">
-      <img src="/icons/clapperboard.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--7">
-      <img src="/icons/camera.png" alt="" />
-    </div>
-    <div class="film-icon film-icon--8">
-      <img src="/icons/director-chair.png" alt="" />
+    <!-- Grid texture background -->
+    <svg class="about__grid" width="100%" height="100%">
+      <defs>
+        <pattern id="about-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="0.5" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#about-grid)" />
+    </svg>
+    <!-- Floating 3D icons — wrapper locks height so icons don't shift on story expand -->
+    <div class="film-icons-wrap">
+      <div class="film-icon film-icon--1">
+        <img src="/icons/sony-a7.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--2">
+        <img src="/icons/film-camera.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--3">
+        <img src="/icons/clapperboard.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--4">
+        <img src="/icons/director-chair.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--5">
+        <img src="/icons/gimbal.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--6">
+        <img src="/icons/gmaster-lens.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--7">
+        <img src="/icons/macbook.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--8">
+        <img src="/icons/sd-card.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--9">
+        <img src="/icons/sigma-lens.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--10">
+        <img src="/icons/camcorder.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--11">
+        <img src="/icons/camera.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--12">
+        <img src="/icons/gm-70-200.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--13">
+        <img src="/icons/fuji-topdown.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--14">
+        <img src="/icons/drone.png" alt="" />
+      </div>
+      <div class="film-icon film-icon--15">
+        <img src="/icons/polaroid.png" alt="" />
+      </div>
     </div>
 
     <div class="about__inner">
@@ -79,19 +111,29 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
 
   </section>
 
-  <!-- Our Goal -->
-  <section class="our-goal" data-animate>
-    <div class="our-goal__content">
-      <h2 class="our-goal__label">Our Goal</h2>
-      <p class="our-goal__text">Keep growing as filmmakers while stepping into more of a directing role — with our team behind it.</p>
-    </div>
-  </section>
-
-  <!-- Scroll indicator after Our Goal -->
-  <div class="scroll-hint scroll-hint--after-goal" data-animate>
-    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M7 13l5 5 5-5" /><path d="M7 6l5 5 5-5" />
+  <!-- Our Goal + Scroll indicator — with dot texture -->
+  <div class="goal-zone">
+    <svg class="goal-zone__grid" width="100%" height="100%">
+      <defs>
+        <pattern id="goal-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="0.5" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#goal-grid)" />
     </svg>
+
+    <section class="our-goal" data-animate>
+      <div class="our-goal__content">
+        <h2 class="our-goal__label">Our Goal</h2>
+        <p class="our-goal__text">Keep growing as filmmakers while stepping into more of a directing role — with our team behind it.</p>
+      </div>
+    </section>
+
+    <div class="scroll-hint scroll-hint--after-goal" data-animate>
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 13l5 5 5-5" /><path d="M7 6l5 5 5-5" />
+      </svg>
+    </div>
   </div>
 
   <!-- Team Zone — unified background wrapper -->
@@ -125,12 +167,12 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
           <div class="founders__card">
             <span class="founders__card-border"></span>
             <div class="founders__card-content">
-              <div class="founders__avatar">
-                <span class="founders__initials">AA</span>
+              <div class="founders__avatar founders__avatar--anthony">
               </div>
               <h3 class="founders__name">Anthony Arutyunov</h3>
               <span class="founders__role">Co-Founder</span>
               <span class="founders__specialty">Director / Editor</span>
+              <img src="/icons/anthony-signature.png" alt="Anthony's signature" class="founders__signature" />
             </div>
           </div>
 
@@ -143,6 +185,7 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
               <h3 class="founders__name">Calo Shiban</h3>
               <span class="founders__role">Co-Founder</span>
               <span class="founders__specialty">Director / Editor</span>
+              <img src="/icons/calo-signature.png" alt="Calo's signature" class="founders__signature" />
             </div>
           </div>
         </div>
@@ -228,7 +271,7 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
         <div class="about-cta-card__content" data-animate>
           <TextReveal
             client:visible
-            text="Ready to work together?"
+            text="Still scrolling?"
             staggerDelay={0.1}
             initialDelay={0.1}
             style={{
@@ -240,9 +283,9 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
               color: "var(--color-text)",
             }}
           />
-          <p class="about-cta-card__sub">No fluff. Just sharp creative, fast turnarounds, and work that speaks.</p>
+          <p class="about-cta-card__sub">We're flattered. Let's work.</p>
           <div class="about-cta-card__buttons">
-            <MagneticCTA client:visible href="/contact">Start a Project</MagneticCTA>
+            <MagneticCTA client:visible href="/contact">Get in Touch</MagneticCTA>
             <MagneticCTA client:visible href="/#portfolio">See the Work</MagneticCTA>
           </div>
         </div>
@@ -256,7 +299,16 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     position: relative;
     padding-top: clamp(2.5rem, 5vh, 4rem);
     padding-bottom: clamp(1rem, 2vh, 1.5rem);
-    overflow: hidden;
+    overflow-x: clip;
+  }
+
+  .about__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    color: var(--color-muted);
+    opacity: 0.06;
+    pointer-events: none;
   }
 
   .about__inner {
@@ -377,6 +429,27 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* ─── Goal Zone — dot texture wrapper ─── */
+  .goal-zone {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .goal-zone__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    color: var(--color-muted);
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .goal-zone .our-goal,
+  .goal-zone .scroll-hint {
+    position: relative;
+    z-index: 1;
+  }
+
   /* ─── Our Goal ─── */
   .our-goal {
     padding: clamp(1rem, 2vh, 1.5rem) clamp(1.5rem, 4vw, 4rem);
@@ -412,6 +485,16 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
   }
 
   /* Floating 3D icons */
+  .film-icons-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+  }
+
   .film-icon {
     position: absolute;
     z-index: 0;
@@ -426,68 +509,124 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
   }
 
-  /* DSLR camera — top right */
+  /* Sony A7 */
   .film-icon--1 {
-    width: 70px;
-    top: 8%;
-    right: 6%;
+    width: 72px;
+    top: 26.6%;
+    left: 21.7%;
     animation: floatIcon1 9s ease-in-out infinite;
   }
 
-  /* Vintage film camera — left side */
+  /* Vintage film camera */
   .film-icon--2 {
     width: 55px;
-    top: 32%;
-    left: 4%;
+    top: 40.2%;
+    left: 14.9%;
     animation: floatIcon2 11s ease-in-out infinite;
   }
 
-  /* Clapperboard — right mid */
+  /* Clapperboard */
   .film-icon--3 {
-    width: 48px;
-    bottom: 28%;
-    right: 10%;
+    width: 50px;
+    top: 10.0%;
+    left: 19.7%;
     animation: floatIcon3 13s ease-in-out infinite;
   }
 
-  /* Director chair — bottom left */
+  /* Director chair */
   .film-icon--4 {
-    width: 45px;
-    bottom: 12%;
-    left: 10%;
+    width: 48px;
+    top: 46.7%;
+    left: 76.0%;
     animation: floatIcon1 8s ease-in-out infinite reverse;
   }
 
-  /* Film camera small — top left */
+  /* Gimbal */
   .film-icon--5 {
-    width: 38px;
-    top: 12%;
-    left: 12%;
+    width: 44px;
+    top: 24.7%;
+    left: 8.0%;
     animation: floatIcon3 10s ease-in-out infinite reverse;
   }
 
-  /* Clapperboard small — bottom right */
+  /* G-Master lens */
   .film-icon--6 {
-    width: 35px;
-    bottom: 6%;
-    right: 5%;
+    width: 52px;
+    top: 29.8%;
+    left: 76.5%;
     animation: floatIcon2 12s ease-in-out infinite;
   }
 
-  /* Camera small — mid left */
+  /* MacBook */
   .film-icon--7 {
-    width: 42px;
-    top: 60%;
-    left: 3%;
+    width: 58px;
+    top: 22.1%;
+    left: 87.8%;
     animation: floatIcon1 14s ease-in-out infinite;
   }
 
-  /* Director chair small — top center-right */
+  /* SD card */
   .film-icon--8 {
-    width: 32px;
-    top: 5%;
-    right: 28%;
+    width: 34px;
+    top: 65.9%;
+    left: 6.2%;
     animation: floatIcon2 9s ease-in-out infinite reverse;
+  }
+
+  /* Sigma lens */
+  .film-icon--9 {
+    width: 42px;
+    top: 56.6%;
+    left: 16.2%;
+    animation: floatIcon3 11s ease-in-out infinite;
+  }
+
+  /* Camcorder */
+  .film-icon--10 {
+    width: 50px;
+    top: 39.3%;
+    left: 89.9%;
+    animation: floatIcon1 12s ease-in-out infinite;
+  }
+
+  /* Camera */
+  .film-icon--11 {
+    width: 46px;
+    top: 9.6%;
+    left: 74.3%;
+    animation: floatIcon2 10s ease-in-out infinite reverse;
+  }
+
+  /* GM 70-200mm lens */
+  .film-icon--12 {
+    width: 56px;
+    top: 6.3%;
+    left: 86.4%;
+    animation: floatIcon1 11s ease-in-out infinite;
+  }
+
+  /* Fuji top-down */
+  .film-icon--13 {
+    width: 48px;
+    top: 46.5%;
+    left: 23.0%;
+    animation: floatIcon3 9s ease-in-out infinite reverse;
+  }
+
+  /* Drone */
+  .film-icon--14 {
+    width: 60px;
+    top: 45.0%;
+    left: 4.7%;
+    animation: floatIcon2 13s ease-in-out infinite;
+  }
+
+  /* Polaroid */
+  .film-icon--15 {
+    width: 42px;
+    top: 55.8%;
+    left: 85.8%;
+    animation: floatIcon1 10s ease-in-out infinite reverse;
   }
 
   @keyframes floatIcon1 {
@@ -726,6 +865,15 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     align-items: center;
     justify-content: center;
     margin-bottom: clamp(0.8rem, 1.5vw, 1.4rem);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .founders__avatar--anthony {
+    background-image: url('/icons/anthony-pfp.jpg');
+    background-position: 18% 31%;
+    background-size: 185%;
+    background-repeat: no-repeat;
   }
 
   .founders__initials {
@@ -760,6 +908,16 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     color: rgba(255, 255, 255, 0.4);
     margin-top: 4px;
     letter-spacing: 0.02em;
+  }
+
+  .founders__signature {
+    margin-top: 12px;
+    height: 40px;
+    width: auto;
+    filter: invert(1);
+    opacity: 0.85;
+    pointer-events: none;
+    user-select: none;
   }
 
   @keyframes floatSquare1 {
@@ -895,17 +1053,45 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     opacity: 1;
   }
 
-  /* ─── Mobile ─── */
+  /* ─── Progressive icon hiding as text area expands ─── */
+
+  /* Text ~25-75% — hide icons in that range */
+  @media (max-width: 1350px) {
+    .film-icon--1,   /* 21.7% */
+    .film-icon--13,  /* 23.0% */
+    .film-icon--11,  /* 74.3% */
+    .film-icon--4,   /* 76.0% */
+    .film-icon--6 {  /* 76.5% */
+      display: none;
+    }
+  }
+
+  /* Text ~17-83% */
+  @media (max-width: 1150px) {
+    .film-icon--2,   /* 14.9% */
+    .film-icon--3,   /* 19.7% */
+    .film-icon--9,   /* 16.2% */
+    .film-icon--15 { /* 85.8% */
+      display: none;
+    }
+  }
+
+  /* Text ~10-90% — keep only far edges */
+  @media (max-width: 950px) {
+    .film-icon--5,   /* 8.0% */
+    .film-icon--12 { /* 86.4% */
+      display: none;
+    }
+  }
+
+  /* ─── Mobile — hide all ─── */
   @media (max-width: 768px) {
     .founders__grid {
       grid-template-columns: 1fr;
       gap: var(--space-xl);
     }
 
-    .film-icon--5,
-    .film-icon--6,
-    .film-icon--7,
-    .film-icon--8 {
+    .film-icons-wrap {
       display: none;
     }
   }
@@ -920,7 +1106,7 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
 
   /* CTA Section */
   .about-cta-section {
-    padding: clamp(3rem, 6vh, 6rem) clamp(1.5rem, 4vw, 4rem) clamp(4rem, 8vh, 8rem);
+    padding: clamp(0.5rem, 1.5vh, 1.5rem) clamp(1.5rem, 4vw, 4rem) clamp(4rem, 8vh, 8rem);
   }
 
   /* Bordered card container */
@@ -1015,3 +1201,26 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     }
   }
 </style>
+
+<script>
+  const checkbox = document.getElementById('story-toggle') as HTMLInputElement | null;
+  if (checkbox) {
+    checkbox.addEventListener('change', () => {
+      if (!checkbox.checked) {
+        const target = document.querySelector('.about') as HTMLElement;
+        if (!target) return;
+        setTimeout(() => {
+          const lenis = (window as any).__lenis;
+          if (lenis) {
+            lenis.scrollTo(target, { immediate: true });
+          } else {
+            target.scrollIntoView();
+          }
+        }, 50);
+      }
+    });
+  }
+
+
+</script>
+

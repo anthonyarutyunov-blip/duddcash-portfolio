@@ -4,9 +4,10 @@ import { motion, useMotionValue, useSpring, useTransform } from "motion/react"
 interface MagneticCTAProps {
   href: string
   children: React.ReactNode
+  variant?: "default" | "outline"
 }
 
-export function MagneticCTA({ href, children }: MagneticCTAProps) {
+export function MagneticCTA({ href, children, variant = "default" }: MagneticCTAProps) {
   const ref = useRef<HTMLAnchorElement>(null)
   const [hovered, setHovered] = useState(false)
 
@@ -51,7 +52,7 @@ export function MagneticCTA({ href, children }: MagneticCTAProps) {
         rotateY,
         transformPerspective: 800,
       }}
-      className="magnetic-cta"
+      className={`magnetic-cta${variant === "outline" ? " magnetic-cta--outline" : ""}`}
     >
       {/* Animated border gradient */}
       <span className="magnetic-cta__border" />
@@ -163,6 +164,25 @@ export function MagneticCTA({ href, children }: MagneticCTAProps) {
           letter-spacing: 0.06em;
           text-transform: uppercase;
           color: var(--color-text);
+        }
+
+        .magnetic-cta--outline {
+          background: transparent;
+        }
+
+        .magnetic-cta--outline:hover {
+          background: rgba(0, 0, 0, 0.03);
+        }
+
+        .magnetic-cta--outline .magnetic-cta__border {
+          background: linear-gradient(
+            135deg,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.06),
+            rgba(0, 0, 0, 0.1)
+          );
+          background-size: 100% 100%;
+          animation: none;
         }
 
       `}</style>

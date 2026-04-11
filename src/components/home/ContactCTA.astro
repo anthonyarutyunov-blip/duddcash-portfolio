@@ -1,6 +1,6 @@
 ---
 import { MagneticCTA } from '../ui/magnetic-cta';
-import { ShimmerText } from '../ui/shimmer-text';
+import { TextReveal } from '../ui/text-reveal';
 import { GradientDots } from '../ui/gradient-dots';
 ---
 
@@ -28,33 +28,31 @@ import { GradientDots } from '../ui/gradient-dots';
       </div>
 
       <div class="contact-cta__content">
-        <p class="contact-cta__eyebrow" data-animate>Ready?</p>
-
         <div class="contact-cta__headline" data-animate>
-          <ShimmerText
+          <TextReveal
             client:visible
-            duration={2.5}
-            delay={0.3}
+            text="You get the picture."
+            staggerDelay={0.1}
+            initialDelay={0.1}
+            animateOnMount={true}
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(2rem, 5vw + 0.5rem, 5rem)",
+              fontSize: "clamp(2rem, 4.5vw, 3.5rem)",
               fontWeight: 500,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.05,
-              textAlign: "center",
+              letterSpacing: "-0.025em",
+              lineHeight: 1.1,
               color: "var(--color-text)",
             }}
-          >
-            Let's make something together.
-          </ShimmerText>
+          />
         </div>
 
         <p class="contact-cta__sub" data-animate>
-          We move fast. Tell us what you need — we'll handle the rest.
+          And the video. That's kind of our thing.
         </p>
 
         <div class="contact-cta__btn" data-animate>
-          <MagneticCTA client:visible href="/contact">Start a Project</MagneticCTA>
+          <MagneticCTA client:visible href="/contact">Get in Touch</MagneticCTA>
+          <MagneticCTA client:visible href="/about">Meet the Team</MagneticCTA>
         </div>
       </div>
     </div>
@@ -64,14 +62,12 @@ import { GradientDots } from '../ui/gradient-dots';
 <style is:global>
   .contact-cta {
     text-align: center;
-    padding: clamp(6rem, 10vh, 10rem) 3.9vw;
+    padding: 0 3.9vw clamp(5rem, 8vh, 7rem);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
-    min-height: 70vh;
-    /* No background — let the grid show through */
   }
 
   /* Bubbly organic border card */
@@ -215,24 +211,16 @@ import { GradientDots } from '../ui/gradient-dots';
     66% { transform: translate(-10px, 8px) scale(0.95); }
   }
 
-  .contact-cta__eyebrow {
-    font-size: var(--text-sm);
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-    margin-bottom: var(--space-md);
-  }
-
   .contact-cta__headline {
     margin-bottom: var(--space-lg);
   }
 
   .contact-cta__sub {
     color: var(--color-muted);
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     line-height: 1.6;
-    max-width: 480px;
+    max-width: 440px;
+    margin-top: var(--space-lg);
     margin-bottom: var(--space-xl);
     font-style: italic;
   }
@@ -240,6 +228,9 @@ import { GradientDots } from '../ui/gradient-dots';
   .contact-cta__btn {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-lg);
   }
 
   @media (max-width: 768px) {
