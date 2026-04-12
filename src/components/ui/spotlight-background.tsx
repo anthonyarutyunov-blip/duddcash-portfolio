@@ -1,18 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 const SpotlightBackground = () => {
   const spotRef = useRef<HTMLDivElement>(null);
   const moveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [isSafari, setIsSafari] = useState(false);
 
   useEffect(() => {
-    setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
-  }, []);
-
-  useEffect(() => {
-    // Skip entirely on Safari — subtle effect not worth the GPU cost
-    if (isSafari) return;
-
     const handleMouseMove = (e: MouseEvent) => {
       const el = spotRef.current;
       if (!el) return;
@@ -30,10 +22,7 @@ const SpotlightBackground = () => {
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [isSafari]);
-
-  // Don't render on Safari
-  if (isSafari) return null;
+  }, []);
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-[2]">

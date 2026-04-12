@@ -82,15 +82,26 @@ export function VideoPlayer({
       }
       video.addEventListener("playing", onPlaying)
 
+      // Try to play, with retry for iOS which sometimes rejects first attempt
+      const tryPlay = () => {
+        video.play().catch(() => {
+          // Retry once after 500ms — iOS can reject play during initial page setup
+          setTimeout(() => {
+            if (!userPausedRef.current && videoRef.current) {
+              videoRef.current.play().catch(() => {})
+            }
+          }, 500)
+        })
+        setIsPaused(false)
+      }
+
       // If video has enough data, play immediately; otherwise wait for canplay
       if (video.readyState >= 3) {
-        video.play().catch(() => {})
-        setIsPaused(false)
+        tryPlay()
       } else {
         const onReady = () => {
           if (!userPausedRef.current) {
-            video.play().catch(() => {})
-            setIsPaused(false)
+            tryPlay()
           }
           video.removeEventListener("canplay", onReady)
         }
@@ -299,7 +310,8 @@ export function VideoPlayer({
         muted
         loop
         playsInline
-        preload="metadata"
+        autoPlay
+        preload={isMobile ? "auto" : "metadata"}
         style={{
           width: "100%",
           height: "100%",

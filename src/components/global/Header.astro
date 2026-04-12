@@ -274,20 +274,34 @@ import { SpecialText } from '../ui/special-text';
 
       var check = isMobileHeader ? checkMobile : checkDesktop;
 
-      // RAF-throttled scroll listener instead of 200ms setInterval
-      var rafPending = false;
-      function onScrollOrResize() {
-        if (rafPending) return;
-        rafPending = true;
-        requestAnimationFrame(function() {
-          check();
-          rafPending = false;
-        });
+      if (isMobileHeader) {
+        // Mobile: debounced scroll check — fires 150ms after scroll stops
+        // Zero per-frame work during active scrolling
+        var scrollTimer = null;
+        function onScrollDebounced() {
+          if (scrollTimer) clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(checkMobile, 150);
+        }
+        check();
+        scrollHandler = onScrollDebounced;
+        window.addEventListener('scroll', scrollHandler, { passive: true });
+        window.addEventListener('resize', scrollHandler, { passive: true });
+      } else {
+        // Desktop: RAF-throttled scroll listener for responsive header state
+        var rafPending = false;
+        function onScrollOrResize() {
+          if (rafPending) return;
+          rafPending = true;
+          requestAnimationFrame(function() {
+            check();
+            rafPending = false;
+          });
+        }
+        check();
+        scrollHandler = onScrollOrResize;
+        window.addEventListener('scroll', scrollHandler, { passive: true });
+        window.addEventListener('resize', scrollHandler, { passive: true });
       }
-      check();
-      scrollHandler = onScrollOrResize;
-      window.addEventListener('scroll', scrollHandler, { passive: true });
-      window.addEventListener('resize', scrollHandler, { passive: true });
     }
 
     document.addEventListener('astro:before-swap', function() {

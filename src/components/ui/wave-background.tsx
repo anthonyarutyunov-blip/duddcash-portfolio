@@ -27,13 +27,9 @@ export function Waves({
   backgroundColor = "transparent",
   pointerSize = 0,
 }: WavesProps) {
-  // Skip on mobile and Safari — heavy SVG animation is subtle on small screens
-  // and Safari's SVG renderer is measurably slower than Chrome's
+  // Skip on mobile — heavy SVG animation is subtle on small screens
   const [isMobile] = useState(() =>
     typeof window !== 'undefined' && (window.innerWidth <= 768 || 'ontouchstart' in window)
-  )
-  const [isSafari] = useState(() =>
-    typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
   )
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -50,7 +46,7 @@ export function Waves({
   const visibleRef = useRef(false) // Start as false — let IntersectionObserver trigger
 
   useEffect(() => {
-    if (isMobile || isSafari) return // No animation on mobile/Safari
+    if (isMobile) return // No animation on mobile
     if (!containerRef.current || !svgRef.current) return
 
     noiseRef.current = createNoise2D()
@@ -84,7 +80,7 @@ export function Waves({
       window.removeEventListener('mousemove', onMouseMove)
       containerRef.current?.removeEventListener('touchmove', onTouchMove)
     }
-  }, [isMobile, isSafari])
+  }, [isMobile])
 
   const setSize = () => {
     if (!containerRef.current || !svgRef.current) return
@@ -249,8 +245,8 @@ export function Waves({
     rafRef.current = requestAnimationFrame(tick)
   }
 
-  // On mobile/Safari, render nothing — the hero works fine without wave animation
-  if (isMobile || isSafari) return null
+  // On mobile, render nothing — the hero works fine without wave animation
+  if (isMobile) return null
 
   return (
     <div

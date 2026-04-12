@@ -124,6 +124,8 @@ export const BackgroundGradientAnimation = ({
   }, [interactive, isMobile]);
 
   // Mobile: static gradient only — no animated blobs, no blur, no compositing layers
+  // will-change: transform promotes the fixed layer to its own compositor layer,
+  // preventing repaints during scroll
   if (isMobile) {
     return (
       <div
@@ -131,6 +133,7 @@ export const BackgroundGradientAnimation = ({
           "h-screen w-screen relative overflow-hidden top-0 left-0 bg-[linear-gradient(40deg,var(--gradient-background-start),var(--gradient-background-end))]",
           containerClassName
         )}
+        style={{ willChange: "transform" }}
       >
         <div className={cn("", className)}>{children}</div>
       </div>
@@ -148,7 +151,7 @@ export const BackgroundGradientAnimation = ({
       <div
         className={cn(
           "gradients-container h-full w-full",
-          isSafari ? "blur-sm" : "blur-[30px]"
+          isSafari ? "blur-xl" : "blur-[30px]"
         )}
       >
         {/* Blob 1 — always rendered */}
@@ -161,18 +164,16 @@ export const BackgroundGradientAnimation = ({
             `opacity-100`
           )}
         />
-        {/* Blob 2 — skip on Safari to reduce compositing layers */}
-        {!isSafari && (
-          <div
-            className={cn(
-              `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
-              `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-              `[transform-origin:calc(50%-400px)]`,
-              `animate-second`,
-              `opacity-100`
-            )}
-          />
-        )}
+        {/* Blob 2 — always rendered (desktop) */}
+        <div
+          className={cn(
+            `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
+            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `[transform-origin:calc(50%-400px)]`,
+            `animate-second`,
+            `opacity-100`
+          )}
+        />
         {/* Blob 3 — skip on mobile/Safari */}
         {!isLite && (
           <div
