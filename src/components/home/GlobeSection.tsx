@@ -152,19 +152,25 @@ export default function GlobeSection() {
     let animationId: number
     let phi = 0
 
+    // Safari & mobile get fewer samples for better performance
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    const isMobileDevice = window.innerWidth <= 768
+    const samples = isSafari || isMobileDevice ? 12000 : 20000
+    const dpr = isSafari ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2)
+
     function init() {
       const width = canvas.offsetWidth
       if (width === 0 || globe) return
 
       globe = createGlobe(canvas, {
-        devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+        devicePixelRatio: dpr,
         width: width * 2,
         height: width * 2,
         phi: 0,
         theta: 0.25,
         dark: 1,
         diffuse: 3,
-        mapSamples: 30000,
+        mapSamples: samples,
         mapBrightness: 3.5,
         baseColor: [0.18, 0.18, 0.22],
         markerColor: [0.5, 0.7, 1.0],

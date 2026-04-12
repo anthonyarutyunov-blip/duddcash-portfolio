@@ -34,8 +34,8 @@ import { IntroScreen } from '../components/ui/intro-screen';
       <InfiniteGrid client:visible height="100%" speedX={0.3} speedY={0.3} spotlightSize={350} />
     </div>
     <div class="grid-section__content">
-      <StickyScrollGallery client:visible />
-      <PortfolioGrid client:visible />
+      <div style="min-height: 300px;"><StickyScrollGallery client:visible /></div>
+      <div style="min-height: 400px;"><PortfolioGrid client:visible /></div>
       <ContactCTA />
     </div>
   </div>

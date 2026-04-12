@@ -118,8 +118,14 @@ const baseCities = ['CHI', 'CLE'];
     height: 100%;
     background: radial-gradient(ellipse at center, rgba(60, 100, 255, 0.18) 0%, rgba(60, 100, 255, 0.06) 40%, transparent 70%);
     pointer-events: none;
-    filter: blur(80px);
-    animation: footerGlowPulse 8s ease-in-out infinite alternate;
+    filter: blur(40px);
+    opacity: 0.7;
+    /* Animation paused by default — only plays when footer is visible */
+    animation: footerGlowPulse 8s ease-in-out infinite alternate paused;
+  }
+
+  .footer.is-visible .footer__glow {
+    animation-play-state: running;
   }
 
   @keyframes footerGlowPulse {
@@ -389,6 +395,13 @@ const baseCities = ['CHI', 'CLE'];
     color: rgba(255, 255, 255, 0.7);
   }
 
+  /* Safari performance — reduce heavy blur + kill animation */
+  :global(.safari) .footer__glow {
+    filter: blur(20px);
+    animation: none;
+    opacity: 0.7;
+  }
+
   @media (max-width: 768px) {
     .footer {
       padding: 48px 20px 24px;
@@ -432,3 +445,16 @@ const baseCities = ['CHI', 'CLE'];
     }
   }
 </style>
+
+<script is:inline>
+  (function() {
+    var footer = document.querySelector('.footer');
+    if (!footer) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        footer.classList.toggle('is-visible', entry.isIntersecting);
+      });
+    }, { threshold: 0, rootMargin: '100px' });
+    observer.observe(footer);
+  })();
+</script>

@@ -77,6 +77,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     </style>
 
     <ClientRouter />
+
+    <!-- Detect Safari early for CSS-based perf optimizations -->
+    <script is:inline>
+      (function(){
+        if(/^((?!chrome|android).)*safari/i.test(navigator.userAgent)){
+          document.documentElement.classList.add('safari');
+        }
+      })();
+    </script>
   </head>
   <body>
     <!-- Animated gradient background -->
@@ -124,6 +133,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         history.scrollRestoration = 'manual';
       }
 
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+
       function initLenis() {
         // Cancel previous RAF loop to prevent stacking
         if (lenisRafId !== null) {
@@ -132,8 +144,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         }
         if (lenis) lenis.destroy();
 
+        // Skip Lenis on mobile — native scroll is better for touch devices
+        // and eliminates the permanent 60fps RAF loop
+        if (isMobile) {
+          (window as any).__lenis = null;
+          return;
+        }
+
         lenis = new Lenis({
-          duration: 1.2,
+          // Safari: shorter duration to avoid fighting native momentum scroll
+          duration: isSafari ? 0.8 : 1.2,
           easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
         });

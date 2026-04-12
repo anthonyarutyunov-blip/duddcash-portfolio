@@ -1119,6 +1119,43 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     }
   }
 
+  /* ─── Safari desktop performance ─── */
+  /* Hide WebGL shader backgrounds on Safari — too heavy */
+  :global(.safari) .team-zone__shader,
+  :global(.safari) .about-cta-card__shader {
+    display: none !important;
+  }
+
+  /* Reduce blur on Safari — 60px is brutal for WebKit compositor */
+  :global(.safari) .team-zone__glow {
+    filter: blur(20px);
+  }
+
+  /* Remove will-change on Safari — too many compositor layers */
+  :global(.safari) .team-zone {
+    will-change: auto;
+  }
+
+  :global(.safari) .team-zone__glow {
+    will-change: auto;
+  }
+
+  /* Simplify backdrop-filter on Safari desktop */
+  :global(.safari) .founders__card-content {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  :global(.safari) .team__card {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Kill animated gradient borders on Safari */
+  :global(.safari) .founders__card-border {
+    animation: none;
+  }
+
   /* ─── Mobile ─── */
   @media (max-width: 768px) {
     .about__title {

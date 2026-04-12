@@ -4,7 +4,6 @@ import {
   motion,
   useMotionValue,
   useMotionTemplate,
-  useAnimationFrame,
 } from "motion/react"
 
 interface InfiniteGridProps {
@@ -27,12 +26,17 @@ export function InfiniteGrid({
   const containerRef = useRef<HTMLDivElement>(null)
   const patternId = useId().replace(/:/g, "")
   const [isVisible, setIsVisible] = useState(false)
+  const [isMobile] = useState(() =>
+    typeof window !== "undefined" && (window.innerWidth <= 768 || "ontouchstart" in window)
+  )
+  const rafRef = useRef<number | null>(null)
 
   const mouseX = useMotionValue(-999)
   const mouseY = useMotionValue(-999)
 
   // Pause when off-screen
   useEffect(() => {
+    if (isMobile) return
     const el = containerRef.current
     if (!el) return
     const observer = new IntersectionObserver(
@@ -41,11 +45,11 @@ export function InfiniteGrid({
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [isMobile])
 
   // Use window-level mouse tracking so it works even when behind other content
   useEffect(() => {
-    if (!isVisible) return
+    if (isMobile || !isVisible) return
     const handleMouseMove = (e: MouseEvent) => {
       const el = containerRef.current
       if (!el) return
@@ -55,18 +59,43 @@ export function InfiniteGrid({
     }
     window.addEventListener("mousemove", handleMouseMove, { passive: true })
     return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [isVisible, mouseX, mouseY])
+  }, [isMobile, isVisible, mouseX, mouseY])
 
   const gridOffsetX = useMotionValue(0)
   const gridOffsetY = useMotionValue(0)
 
-  useAnimationFrame(() => {
-    if (!isVisible) return
-    gridOffsetX.set((gridOffsetX.get() + speedX) % 40)
-    gridOffsetY.set((gridOffsetY.get() + speedY) % 40)
-  })
+  // Manual RAF loop that fully stops when not visible (instead of useAnimationFrame which always ticks)
+  useEffect(() => {
+    if (isMobile || !isVisible) return
+    function tick() {
+      gridOffsetX.set((gridOffsetX.get() + speedX) % 40)
+      gridOffsetY.set((gridOffsetY.get() + speedY) % 40)
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
+  }, [isMobile, isVisible, speedX, speedY, gridOffsetX, gridOffsetY])
 
   const maskImage = useMotionTemplate`radial-gradient(${spotlightSize}px circle at ${mouseX}px ${mouseY}px, black, transparent)`
+
+  // On mobile, render only children — grid pattern is invisible on small screens
+  if (isMobile) {
+    return (
+      <div
+        className={cn("relative w-full overflow-hidden", className)}
+        style={{ height }}
+      >
+        {children && (
+          <div className="relative z-10">
+            {children}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div

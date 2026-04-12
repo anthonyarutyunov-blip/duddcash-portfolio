@@ -92,8 +92,13 @@ import { GradientDots } from '../ui/gradient-dots';
       rgba(210, 195, 170, 0.3) 100%
     );
     background-size: 400% 400%;
-    animation: borderFlow 10s ease-in-out infinite;
+    animation: borderFlow 10s ease-in-out infinite paused;
     z-index: 0;
+  }
+
+  /* Play animations only when section is visible */
+  .contact-cta.is-visible .contact-cta__card-border {
+    animation-play-state: running;
   }
 
   @keyframes borderFlow {
@@ -137,7 +142,7 @@ import { GradientDots } from '../ui/gradient-dots';
       rgba(255, 220, 180, 0.08) 100%
     );
     background-size: 300% 300%;
-    animation: holoSheen 8s ease-in-out infinite;
+    animation: holoSheen 8s ease-in-out infinite paused;
     pointer-events: none;
     z-index: 1;
   }
@@ -184,7 +189,16 @@ import { GradientDots } from '../ui/gradient-dots';
     filter: blur(60px);
     z-index: -1;
     pointer-events: none;
-    animation: orbFloat 10s ease-in-out infinite;
+    animation: orbFloat 10s ease-in-out infinite paused;
+  }
+
+  .contact-cta.is-visible .contact-cta__card-inner::before {
+    animation-play-state: running;
+  }
+
+  .contact-cta.is-visible .contact-cta__card::before,
+  .contact-cta.is-visible .contact-cta__card::after {
+    animation-play-state: running;
   }
 
   .contact-cta__card::before {
@@ -233,6 +247,26 @@ import { GradientDots } from '../ui/gradient-dots';
     gap: var(--space-lg);
   }
 
+  /* Safari performance — reduce expensive blurs */
+  :global(.safari) .contact-cta__card-inner {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  :global(.safari) .contact-cta__card::before,
+  :global(.safari) .contact-cta__card::after {
+    filter: blur(20px);
+    animation: none;
+  }
+
+  :global(.safari) .contact-cta__card-inner::before {
+    animation: none;
+  }
+
+  :global(.safari) .contact-cta__card-border {
+    animation: none;
+  }
+
   @media (max-width: 768px) {
     .contact-cta {
       padding: 0 1rem 2rem;
@@ -271,3 +305,16 @@ import { GradientDots } from '../ui/gradient-dots';
     }
   }
 </style>
+
+<script is:inline>
+  (function() {
+    var section = document.querySelector('.contact-cta');
+    if (!section) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        section.classList.toggle('is-visible', entry.isIntersecting);
+      });
+    }, { threshold: 0, rootMargin: '100px' });
+    observer.observe(section);
+  })();
+</script>

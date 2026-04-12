@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createNoise2D } from 'simplex-noise'
 
 interface Point {
@@ -27,6 +27,11 @@ export function Waves({
   backgroundColor = "transparent",
   pointerSize = 0,
 }: WavesProps) {
+  // Skip entirely on mobile — heavy SVG animation is subtle on small screens
+  const [isMobile] = useState(() =>
+    typeof window !== 'undefined' && (window.innerWidth <= 768 || 'ontouchstart' in window)
+  )
+
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const mouseRef = useRef({
@@ -38,9 +43,10 @@ export function Waves({
   const noiseRef = useRef<((x: number, y: number) => number) | null>(null)
   const rafRef = useRef<number | null>(null)
   const boundingRef = useRef<DOMRect | null>(null)
-  const visibleRef = useRef(true)
+  const visibleRef = useRef(false) // Start as false — let IntersectionObserver trigger
 
   useEffect(() => {
+    if (isMobile) return // No animation on mobile
     if (!containerRef.current || !svgRef.current) return
 
     noiseRef.current = createNoise2D()
@@ -63,7 +69,8 @@ export function Waves({
     window.addEventListener('mousemove', onMouseMove, { passive: true })
     containerRef.current.addEventListener('touchmove', onTouchMove, { passive: false })
 
-    rafRef.current = requestAnimationFrame(tick)
+    // Don't start RAF here — let IntersectionObserver trigger it when visible
+    // (avoids animating behind the 5-second intro screen)
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
@@ -73,7 +80,7 @@ export function Waves({
       window.removeEventListener('mousemove', onMouseMove)
       containerRef.current?.removeEventListener('touchmove', onTouchMove)
     }
-  }, [])
+  }, [isMobile])
 
   const setSize = () => {
     if (!containerRef.current || !svgRef.current) return
@@ -90,8 +97,9 @@ export function Waves({
     pathsRef.current.forEach(path => path.remove())
     pathsRef.current = []
 
-    const xGap = 20
-    const yGap = 20
+    // Use wider gaps for all browsers — 33% fewer SVG paths per frame
+    const xGap = 30
+    const yGap = 30
     const oWidth = width + 200
     const oHeight = height + 30
     const totalLines = Math.ceil(oWidth / xGap)
@@ -236,6 +244,9 @@ export function Waves({
     drawLines()
     rafRef.current = requestAnimationFrame(tick)
   }
+
+  // On mobile, render nothing — the hero works fine without wave animation
+  if (isMobile) return null
 
   return (
     <div

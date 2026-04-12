@@ -160,14 +160,17 @@ import { SpecialText } from '../ui/special-text';
 
 <script is:inline>
   (function() {
-    var checkerId = null;
+    var scrollHandler = null;
 
     function initHeaderColorSwitch() {
       var header = document.querySelector('.header');
       if (!header) return;
 
-      // Clear any previous interval from prior page
-      if (checkerId) clearInterval(checkerId);
+      // Clean up previous listeners from prior page
+      if (scrollHandler) {
+        window.removeEventListener('scroll', scrollHandler);
+        window.removeEventListener('resize', scrollHandler);
+      }
 
       function isDarkBg(el) {
         var bg = getComputedStyle(el).backgroundColor;
@@ -184,37 +187,37 @@ import { SpecialText } from '../ui/special-text';
       var lastNavHidden = null;
       var lastMediaState = null;
 
+      // Use document.elementFromPoint instead of scanning every element
       function isOverText(logoRect) {
-        var textEls = document.querySelectorAll('h1, h2, h3, p, .label, .stat__number, .stat__label');
-        for (var i = 0; i < textEls.length; i++) {
-          var r = textEls[i].getBoundingClientRect();
-          if (r.right > logoRect.left && r.left < logoRect.right &&
-              r.bottom > logoRect.top && r.top < logoRect.bottom) {
-            return true;
-          }
-        }
-        return false;
+        var cx = (logoRect.left + logoRect.right) / 2;
+        var cy = (logoRect.top + logoRect.bottom) / 2;
+        var el = document.elementFromPoint(cx, cy);
+        if (!el || el.closest('.header')) return false;
+        var tag = el.tagName;
+        return tag === 'H1' || tag === 'H2' || tag === 'H3' || tag === 'P' ||
+               el.classList.contains('label') || el.classList.contains('stat__number') || el.classList.contains('stat__label');
       }
 
       function isOverMedia(logoRect) {
-        var mediaEls = document.querySelectorAll('img, video, picture, .gallery__item, .sticky-gallery__media, [data-media], input, textarea, select, .form-input, .contact__form');
-        for (var i = 0; i < mediaEls.length; i++) {
-          var r = mediaEls[i].getBoundingClientRect();
-          if (r.right > logoRect.left && r.left < logoRect.right &&
-              r.bottom > logoRect.top && r.top < logoRect.bottom) {
-            return true;
-          }
-        }
-        return false;
+        var cx = (logoRect.left + logoRect.right) / 2;
+        var cy = (logoRect.top + logoRect.bottom) / 2;
+        var el = document.elementFromPoint(cx, cy);
+        if (!el || el.closest('.header')) return false;
+        var tag = el.tagName;
+        return tag === 'IMG' || tag === 'VIDEO' || tag === 'PICTURE' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+               el.classList.contains('gallery__item') || el.classList.contains('sticky-gallery__media') ||
+               el.hasAttribute('data-media') || el.classList.contains('form-input') || el.closest('.contact__form');
       }
+
+      // Cache section candidates — re-query only on page swap
+      var darkCandidates = document.querySelectorAll('.globe-section, .footer, section');
 
       function check() {
         var checkY = 30;
         var overDark = false;
-        var candidates = document.querySelectorAll('.globe-section, .footer, section');
-        for (var i = 0; i < candidates.length; i++) {
-          var rect = candidates[i].getBoundingClientRect();
-          if (rect.top <= checkY && rect.bottom >= checkY && isDarkBg(candidates[i])) {
+        for (var i = 0; i < darkCandidates.length; i++) {
+          var rect = darkCandidates[i].getBoundingClientRect();
+          if (rect.top <= checkY && rect.bottom >= checkY && isDarkBg(darkCandidates[i])) {
             overDark = true;
             break;
           }
@@ -253,13 +256,28 @@ import { SpecialText } from '../ui/special-text';
         }
       }
 
-      // Throttled check — every 200ms instead of every frame
+      // RAF-throttled scroll listener instead of 200ms setInterval
+      var rafPending = false;
+      function onScrollOrResize() {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(function() {
+          check();
+          rafPending = false;
+        });
+      }
       check();
-      checkerId = setInterval(check, 200);
+      scrollHandler = onScrollOrResize;
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      window.addEventListener('resize', scrollHandler, { passive: true });
     }
 
     document.addEventListener('astro:before-swap', function() {
       document.body.style.overflow = '';
+      if (scrollHandler) {
+        window.removeEventListener('scroll', scrollHandler);
+        window.removeEventListener('resize', scrollHandler);
+      }
     });
 
     if (document.readyState === 'loading') {

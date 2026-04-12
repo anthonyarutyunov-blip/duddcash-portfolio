@@ -128,7 +128,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Featured", "Nightlife"],
     featured: true,
     order: 1,
-    customThumbnail: "/gallery/wynn-resi.png",
+    customThumbnail: "/gallery/wynn-resi.jpg",
     thumbnailVideoId: "ba823cf7-8001-4ed9-bf4b-ba292ab1c4e4",
     videos: [
       {
@@ -323,7 +323,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Branded & Social"],
     featured: false,
     order: 5,
-    customThumbnail: "/gallery/academy-holiday.png",
+    customThumbnail: "/gallery/academy-holiday.jpg",
     thumbnailVideoId: "73e885fe-7c1b-49da-85d7-07ed7dd066eb",
     videos: [
       {
@@ -362,7 +362,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Branded & Social"],
     featured: false,
     order: 6.5,
-    customThumbnail: "/gallery/marine-layer.png",
+    customThumbnail: "/gallery/marine-layer.jpg",
     video: {
       videoId: "cfa37e9c-0e1e-48f9-9fff-2ae82a5fd91e",
       title: "Marine Layer — Fall 2024",
@@ -389,7 +389,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Branded & Social"],
     featured: false,
     order: 6,
-    customThumbnail: "/gallery/pringles.png",
+    customThumbnail: "/gallery/pringles.jpg",
     thumbnailVideoId: "e3440c87-e6da-412a-ada7-7bbad2d8e7d8",
     videos: [
       {
@@ -413,7 +413,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Branded & Social"],
     featured: false,
     order: 8.5,
-    customThumbnail: "/gallery/evian.png",
+    customThumbnail: "/gallery/evian.jpg",
     video: {
       videoId: "b4629515-6fef-4620-a465-2227b5daf5b0",
       title: "Evian Water x F1 Weekend 2024",
@@ -462,7 +462,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Branded & Social"],
     featured: false,
     order: 3,
-    customThumbnail: "/gallery/pp-still.png",
+    customThumbnail: "/gallery/pp-still.jpg",
     thumbnailVideoId: "c6550516-289e-4763-b91b-c15fcb56c011",
     videos: [],
     sections: [
@@ -623,7 +623,7 @@ export const portfolioItems: PortfolioItem[] = [
     categories: ["Branded & Social"],
     featured: false,
     order: 5.5,
-    customThumbnail: "/gallery/chipotle.png",
+    customThumbnail: "/gallery/chipotle.jpg",
     video: {
       videoId: "44a352f6-ec7b-4050-b2ca-2a89d278504b",
       title: "Chipotle Presents… Behind the Line",

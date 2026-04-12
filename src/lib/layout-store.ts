@@ -106,7 +106,11 @@ let _defaultOverridesFetching = false
 export async function loadDefaultOverrides(): Promise<LayoutOverrides> {
   if (_defaultOverridesCache) return _defaultOverridesCache
   try {
-    const res = await fetch("/layout-overrides.json")
+    // 3-second timeout — on slow mobile connections, render with base data immediately
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 3000)
+    const res = await fetch("/layout-overrides.json", { signal: controller.signal })
+    clearTimeout(timeout)
     if (res.ok) {
       const data = (await res.json()) as LayoutOverrides
       if (data.version === 1) {

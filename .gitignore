@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Netlify local state
 .netlify/
+
+# Large image formats
+*.tiff
