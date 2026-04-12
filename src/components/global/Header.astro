@@ -172,6 +172,8 @@ import { SpecialText } from '../ui/special-text';
         window.removeEventListener('resize', scrollHandler);
       }
 
+      var isMobileHeader = window.innerWidth <= 768 || 'ontouchstart' in window;
+
       function isDarkBg(el) {
         var bg = getComputedStyle(el).backgroundColor;
         if (bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') return false;
@@ -210,9 +212,23 @@ import { SpecialText } from '../ui/special-text';
       }
 
       // Cache section candidates — re-query only on page swap
-      var darkCandidates = document.querySelectorAll('.globe-section, .footer, section');
+      var darkCandidates = isMobileHeader ? null : document.querySelectorAll('.globe-section, .footer, section');
 
-      function check() {
+      // Mobile: lightweight check — only track hero visibility for nav toggle
+      function checkMobile() {
+        var hero = document.getElementById('hero');
+        if (hero) {
+          var heroBottom = hero.getBoundingClientRect().bottom;
+          var navHidden = heroBottom < 0;
+          if (lastNavHidden !== navHidden) {
+            header.classList.toggle('header--nav-hidden', navHidden);
+            lastNavHidden = navHidden;
+          }
+        }
+      }
+
+      // Desktop: full check — dark bg, nav hidden, text/media overlap
+      function checkDesktop() {
         var checkY = 30;
         var overDark = false;
         for (var i = 0; i < darkCandidates.length; i++) {
@@ -255,6 +271,8 @@ import { SpecialText } from '../ui/special-text';
           }
         }
       }
+
+      var check = isMobileHeader ? checkMobile : checkDesktop;
 
       // RAF-throttled scroll listener instead of 200ms setInterval
       var rafPending = false;

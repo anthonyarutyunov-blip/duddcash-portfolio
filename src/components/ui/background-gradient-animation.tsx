@@ -50,9 +50,18 @@ export const BackgroundGradientAnimation = ({
     document.body.style.setProperty("--blending-value", blendingValue);
   }, []);
 
+  // Detect Safari and mobile synchronously first — used to gate effects below
+  const [isSafari] = useState(() =>
+    typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  );
+  const [isMobile] = useState(() =>
+    typeof window !== "undefined" && (window.innerWidth <= 768 || "ontouchstart" in window)
+  );
+  const isLite = isSafari || isMobile;
+
   // Animation loop using refs — stops when pointer converges (idle)
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive || isMobile) return;
 
     function animate() {
       const cur = curRef.current;
@@ -76,11 +85,11 @@ export const BackgroundGradientAnimation = ({
 
     rafRef.current = requestAnimationFrame(animate);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [interactive]);
+  }, [interactive, isMobile]);
 
   // Global mouse listener — restarts RAF when mouse moves
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive || isMobile) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (interactiveRef.current) {
@@ -112,16 +121,21 @@ export const BackgroundGradientAnimation = ({
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [interactive]);
+  }, [interactive, isMobile]);
 
-  // Detect Safari and mobile synchronously to avoid first-render flash with all blobs
-  const [isSafari] = useState(() =>
-    typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-  );
-  const [isMobile] = useState(() =>
-    typeof window !== "undefined" && (window.innerWidth <= 768 || "ontouchstart" in window)
-  );
-  const isLite = isSafari || isMobile;
+  // Mobile: static gradient only — no animated blobs, no blur, no compositing layers
+  if (isMobile) {
+    return (
+      <div
+        className={cn(
+          "h-screen w-screen relative overflow-hidden top-0 left-0 bg-[linear-gradient(40deg,var(--gradient-background-start),var(--gradient-background-end))]",
+          containerClassName
+        )}
+      >
+        <div className={cn("", className)}>{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -134,7 +148,7 @@ export const BackgroundGradientAnimation = ({
       <div
         className={cn(
           "gradients-container h-full w-full",
-          isLite ? "blur-lg" : "blur-[30px]"
+          isSafari ? "blur-sm" : "blur-[30px]"
         )}
       >
         {/* Blob 1 — always rendered */}
@@ -147,16 +161,18 @@ export const BackgroundGradientAnimation = ({
             `opacity-100`
           )}
         />
-        {/* Blob 2 — always rendered */}
-        <div
-          className={cn(
-            `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
-            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-            `[transform-origin:calc(50%-400px)]`,
-            `animate-second`,
-            `opacity-100`
-          )}
-        />
+        {/* Blob 2 — skip on Safari to reduce compositing layers */}
+        {!isSafari && (
+          <div
+            className={cn(
+              `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
+              `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+              `[transform-origin:calc(50%-400px)]`,
+              `animate-second`,
+              `opacity-100`
+            )}
+          />
+        )}
         {/* Blob 3 — skip on mobile/Safari */}
         {!isLite && (
           <div

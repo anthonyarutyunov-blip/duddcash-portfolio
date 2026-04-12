@@ -64,7 +64,7 @@ export function VideoPlayer({
 
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.3 }
+      { threshold: 0.1, rootMargin: "200px 0px" }
     )
     observer.observe(container)
     return () => observer.disconnect()
@@ -294,7 +294,8 @@ export function VideoPlayer({
     >
       <video
         ref={videoRef}
-        src={videoUrl(videoId, "1080p")}
+        src={videoUrl(videoId, isMobile ? "720p" : "1080p")}
+        poster={customThumbnail || thumbnailUrl(videoId)}
         muted
         loop
         playsInline

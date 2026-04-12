@@ -26,6 +26,7 @@ interface TrustedByCarouselProps {
 
 export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouselProps) {
   const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
+  const [isSafari] = useState(() => typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent))
   const textColor = darkMode ? "rgba(255,255,255,0.92)" : "var(--color-text)"
   const mutedColor = darkMode ? "rgba(255,255,255,0.4)" : "var(--color-muted)"
   const logoFilter = darkMode
@@ -106,7 +107,7 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
           display: flex;
           width: max-content;
           animation: trustedScroll linear infinite;
-          will-change: transform;
+          will-change: ${isSafari ? 'auto' : 'transform'};
         }
 
         @keyframes trustedScroll {
