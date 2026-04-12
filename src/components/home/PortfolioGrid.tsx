@@ -128,19 +128,13 @@ export default function PortfolioGrid() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [isMobileGrid] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
 
-  // Handle filter change with mobile scroll management
+  // Handle filter change
   const handleFilterChange = useCallback((cat: "All" | Category) => {
     if (cat === filter) return
     setFilter(cat)
-
-    // On mobile, use native scroll to filter bar (bypass Lenis)
-    if (isMobileGrid && filterBarRef.current) {
-      requestAnimationFrame(() => {
-        filterBarRef.current!.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
-        window.scrollBy(0, -20)
-      })
-    }
-  }, [filter, isMobileGrid])
+    // On mobile: no scroll manipulation — user is already looking at the filter bar.
+    // Scrolling here fights with grid height changes and causes visible jumps.
+  }, [filter])
 
   // Load overrides on mount and when edit mode changes
   useEffect(() => {
@@ -346,36 +340,43 @@ export default function PortfolioGrid() {
     )
   })
 
-  const gridElement = (
+  const editButtons = editMode && !expandedId && (
+    <>
+      <button
+        onClick={() => setShowAddVideo(true)}
+        className="portfolio-add-btn"
+      >
+        <Film size={16} />
+        <span>Add Video</span>
+      </button>
+      <button
+        onClick={() => setShowAddProject(true)}
+        className="portfolio-add-btn"
+      >
+        <FolderPlus size={16} />
+        <span>Add Project</span>
+      </button>
+    </>
+  )
+
+  // Mobile: plain div, zero animation, instant content swap
+  // Desktop: motion.div with fade animation via AnimatePresence
+  const gridElement = isMobileGrid ? (
+    <div className={`portfolio-bento-grid${activeId ? " portfolio-grid--dragging" : ""}`}>
+      {gridContent}
+      {editButtons}
+    </div>
+  ) : (
     <motion.div
       key={filter}
       className={`portfolio-bento-grid${activeId ? " portfolio-grid--dragging" : ""}`}
-      initial={isMobileGrid ? false : { opacity: 0 }}
+      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={isMobileGrid ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: isMobileGrid ? 0 : 0.15 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
     >
       {gridContent}
-
-      {/* Add content buttons in edit mode */}
-      {editMode && !expandedId && (
-        <>
-          <button
-            onClick={() => setShowAddVideo(true)}
-            className="portfolio-add-btn"
-          >
-            <Film size={16} />
-            <span>Add Video</span>
-          </button>
-          <button
-            onClick={() => setShowAddProject(true)}
-            className="portfolio-add-btn"
-          >
-            <FolderPlus size={16} />
-            <span>Add Project</span>
-          </button>
-        </>
-      )}
+      {editButtons}
     </motion.div>
   )
 
@@ -419,63 +420,67 @@ export default function PortfolioGrid() {
           </div>
         </div>
 
-        <AnimatePresence mode={isMobileGrid ? "sync" : "wait"}>
-          {editMode && !expandedId ? (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCorners}
-              onDragStart={(e: DragStartEvent) =>
-                setActiveId(e.active.id as string)
-              }
-              onDragEnd={(e: DragEndEvent) => {
-                setActiveId(null)
-                handleDragEnd(e)
-              }}
-              onDragCancel={() => setActiveId(null)}
-            >
-              <SortableContext
-                items={displayItems.map((m) => m.item.id)}
-                strategy={rectSortingStrategy}
+        {isMobileGrid ? (
+          gridElement
+        ) : (
+          <AnimatePresence mode="wait">
+            {editMode && !expandedId ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={(e: DragStartEvent) =>
+                  setActiveId(e.active.id as string)
+                }
+                onDragEnd={(e: DragEndEvent) => {
+                  setActiveId(null)
+                  handleDragEnd(e)
+                }}
+                onDragCancel={() => setActiveId(null)}
               >
-                {gridElement}
-              </SortableContext>
+                <SortableContext
+                  items={displayItems.map((m) => m.item.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  {gridElement}
+                </SortableContext>
 
-              <DragOverlay adjustScale={false} dropAnimation={null}>
-                {activeId
-                  ? (() => {
-                      const found = mergedItems.find(
-                        (m) => m.item.id === activeId
-                      )
-                      if (!found) return null
-                      return (
-                        <div
-                          style={{
-                            opacity: 1,
-                            boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
-                            transform: "scale(1.03)",
-                            borderRadius: 12,
-                            overflow: "hidden",
-                            pointerEvents: "none",
-                          }}
-                        >
-                          <PortfolioCard
-                            item={found.item}
-                            isExpanded={false}
-                            onExpand={() => {}}
-                            onCollapse={() => {}}
-                            editMode={false}
-                            currentSize={found.size}
-                          />
-                        </div>
-                      )
-                    })()
-                  : null}
-              </DragOverlay>
-            </DndContext>
-          ) : (
-            gridElement
-          )}
-        </AnimatePresence>
+                <DragOverlay adjustScale={false} dropAnimation={null}>
+                  {activeId
+                    ? (() => {
+                        const found = mergedItems.find(
+                          (m) => m.item.id === activeId
+                        )
+                        if (!found) return null
+                        return (
+                          <div
+                            style={{
+                              opacity: 1,
+                              boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+                              transform: "scale(1.03)",
+                              borderRadius: 12,
+                              overflow: "hidden",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            <PortfolioCard
+                              item={found.item}
+                              isExpanded={false}
+                              onExpand={() => {}}
+                              onCollapse={() => {}}
+                              editMode={false}
+                              currentSize={found.size}
+                            />
+                          </div>
+                        )
+                      })()
+                    : null}
+                </DragOverlay>
+              </DndContext>
+            ) : (
+              gridElement
+            )}
+          </AnimatePresence>
+        )}
       </div>
 
       {/* Add single video to current tab */}
@@ -720,8 +725,10 @@ export default function PortfolioGrid() {
           }
 
           /* Force single column, but allow expanded cards to span full */
+          /* Kill all transitions on cards — prevents glitchy animation on tab switch */
           .portfolio-card-wrapper {
             grid-column: span 1 !important;
+            transition: none !important;
           }
 
           .portfolio-card-wrapper--expanded {
@@ -751,6 +758,17 @@ export default function PortfolioGrid() {
           /* Hide scroll hint arrow */
           .portfolio-filter-hint {
             display: none !important;
+          }
+
+          /* Uniform card height — override per-card aspect ratios to eliminate row gaps */
+          .portfolio-card {
+            aspect-ratio: 4/5 !important;
+          }
+
+          .portfolio-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
           }
 
           .portfolio-card__hover-overlay {
