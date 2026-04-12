@@ -267,6 +267,7 @@ export default function GlobeSection() {
           background: #0b0b0b;
           padding: var(--space-3xl) 3.9vw;
           overflow: hidden;
+          margin-top: -1px;
         }
 
         .globe-section__inner {

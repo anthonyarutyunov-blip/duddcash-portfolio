@@ -711,6 +711,9 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     z-index: 1;
     background: #403D39;
     overflow: hidden;
+    /* Isolate into own compositor layer — prevents shader/blur from causing scroll jank */
+    contain: layout style paint;
+    will-change: transform;
   }
 
   .team-zone .scroll-hint {
@@ -724,19 +727,22 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     inset: 0;
     z-index: 0;
     opacity: 0.25;
+    will-change: transform;
+    transform: translateZ(0);
   }
 
   .team-zone__glow {
     position: absolute;
     top: 35%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0);
     width: 60%;
     height: 50%;
     background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
     pointer-events: none;
     filter: blur(60px);
     z-index: 0;
+    will-change: transform;
   }
 
   .team-zone .meet-team,
@@ -868,6 +874,7 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     backdrop-filter: blur(16px);
     width: 100%;
     transition: box-shadow 0.4s ease, background 0.4s ease;
+    transform: translateZ(0);
   }
 
   .founders__card:hover .founders__card-content {
@@ -993,6 +1000,7 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(8px);
     transition: border-color 0.3s ease, background 0.3s ease;
+    transform: translateZ(0);
   }
 
   .team__card:hover {
@@ -1378,9 +1386,40 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
 </style>
 
 <script>
-  const checkbox = document.getElementById('story-toggle') as HTMLInputElement | null;
-  if (checkbox) {
+  function initStoryToggle() {
+    const checkbox = document.getElementById('story-toggle') as HTMLInputElement | null;
+    const storyLabel = document.querySelector('.story__toggle') as HTMLElement | null;
+    if (!checkbox || !storyLabel) return;
+
+    // ── Mobile: intercept the label CLICK before checkbox toggles ──
+    storyLabel.addEventListener('click', (e) => {
+      if (window.innerWidth > 768) return;
+      if (!checkbox.checked) return;
+
+      e.preventDefault();
+
+      const storyMore = document.querySelector('.story__more') as HTMLElement;
+      const lenis = (window as any).__lenis;
+
+      if (storyMore) storyMore.style.transition = 'none';
+      checkbox.checked = false;
+      void document.body.offsetHeight;
+
+      if (lenis) {
+        lenis.scrollTo(0, { immediate: true, force: true });
+        lenis.resize();
+      } else {
+        document.documentElement.scrollTop = 0;
+      }
+
+      requestAnimationFrame(() => {
+        if (storyMore) storyMore.style.transition = '';
+      });
+    });
+
+    // ── Desktop: use change event with Lenis scroll ──
     checkbox.addEventListener('change', () => {
+      if (window.innerWidth <= 768) return;
       if (!checkbox.checked) {
         const target = document.querySelector('.about') as HTMLElement;
         if (!target) return;
@@ -1396,7 +1435,10 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     });
   }
 
-
+  // Run on initial load
+  initStoryToggle();
+  // Re-run after Astro client-side navigation (DOM is swapped, old listeners are gone)
+  document.addEventListener('astro:after-swap', initStoryToggle);
 </script>
 
 

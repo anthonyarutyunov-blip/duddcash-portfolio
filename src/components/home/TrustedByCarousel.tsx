@@ -1,10 +1,4 @@
 import { useState } from "react"
-import AutoScroll from "embla-carousel-auto-scroll"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "../ui/carousel"
 import { ShimmerText } from "../ui/shimmer-text"
 
 const brands = [
@@ -32,7 +26,6 @@ interface TrustedByCarouselProps {
 
 export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouselProps) {
   const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
-  const fadeBg = darkMode ? "rgba(0,0,0,0.95)" : "var(--color-bg)"
   const textColor = darkMode ? "rgba(255,255,255,0.92)" : "var(--color-text)"
   const mutedColor = darkMode ? "rgba(255,255,255,0.4)" : "var(--color-muted)"
   const logoFilter = darkMode
@@ -41,6 +34,10 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
   const logoHoverFilter = darkMode
     ? "grayscale(0%) brightness(10) opacity(0.8)"
     : "grayscale(0%) opacity(1)"
+
+  // Duplicate brands for seamless loop
+  const track = [...brands, ...brands]
+  const duration = isMobile ? 30 : 40
 
   return (
     <section style={{ padding: "clamp(4rem, 8vh, 8rem) 0", overflow: "hidden" }}>
@@ -72,62 +69,81 @@ export default function TrustedByCarousel({ darkMode = false }: TrustedByCarouse
         </p>
       </div>
 
-      <div
-        style={{
-          position: "relative",
-          maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-        }}
-      >
-        <Carousel
-          opts={{ loop: true, dragFree: true }}
-          plugins={[AutoScroll({ playOnInit: true, speed: isMobile ? 0.6 : 1.2, stopOnInteraction: false })]}
-        >
-          <CarouselContent className="ml-0" style={isMobile ? { willChange: "transform", transform: "translateZ(0)" } : undefined}>
-            {brands.map((brand, i) => (
-              <CarouselItem
-                key={i}
-                className="flex basis-auto justify-center pl-0"
-              >
-                <div
-                  style={{
-                    padding: "0 clamp(28px, 4vw, 60px)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    height: 80,
-                  }}
-                >
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    loading="lazy"
-                    draggable={false}
-                    style={{
-                      height: "auto",
-                      width: "auto",
-                      maxHeight: 40,
-                      maxWidth: 160,
-                      objectFit: "contain",
-                      filter: logoFilter,
-                      transition: "filter 0.4s ease, transform 0.4s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.filter = logoHoverFilter
-                      e.currentTarget.style.transform = "scale(1.08)"
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.filter = logoFilter
-                      e.currentTarget.style.transform = "scale(1)"
-                    }}
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+      <div className="trusted-scroll-mask">
+        <div className="trusted-scroll-track" style={{ animationDuration: `${duration}s` }}>
+          {track.map((brand, i) => (
+            <div key={i} className="trusted-scroll-item">
+              <img
+                src={brand.logo}
+                alt={brand.name}
+                loading="lazy"
+                draggable={false}
+                className="trusted-scroll-logo"
+                style={{ filter: logoFilter }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.filter = logoHoverFilter
+                  e.currentTarget.style.transform = "scale(1.08)"
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.filter = logoFilter
+                  e.currentTarget.style.transform = "scale(1)"
+                }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
+
+      <style>{`
+        .trusted-scroll-mask {
+          position: relative;
+          mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+          overflow: hidden;
+        }
+
+        .trusted-scroll-track {
+          display: flex;
+          width: max-content;
+          animation: trustedScroll linear infinite;
+          will-change: transform;
+        }
+
+        @keyframes trustedScroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .trusted-scroll-item {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 clamp(28px, 4vw, 60px);
+          height: 80px;
+        }
+
+        .trusted-scroll-logo {
+          height: auto;
+          width: auto;
+          max-height: 40px;
+          max-width: 160px;
+          object-fit: contain;
+          transition: filter 0.4s ease, transform 0.4s ease;
+        }
+
+        @media (max-width: 768px) {
+          .trusted-scroll-item {
+            padding: 0 20px;
+            height: 60px;
+          }
+
+          .trusted-scroll-logo {
+            max-height: 30px;
+            max-width: 120px;
+          }
+        }
+      `}</style>
     </section>
   )
 }

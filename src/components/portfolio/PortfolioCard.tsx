@@ -98,14 +98,23 @@ export function PortfolioCard({
   useLayoutEffect(() => {
     if (!isExpanded || !cardRef.current) return
     const section = document.getElementById("portfolio")
+    const lenis = (window as any).__lenis
 
     if (isMobile && section) {
-      // Mobile: bypass Lenis entirely — use native scroll to #portfolio section.
-      // lenis.resize() on mobile causes secondary scroll corrections = jumps.
-      section.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
-      // Release height lock after DOM settles (no lenis.resize on mobile)
+      // Mobile: use Lenis scrollTo with NUMERIC position so Lenis's internal
+      // scroll state stays in sync. Native scrollIntoView doesn't update Lenis,
+      // causing it to "correct" back to the old deep position on next RAF.
+      const scrollTarget = section.getBoundingClientRect().top + window.scrollY
+      if (lenis) {
+        lenis.scrollTo(scrollTarget, { immediate: true, force: true })
+      } else {
+        window.scrollTo(0, scrollTarget)
+      }
+      // Release height lock and sync Lenis with new page dimensions
       const unlockTimer = setTimeout(() => {
         if (section) section.style.minHeight = ""
+        void document.body.offsetHeight
+        if (lenis) lenis.resize()
       }, 200)
       return () => {
         clearTimeout(unlockTimer)
@@ -114,7 +123,6 @@ export function PortfolioCard({
     }
 
     // Desktop: use Lenis
-    const lenis = (window as any).__lenis
     if (lenis) {
       lenis.resize()
       lenis.scrollTo(cardRef.current, { offset: -100, immediate: true })
@@ -168,16 +176,23 @@ export function PortfolioCard({
 
     if (wasExpanded && !isExpanded) {
       const section = document.getElementById("portfolio")
+      const lenis = (window as any).__lenis
 
       if (isMobile && section) {
-        // Mobile: bypass Lenis — native scroll to #portfolio section
-        section.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
+        // Mobile: use Lenis scrollTo with numeric position to keep internal state in sync
+        const scrollTarget = section.getBoundingClientRect().top + window.scrollY
+        if (lenis) {
+          lenis.scrollTo(scrollTarget, { immediate: true, force: true })
+        } else {
+          window.scrollTo(0, scrollTarget)
+        }
         setTimeout(() => {
           if (section) section.style.minHeight = ""
+          void document.body.offsetHeight
+          if (lenis) lenis.resize()
         }, 200)
       } else {
         // Desktop: use Lenis to scroll to card's grid position
-        const lenis = (window as any).__lenis
         if (lenis && cardRef.current) {
           lenis.resize()
           lenis.scrollTo(cardRef.current, { offset: -100, immediate: true })

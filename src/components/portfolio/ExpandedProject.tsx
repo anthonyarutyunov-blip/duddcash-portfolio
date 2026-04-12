@@ -376,14 +376,18 @@ function VideoGrid({
     // After React commits new videos, scroll to top of grid container and unlock.
     requestAnimationFrame(() => {
       if (isMobileView && gridContainerRef.current) {
-        // Mobile: use native scrollIntoView — bypasses Lenis resize issues.
-        // Lenis on touch delegates to native anyway, but lenis.scrollTo +
-        // lenis.resize can fight each other and cause jumps.
-        gridContainerRef.current.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
-        window.scrollBy(0, -20)
-        // Release height lock after a generous delay so thumbnails settle
+        // Mobile: use Lenis scrollTo with numeric position to keep internal state in sync.
+        // Native scrollIntoView doesn't update Lenis, causing scroll corrections.
+        const scrollTarget = gridContainerRef.current.getBoundingClientRect().top + window.scrollY - 20
+        if (lenis) {
+          lenis.scrollTo(scrollTarget, { immediate: true, force: true })
+        } else {
+          window.scrollTo(0, scrollTarget)
+        }
         setTimeout(() => {
           if (grid) grid.style.minHeight = ""
+          void document.body.offsetHeight
+          if (lenis) lenis.resize()
         }, 200)
       } else {
         // Desktop: Lenis handles everything
@@ -1125,8 +1129,13 @@ function SectionTabs({
 
     if (isMobileTabs && tabBarRef.current) {
       requestAnimationFrame(() => {
-        tabBarRef.current!.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior })
-        window.scrollBy(0, -20)
+        const lenis = (window as any).__lenis
+        const scrollTarget = tabBarRef.current!.getBoundingClientRect().top + window.scrollY - 20
+        if (lenis) {
+          lenis.scrollTo(scrollTarget, { immediate: true, force: true })
+        } else {
+          window.scrollTo(0, scrollTarget)
+        }
       })
     }
   }, [activeTab, isMobileTabs])
