@@ -91,35 +91,19 @@ export function VideoPlayer({
       }
       video.addEventListener("playing", onPlaying)
 
-      // Try to play with exponential backoff — handles slow cellular and iOS race conditions
-      const tryPlay = () => {
-        const attempt = (retries: number, delay: number) => {
-          video.play().catch(() => {
-            if (retries > 0 && !userPausedRef.current && videoRef.current) {
-              setTimeout(() => attempt(retries - 1, delay * 2), delay)
-            }
-          })
-        }
-        attempt(3, 500)
-        setIsPaused(false)
-      }
-
-      // If video has enough data, play immediately; otherwise wait for canplay
-      if (video.readyState >= 3) {
-        tryPlay()
-      } else {
-        const onReady = () => {
-          if (!userPausedRef.current) {
-            tryPlay()
+      // Play immediately — don't wait for canplay. With preload="metadata", iOS won't
+      // buffer data until play() is called, so gating on canplay creates a deadlock.
+      // The play() call itself triggers data loading; retries handle the buffering race.
+      const attempt = (retries: number, delay: number) => {
+        video.play().catch(() => {
+          if (retries > 0 && !userPausedRef.current && videoRef.current) {
+            setTimeout(() => attempt(retries - 1, delay * 2), delay)
           }
-          video.removeEventListener("canplay", onReady)
-        }
-        video.addEventListener("canplay", onReady)
-        return () => {
-          video.removeEventListener("canplay", onReady)
-          video.removeEventListener("playing", onPlaying)
-        }
+        })
       }
+      attempt(4, 500)
+      setIsPaused(false)
+
       return () => video.removeEventListener("playing", onPlaying)
     } else {
       video.pause()
@@ -299,6 +283,7 @@ export function VideoPlayer({
         ref={videoRef}
         src={videoUrl(videoId, isMobile ? "720p" : "1080p")}
         poster={customThumbnail || thumbnailUrl(videoId)}
+        autoPlay
         muted
         loop
         playsInline
