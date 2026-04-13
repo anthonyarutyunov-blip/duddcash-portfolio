@@ -218,10 +218,12 @@ export default function PortfolioGrid() {
     return () => bar.removeEventListener("scroll", onScroll)
   }, [])
 
-  // Get merged items (applies overrides to base data)
+  // Show all items while overrides are loading — "Featured" only exists in overrides,
+  // so it would show an empty grid on cold load
+  const effectiveFilter = overrides === null ? "All" : filter
   const mergedItems: MergedItem[] = getMergedItems(
     portfolioItems,
-    filter,
+    effectiveFilter,
     overrides
   )
 
