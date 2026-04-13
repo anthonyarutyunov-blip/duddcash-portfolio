@@ -193,6 +193,10 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
               <h3 class="founders__name">Anthony Arutyunov</h3>
               <span class="founders__role">Co-Founder</span>
               <span class="founders__specialty">Director / Editor</span>
+              <div class="founders__contact">
+                <a href="mailto:anthony@duddcashstudios.com" class="founders__contact-link">anthony@duddcashstudios.com</a>
+                <a href="tel:+12165364429" class="founders__contact-link">216.536.4429</a>
+              </div>
               <img src="/icons/anthony-signature.png" alt="Anthony's signature" class="founders__signature" />
             </div>
           </div>
@@ -205,6 +209,10 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
               <h3 class="founders__name">Calo Shiban</h3>
               <span class="founders__role">Co-Founder</span>
               <span class="founders__specialty">Director / Editor</span>
+              <div class="founders__contact">
+                <a href="mailto:calo@duddcashstudios.com" class="founders__contact-link">calo@duddcashstudios.com</a>
+                <a href="tel:+14405149124" class="founders__contact-link">440.514.9124</a>
+              </div>
               <img src="/icons/calo-signature.png" alt="Calo's signature" class="founders__signature" />
             </div>
           </div>
@@ -942,6 +950,25 @@ import { BackgroundMesh } from '../components/ui/background-paper-shaders';
     color: rgba(255, 255, 255, 0.4);
     margin-top: 4px;
     letter-spacing: 0.02em;
+  }
+
+  .founders__contact {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 10px;
+  }
+
+  .founders__contact-link {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: color 0.25s ease;
+  }
+
+  .founders__contact-link:hover {
+    color: rgba(255, 255, 255, 0.8);
   }
 
   .founders__signature {
