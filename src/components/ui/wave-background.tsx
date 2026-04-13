@@ -226,13 +226,12 @@ export function Waves({
       return
     }
 
-    // Safari: skip every other frame → 30fps instead of 60fps
-    if (isSafari) {
-      frameCountRef.current++
-      if (frameCountRef.current % 2 !== 0) {
-        rafRef.current = requestAnimationFrame(tick)
-        return
-      }
+    // 30fps for all browsers — wave is a slow ambient effect, 30fps looks identical to 60fps
+    // Cuts noise calculations and SVG path mutations in half
+    frameCountRef.current++
+    if (frameCountRef.current % 2 !== 0) {
+      rafRef.current = requestAnimationFrame(tick)
+      return
     }
 
     const { current: mouse } = mouseRef

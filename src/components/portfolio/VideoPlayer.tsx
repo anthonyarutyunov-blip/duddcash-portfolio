@@ -70,6 +70,12 @@ export function VideoPlayer({
       { threshold: 0.1, rootMargin: "200px 0px" }
     )
     observer.observe(container)
+    // Check initial state — with client:visible hydration, the IO callback may have
+    // already "missed" the element entering the viewport before React mounted
+    const rect = container.getBoundingClientRect()
+    if (rect.top < window.innerHeight + 200 && rect.bottom > -200) {
+      setIsVisible(true)
+    }
     return () => observer.disconnect()
   }, [])
 
@@ -85,16 +91,16 @@ export function VideoPlayer({
       }
       video.addEventListener("playing", onPlaying)
 
-      // Try to play, with retry for iOS which sometimes rejects first attempt
+      // Try to play with exponential backoff — handles slow cellular and iOS race conditions
       const tryPlay = () => {
-        video.play().catch(() => {
-          // Retry once after 500ms — iOS can reject play during initial page setup
-          setTimeout(() => {
-            if (!userPausedRef.current && videoRef.current) {
-              videoRef.current.play().catch(() => {})
+        const attempt = (retries: number, delay: number) => {
+          video.play().catch(() => {
+            if (retries > 0 && !userPausedRef.current && videoRef.current) {
+              setTimeout(() => attempt(retries - 1, delay * 2), delay)
             }
-          }, 500)
-        })
+          })
+        }
+        attempt(3, 500)
         setIsPaused(false)
       }
 
@@ -138,38 +144,11 @@ export function VideoPlayer({
       }
     }
 
-    // Safari: use timeupdate event (~4Hz) instead of RAF loop to eliminate per-video RAF
-    if (isSafari) {
-      video.addEventListener("timeupdate", updateProgress)
-      return () => video.removeEventListener("timeupdate", updateProgress)
-    }
-
-    // Chrome/Firefox: RAF for smooth 60fps seek bar
-    const tick = () => {
-      updateProgress()
-      rafRef.current = requestAnimationFrame(tick)
-    }
-
-    const startTick = () => {
-      if (!rafRef.current) rafRef.current = requestAnimationFrame(tick)
-    }
-    const stopTick = () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current)
-        rafRef.current = null
-      }
-    }
-
-    video.addEventListener("play", startTick)
-    video.addEventListener("pause", stopTick)
-    if (!video.paused) startTick()
-
-    return () => {
-      stopTick()
-      video.removeEventListener("play", startTick)
-      video.removeEventListener("pause", stopTick)
-    }
-  }, [isSafari])
+    // Use timeupdate event (~4Hz) for all browsers — eliminates per-video RAF loops
+    // The seek bar is a thin progress line; ~4Hz updates are visually sufficient
+    video.addEventListener("timeupdate", updateProgress)
+    return () => video.removeEventListener("timeupdate", updateProgress)
+  }, [])
 
   // Listen for mute-others events from sibling VideoPlayers
   useEffect(() => {
@@ -323,8 +302,7 @@ export function VideoPlayer({
         muted
         loop
         playsInline
-        autoPlay
-        preload={isMobile ? "auto" : "metadata"}
+        preload="metadata"
         style={{
           width: "100%",
           height: "100%",

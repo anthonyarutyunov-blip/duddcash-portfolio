@@ -124,7 +124,7 @@ export function InfiniteGrid({
     <div
       ref={containerRef}
       className={cn("relative w-full overflow-hidden", className)}
-      style={{ height, pointerEvents: "none" }}
+      style={{ height, pointerEvents: "none", contain: "layout style paint" }}
     >
       {/* Subtle background grid */}
       <div className="absolute inset-0 z-0 opacity-[0.04]">
