@@ -42,6 +42,9 @@ export function VideoPlayer({
   const userPausedRef = useRef(false)
   const instanceId = useRef(`vp-${videoId}-${Math.random().toString(36).slice(2, 8)}`)
   const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
+  const [isSafari] = useState(() =>
+    typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  )
 
   // Fullscreen handler (mobile only)
   const handleFullscreen = useCallback((e: React.MouseEvent) => {
@@ -126,13 +129,24 @@ export function VideoPlayer({
     const handle = handleDotRef.current
     if (!video || (!fill && !mobileFill)) return
 
-    const tick = () => {
+    const updateProgress = () => {
       if (video.duration && !seekingRef.current) {
         const pct = (video.currentTime / video.duration) * 100
         if (fill) fill.style.width = `${pct}%`
         if (handle) handle.style.left = `${pct}%`
         if (mobileFill) mobileFill.style.width = `${pct}%`
       }
+    }
+
+    // Safari: use timeupdate event (~4Hz) instead of RAF loop to eliminate per-video RAF
+    if (isSafari) {
+      video.addEventListener("timeupdate", updateProgress)
+      return () => video.removeEventListener("timeupdate", updateProgress)
+    }
+
+    // Chrome/Firefox: RAF for smooth 60fps seek bar
+    const tick = () => {
+      updateProgress()
       rafRef.current = requestAnimationFrame(tick)
     }
 
@@ -148,7 +162,6 @@ export function VideoPlayer({
 
     video.addEventListener("play", startTick)
     video.addEventListener("pause", stopTick)
-    // Start immediately if already playing
     if (!video.paused) startTick()
 
     return () => {
@@ -156,7 +169,7 @@ export function VideoPlayer({
       video.removeEventListener("play", startTick)
       video.removeEventListener("pause", stopTick)
     }
-  }, [])
+  }, [isSafari])
 
   // Listen for mute-others events from sibling VideoPlayers
   useEffect(() => {
@@ -349,8 +362,8 @@ export function VideoPlayer({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          background: "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(8px)",
+          background: isSafari ? "rgba(0,0,0,0.65)" : "rgba(0,0,0,0.5)",
+          backdropFilter: isSafari ? "none" : "blur(8px)",
           borderRadius: "50%",
           width: isMobile ? 40 : 56,
           height: isMobile ? 40 : 56,

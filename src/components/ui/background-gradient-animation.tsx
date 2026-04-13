@@ -151,28 +151,36 @@ export const BackgroundGradientAnimation = ({
       <div
         className={cn(
           "gradients-container h-full w-full",
-          isSafari ? "blur-xl" : "blur-[30px]"
+          isSafari ? "blur-lg" : "blur-[30px]"
         )}
       >
         {/* Blob 1 — always rendered */}
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_var(--first-color)_0,_var(--first-color)_50%)_no-repeat]`,
-            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:center_center]`,
             `animate-first`,
             `opacity-100`
           )}
+          style={{
+            mixBlendMode: isSafari ? "normal" : blendingValue as any,
+            willChange: isSafari ? "transform" : "auto",
+          }}
         />
         {/* Blob 2 — always rendered (desktop) */}
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
-            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
             `[transform-origin:calc(50%-400px)]`,
             `animate-second`,
             `opacity-100`
           )}
+          style={{
+            mixBlendMode: isSafari ? "normal" : blendingValue as any,
+            willChange: isSafari ? "transform" : "auto",
+          }}
         />
         {/* Blob 3 — skip on mobile/Safari */}
         {!isLite && (

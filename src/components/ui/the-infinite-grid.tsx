@@ -29,6 +29,9 @@ export function InfiniteGrid({
   const [isMobile] = useState(() =>
     typeof window !== "undefined" && (window.innerWidth <= 768 || "ontouchstart" in window)
   )
+  const [isSafari] = useState(() =>
+    typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  )
   const rafRef = useRef<number | null>(null)
 
   const mouseX = useMotionValue(-999)
@@ -36,7 +39,7 @@ export function InfiniteGrid({
 
   // Pause when off-screen
   useEffect(() => {
-    if (isMobile) return
+    if (isMobile || isSafari) return
     const el = containerRef.current
     if (!el) return
     const observer = new IntersectionObserver(
@@ -49,7 +52,7 @@ export function InfiniteGrid({
 
   // Use window-level mouse tracking so it works even when behind other content
   useEffect(() => {
-    if (isMobile || !isVisible) return
+    if (isMobile || isSafari || !isVisible) return
     const handleMouseMove = (e: MouseEvent) => {
       const el = containerRef.current
       if (!el) return
@@ -66,7 +69,7 @@ export function InfiniteGrid({
 
   // Manual RAF loop that fully stops when not visible (instead of useAnimationFrame which always ticks)
   useEffect(() => {
-    if (isMobile || !isVisible) return
+    if (isMobile || isSafari || !isVisible) return
     function tick() {
       gridOffsetX.set((gridOffsetX.get() + speedX) % 40)
       gridOffsetY.set((gridOffsetY.get() + speedY) % 40)
@@ -81,7 +84,7 @@ export function InfiniteGrid({
 
   const maskImage = useMotionTemplate`radial-gradient(${spotlightSize}px circle at ${mouseX}px ${mouseY}px, black, transparent)`
 
-  // On mobile, render only children — grid pattern is invisible on small screens
+  // Mobile: no grid at all. Safari: static grid only (no RAF, no mousemove)
   if (isMobile) {
     return (
       <div
@@ -90,6 +93,26 @@ export function InfiniteGrid({
       >
         {children && (
           <div className="relative z-10">
+            {children}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  if (isSafari) {
+    return (
+      <div
+        ref={containerRef}
+        className={cn("relative w-full overflow-hidden", className)}
+        style={{ height, pointerEvents: "none" }}
+      >
+        {/* Static background grid — no animation, no cursor mask */}
+        <div className="absolute inset-0 z-0 opacity-[0.04]">
+          <StaticGridPattern patternId={`${patternId}-static`} />
+        </div>
+        {children && (
+          <div className="relative z-10" style={{ pointerEvents: "auto" }}>
             {children}
           </div>
         )}
@@ -123,6 +146,30 @@ export function InfiniteGrid({
         </div>
       )}
     </div>
+  )
+}
+
+function StaticGridPattern({ patternId }: { patternId: string }) {
+  return (
+    <svg className="w-full h-full">
+      <defs>
+        <pattern
+          id={patternId}
+          width="40"
+          height="40"
+          patternUnits="userSpaceOnUse"
+        >
+          <path
+            d="M 40 0 L 0 0 0 40"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            style={{ color: "var(--color-muted)" }}
+          />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${patternId})`} />
+    </svg>
   )
 }
 

@@ -136,6 +136,35 @@ import { SpecialText } from '../ui/special-text';
     opacity: 0.35;
   }
 
+  /* ── Safari: replace expensive blur transitions with opacity-only ── */
+  :global(.safari) .header__logo {
+    filter: none !important;
+  }
+
+  :global(.safari) .header--over-text .header__logo {
+    opacity: 0.3;
+    filter: none !important;
+  }
+
+  :global(.safari) .header--over-media .header__logo {
+    opacity: 0.25;
+    filter: none !important;
+  }
+
+  :global(.safari) .header__nav {
+    filter: none !important;
+  }
+
+  :global(.safari) .header--over-text .header__nav {
+    opacity: 0.3;
+    filter: none !important;
+  }
+
+  :global(.safari) .header--over-media .header__nav {
+    opacity: 0.25;
+    filter: none !important;
+  }
+
   /* ── Mobile styles ── */
   @media (max-width: 768px) {
     .header {
@@ -173,6 +202,7 @@ import { SpecialText } from '../ui/special-text';
       }
 
       var isMobileHeader = window.innerWidth <= 768 || 'ontouchstart' in window;
+      var isSafariHeader = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       function isDarkBg(el) {
         var bg = getComputedStyle(el).backgroundColor;
@@ -286,8 +316,44 @@ import { SpecialText } from '../ui/special-text';
         scrollHandler = onScrollDebounced;
         window.addEventListener('scroll', scrollHandler, { passive: true });
         window.addEventListener('resize', scrollHandler, { passive: true });
+      } else if (isSafariHeader) {
+        // Safari desktop: debounced scroll (100ms) — skip expensive elementFromPoint
+        // Only check dark-bg toggle and nav-hidden state
+        function checkSafariDesktop() {
+          var checkY = 30;
+          var overDark = false;
+          for (var i = 0; i < darkCandidates.length; i++) {
+            var rect = darkCandidates[i].getBoundingClientRect();
+            if (rect.top <= checkY && rect.bottom >= checkY && isDarkBg(darkCandidates[i])) {
+              overDark = true;
+              break;
+            }
+          }
+          if (lastState !== overDark) {
+            header.classList.toggle('header--light', overDark);
+            lastState = overDark;
+          }
+          var hero = document.getElementById('hero');
+          if (hero) {
+            var heroBottom = hero.getBoundingClientRect().bottom;
+            var navHidden = heroBottom < 0;
+            if (lastNavHidden !== navHidden) {
+              header.classList.toggle('header--nav-hidden', navHidden);
+              lastNavHidden = navHidden;
+            }
+          }
+        }
+        var safariScrollTimer = null;
+        function onSafariScroll() {
+          if (safariScrollTimer) clearTimeout(safariScrollTimer);
+          safariScrollTimer = setTimeout(checkSafariDesktop, 100);
+        }
+        checkSafariDesktop();
+        scrollHandler = onSafariScroll;
+        window.addEventListener('scroll', scrollHandler, { passive: true });
+        window.addEventListener('resize', scrollHandler, { passive: true });
       } else {
-        // Desktop: RAF-throttled scroll listener for responsive header state
+        // Desktop Chrome/Firefox: RAF-throttled scroll listener for responsive header state
         var rafPending = false;
         function onScrollOrResize() {
           if (rafPending) return;

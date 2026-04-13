@@ -31,6 +31,9 @@ export function Waves({
   const [isMobile] = useState(() =>
     typeof window !== 'undefined' && (window.innerWidth <= 768 || 'ontouchstart' in window)
   )
+  const [isSafari] = useState(() =>
+    typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  )
 
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -97,9 +100,9 @@ export function Waves({
     pathsRef.current.forEach(path => path.remove())
     pathsRef.current = []
 
-    // Use wider gaps for all browsers — 33% fewer SVG paths per frame
-    const xGap = 30
-    const yGap = 30
+    // Safari: wider gaps = ~56% fewer SVG paths and noise calculations per frame
+    const xGap = isSafari ? 45 : 30
+    const yGap = isSafari ? 45 : 30
     const oWidth = width + 200
     const oHeight = height + 30
     const totalLines = Math.ceil(oWidth / xGap)
@@ -214,11 +217,22 @@ export function Waves({
     })
   }
 
+  const frameCountRef = useRef(0)
+
   const tick = (time: number) => {
     // Stop looping when off-screen
     if (!visibleRef.current) {
       rafRef.current = null
       return
+    }
+
+    // Safari: skip every other frame → 30fps instead of 60fps
+    if (isSafari) {
+      frameCountRef.current++
+      if (frameCountRef.current % 2 !== 0) {
+        rafRef.current = requestAnimationFrame(tick)
+        return
+      }
     }
 
     const { current: mouse } = mouseRef
