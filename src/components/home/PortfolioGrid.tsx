@@ -181,16 +181,29 @@ export default function PortfolioGrid() {
           setExpandedId(projectParam)
           const videoParam = params.get("video")
           if (videoParam) {
-            // After expand animation, scroll to the specific video
-            setTimeout(() => {
+            // Poll for the video DOM element — it may not render immediately on
+            // slow mobile networks, after pagination, or before hydration completes.
+            // Check every 100ms up to 5s. As soon as it exists, scroll to it.
+            const deadline = Date.now() + 5000
+            const pollForVideo = () => {
               const videoEl = document.querySelector(
                 `[data-video-id="${videoParam}"]`
               )
-              const lenis = (window as any).__lenis
-              if (videoEl && lenis) {
-                lenis.scrollTo(videoEl, { offset: -200, duration: 1.0 })
+              if (videoEl) {
+                const lenis = (window as any).__lenis
+                if (lenis) {
+                  lenis.scrollTo(videoEl, { offset: -200, duration: 1.0 })
+                } else {
+                  videoEl.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+                return
               }
-            }, 600)
+              if (Date.now() < deadline) {
+                setTimeout(pollForVideo, 100)
+              }
+            }
+            // Start polling after the expand animation begins (~400ms)
+            setTimeout(pollForVideo, 400)
           }
         }, 400)
       }

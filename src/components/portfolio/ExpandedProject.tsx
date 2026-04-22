@@ -473,7 +473,10 @@ function VideoGrid({
 
   const handleShare = useCallback(
     (videoId: string) => {
-      const url = `${window.location.origin}/?project=${projectId}&video=${videoId}`
+      // Share through the /v/[id] page so the link preview shows the project
+      // thumbnail + title (proper OG meta). The /v/[id] page then redirects
+      // to the homepage with ?project=X&video=Y to scroll to the specific video.
+      const url = `${window.location.origin}/v/${encodeURIComponent(projectId)}?video=${encodeURIComponent(videoId)}`
       navigator.clipboard.writeText(url).then(() => {
         setCopiedVideoId(videoId)
         setTimeout(() => setCopiedVideoId(null), 2000)

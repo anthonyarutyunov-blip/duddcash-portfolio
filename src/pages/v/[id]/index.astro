@@ -1,0 +1,139 @@
+---
+// Per-project share pages with proper OG meta + redirect to expanded homepage view.
+// Used when someone shares a video link — generates proper link previews
+// (project title + thumbnail) for iMessage, Slack, Twitter, etc.
+// On actual page load, redirects to /?project={id}&video={videoFromUrl}.
+import { portfolioItems, type PortfolioItem } from '../../../data/portfolio';
+import { thumbnailUrl } from '../../../lib/bunny';
+
+export async function getStaticPaths() {
+  return portfolioItems.map((item) => ({
+    params: { id: item.id },
+    props: { item },
+  }));
+}
+
+interface Props {
+  item: PortfolioItem;
+}
+
+const { item } = Astro.props;
+
+// Resolve the thumbnail video ID (used for OG image via Bunny CDN)
+function getThumbnailVideoId(item: PortfolioItem): string {
+  if (item.type === 'single') {
+    return item.video.videoId;
+  }
+  // Project — use explicit thumbnailVideoId or fall back to first video
+  if (item.thumbnailVideoId) return item.thumbnailVideoId;
+  if (item.sections && item.sections.length > 0) {
+    const firstSectionVideo = item.sections[0].videos[0];
+    if (firstSectionVideo) return firstSectionVideo.videoId;
+  }
+  if (item.videos && item.videos.length > 0) return item.videos[0].videoId;
+  return '';
+}
+
+const thumbVideoId = getThumbnailVideoId(item);
+// Prefer custom thumbnail if set (absolute URL), otherwise use Bunny CDN thumbnail
+const ogImage = item.customThumbnail
+  ? (item.customThumbnail.startsWith('http')
+      ? item.customThumbnail
+      : new URL(item.customThumbnail, Astro.site).href)
+  : (thumbVideoId ? thumbnailUrl(thumbVideoId) : new URL('/og-image.jpg', Astro.site).href);
+
+const title = `${item.title} | Duddcash Studios`;
+const description = item.description || `Watch ${item.title} — video production by Duddcash Studios.`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph — video preview -->
+    <meta property="og:type" content="video.other" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:site_name" content="Duddcash Studios" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Preload fonts for the brief moment this page is visible -->
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #f2f2f2;
+        color: #111;
+        font-family: system-ui, -apple-system, sans-serif;
+        height: 100%;
+        width: 100%;
+      }
+      .loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        gap: 12px;
+        opacity: 0.7;
+      }
+      .loader__title {
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+      .loader__sub {
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loader">
+      <div class="loader__title">Loading {item.title}</div>
+      <div class="loader__sub">duddcashstudios.com</div>
+    </div>
+
+    <script define:vars={{ projectId: item.id }}>
+      // Redirect to homepage with project (and optional video) query params.
+      // Client-side for speed; also has <noscript> fallback below.
+      (function () {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const videoId = urlParams.get('video');
+          const target = videoId
+            ? `/?project=${encodeURIComponent(projectId)}&video=${encodeURIComponent(videoId)}`
+            : `/?project=${encodeURIComponent(projectId)}`;
+          window.location.replace(target);
+        } catch (e) {
+          window.location.replace('/');
+        }
+      })();
+    </script>
+
+    <!-- No-JS fallback: meta refresh to homepage with project param -->
+    <noscript>
+      <meta http-equiv="refresh" content={`0;url=/?project=${item.id}`} />
+    </noscript>
+  </body>
+</html>
