@@ -159,10 +159,57 @@ import { IntroScreen } from '../components/ui/intro-screen';
 </style>
 
 <script is:inline>
-  // Match IntroScreen logic: play on first visit or refresh, skip on navigation.
-  // "duddcash_nav" is set by a click listener on internal links (in BaseLayout).
-  // On refresh no click happens, so the flag is absent → intro plays.
+  // Deep-link from a shared video: if ?project=X (or &video=Y) is in the URL,
+  // the user came from a shared link and should land directly on the portfolio
+  // section with the project expanded. Skip the intro and jump to #portfolio
+  // so PortfolioGrid (client:visible) hydrates and runs its URL-param handler.
   (function() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.has("project")) {
+        // Skip intro for shared links — set both flags so IntroScreen bails out
+        sessionStorage.setItem("duddcash_visited", "1");
+        sessionStorage.setItem("duddcash_nav", "1");
+
+        // Jump to the portfolio section as soon as it's in the DOM.
+        // #portfolio is server-rendered (inside PortfolioGrid), so it exists
+        // before hydration. Scrolling there triggers client:visible hydration,
+        // which then runs the expand-and-scroll-to-video logic.
+        var tryScroll = function() {
+          var el = document.getElementById("portfolio");
+          if (el) {
+            // Disable the default intro hero class — we're skipping the intro
+            var hero = document.getElementById("hero");
+            if (hero) hero.classList.remove("hero--with-intro");
+            // Instant scroll to the portfolio section (no smooth — we don't
+            // want a long scroll animation before the expand+video-scroll).
+            el.scrollIntoView({ behavior: "instant", block: "start" });
+            // Nudge up a bit to keep the filter bar visible under any sticky header
+            window.scrollBy(0, -40);
+            return true;
+          }
+          return false;
+        };
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function() {
+            if (!tryScroll()) {
+              // Fallback: poll briefly in case #portfolio renders slightly late
+              var tries = 0;
+              var iv = setInterval(function() {
+                if (tryScroll() || ++tries > 20) clearInterval(iv);
+              }, 50);
+            }
+          });
+        } else {
+          tryScroll();
+        }
+        return; // Skip the standard intro logic below
+      }
+    } catch (e) {}
+
+    // Normal flow: play intro on first visit or refresh, skip on nav.
+    // "duddcash_nav" is set by a click listener on internal links (in BaseLayout).
+    // On refresh no click happens, so the flag is absent → intro plays.
     var hero = document.getElementById("hero");
     if (!hero) return;
     var visited = sessionStorage.getItem("duddcash_visited");
