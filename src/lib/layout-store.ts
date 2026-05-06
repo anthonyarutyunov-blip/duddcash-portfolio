@@ -98,6 +98,7 @@ function ensureFields(parsed: LayoutOverrides): LayoutOverrides {
 /** Cache for the fetched default overrides */
 let _defaultOverridesCache: LayoutOverrides | null = null
 let _defaultOverridesFetching = false
+const SYNC_FLAG_KEY = "duddcash_layout_synced_session"
 
 /**
  * Fetch default overrides from /layout-overrides.json (served from public/).
@@ -109,7 +110,7 @@ export async function loadDefaultOverrides(): Promise<LayoutOverrides> {
     // 3-second timeout — on slow mobile connections, render with base data immediately
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 3000)
-    const res = await fetch("/layout-overrides.json", { signal: controller.signal })
+    const res = await fetch("/layout-overrides.json", { signal: controller.signal, cache: "no-cache" })
     clearTimeout(timeout)
     if (res.ok) {
       const data = (await res.json()) as LayoutOverrides
@@ -125,6 +126,36 @@ export async function loadDefaultOverrides(): Promise<LayoutOverrides> {
   return createEmptyOverrides()
 }
 
+/**
+ * Once per session, fetch the published layout file and overwrite localStorage
+ * if the file's timestamp is newer. Triggers a single page reload so the new
+ * data renders. This makes published changes propagate to admins whose
+ * Chrome localStorage has stale state.
+ */
+function syncFromPublishedFileIfNewer(localTimestamp: string) {
+  if (typeof window === "undefined") return
+  if (_defaultOverridesFetching) return
+  try {
+    if (sessionStorage.getItem(SYNC_FLAG_KEY)) return
+    sessionStorage.setItem(SYNC_FLAG_KEY, "1")
+  } catch { return }
+
+  _defaultOverridesFetching = true
+  fetch("/layout-overrides.json", { cache: "no-cache" })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data: LayoutOverrides | null) => {
+      if (!data || data.version !== 1 || !data.timestamp) return
+      const localMs = new Date(localTimestamp).getTime()
+      const fileMs = new Date(data.timestamp).getTime()
+      if (Number.isFinite(fileMs) && fileMs > localMs) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(ensureFields(data)))
+        // Reload once so all components pick up the fresh data
+        window.location.reload()
+      }
+    })
+    .catch(() => {})
+}
+
 /** Load overrides from localStorage (sync — returns empty if not yet seeded) */
 export function loadOverrides(): LayoutOverrides {
   try {
@@ -132,6 +163,8 @@ export function loadOverrides(): LayoutOverrides {
     if (raw) {
       const parsed = JSON.parse(raw) as LayoutOverrides
       if (parsed.version === 1) {
+        // Background: replace localStorage if the published file is newer.
+        if (parsed.timestamp) syncFromPublishedFileIfNewer(parsed.timestamp)
         return ensureFields(parsed)
       }
     }

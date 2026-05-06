@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "timestamp": "2026-05-05T23:53:15.678Z",
+  "timestamp": "2026-05-06T00:22:57.386644+00:00",
   "tabLayouts": {
     "Featured": {
       "items": [
@@ -1016,8 +1016,13 @@
       "videos": [
         {
           "videoId": "9fd37b9c-a020-4369-ae77-8838da605a72",
-          "order": 9999,
+          "order": 0,
           "size": "xl"
+        },
+        {
+          "videoId": "f08bad88-b4a3-4493-9ac3-d56d54b74810",
+          "order": 1,
+          "size": "m"
         }
       ]
     }
@@ -1697,6 +1702,11 @@
       "itemId": "new-project-1778024854775",
       "field": "customThumbnail",
       "value": "/gallery/meta-spec-ad.jpg"
+    },
+    {
+      "itemId": "new-project-1778024854775",
+      "field": "title",
+      "value": "Meta — Spec Ad"
     }
   ],
   "newVideos": [
@@ -1837,7 +1847,7 @@
     {
       "projectId": "new-project-1778024854775",
       "videoId": "9fd37b9c-a020-4369-ae77-8838da605a72",
-      "title": "Meta Spec Ad",
+      "title": "Meta — Spec Ad",
       "aspectRatio": "16/9"
     }
   ],
@@ -1869,7 +1879,7 @@
     {
       "id": "new-project-1778024854775",
       "type": "project",
-      "title": "Meta Spec Ad",
+      "title": "Meta — Spec Ad",
       "categories": [
         "Featured",
         "Spec Creative"
@@ -2225,24 +2235,6 @@
   ],
   "removedVideos": [
     "https://player.mediadelivery.net/play/633708/dd29af91-22dd-4a91-9d69-1145e03c0c54",
-    "d8a4b789-1c3b-4786-9395-01245f015405",
-    "9fd37b9c-a020-4369-ae77-8838da605a72"
-  ],
-  "videoOrders": [
-    {
-      "projectId": "new-project-1778024854775",
-      "videos": [
-        {
-          "videoId": "9fd37b9c-a020-4369-ae77-8838da605a72",
-          "order": 0,
-          "size": "xl"
-        },
-        {
-          "videoId": "f08bad88-b4a3-4493-9ac3-d56d54b74810",
-          "size": "m",
-          "order": 1
-        }
-      ]
-    }
+    "d8a4b789-1c3b-4786-9395-01245f015405"
   ]
 }
