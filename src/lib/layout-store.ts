@@ -110,7 +110,7 @@ export async function loadDefaultOverrides(): Promise<LayoutOverrides> {
     // 3-second timeout — on slow mobile connections, render with base data immediately
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 3000)
-    const res = await fetch("/layout-overrides.json", { signal: controller.signal, cache: "no-cache" })
+    const res = await fetch(`/layout-overrides.json?t=${Date.now()}`, { signal: controller.signal, cache: "no-store" })
     clearTimeout(timeout)
     if (res.ok) {
       const data = (await res.json()) as LayoutOverrides
@@ -141,7 +141,7 @@ function syncFromPublishedFileIfNewer(localTimestamp: string) {
   } catch { return }
 
   _defaultOverridesFetching = true
-  fetch("/layout-overrides.json", { cache: "no-cache" })
+  fetch(`/layout-overrides.json?t=${Date.now()}`, { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : null))
     .then((data: LayoutOverrides | null) => {
       if (!data || data.version !== 1 || !data.timestamp) return
