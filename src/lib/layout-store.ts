@@ -69,7 +69,10 @@ export interface LayoutOverrides {
   removedVideos: string[]
 }
 
-const STORAGE_KEY = "duddcash_layout_overrides"
+// v2 — forces all clients (especially mobile Safari) to drop the old 4 MB
+// base64-laden cache and refetch the slim published file on next load.
+const STORAGE_KEY = "duddcash_layout_overrides_v2"
+const LEGACY_STORAGE_KEY = "duddcash_layout_overrides"
 
 /** Create a fresh empty overrides object */
 export function createEmptyOverrides(): LayoutOverrides {
@@ -106,10 +109,14 @@ const SYNC_FLAG_KEY = "duddcash_layout_synced_session"
  */
 export async function loadDefaultOverrides(): Promise<LayoutOverrides> {
   if (_defaultOverridesCache) return _defaultOverridesCache
+  // Drop any pre-v2 localStorage entry — it may contain a stale 4 MB blob
+  // that's bumping into Safari/mobile localStorage quotas.
+  try { localStorage.removeItem(LEGACY_STORAGE_KEY) } catch {}
   try {
-    // 3-second timeout — on slow mobile connections, render with base data immediately
+    // 8-second timeout — generous enough for slow mobile networks
+    // while still letting the page render quickly on truly offline cases
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000)
+    const timeout = setTimeout(() => controller.abort(), 8000)
     const res = await fetch(`/layout-overrides.json?t=${Date.now()}`, { signal: controller.signal, cache: "no-store" })
     clearTimeout(timeout)
     if (res.ok) {
