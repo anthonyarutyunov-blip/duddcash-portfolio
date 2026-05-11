@@ -38,6 +38,23 @@
   [data-animate="fade"] {
     transform: none;
   }
+
+  /* IAB safety net: if the IntersectionObserver in BaseLayout.astro never
+     fires (Instagram / LinkedIn / iMessage webviews throttle these callbacks
+     hard on cold loads), force visibility after 3s so content can never be
+     permanently invisible. Normal IO-driven path still wins when IO fires. */
+  [data-animate]:not(.is-visible) {
+    animation: data-animate-fallback 0.8s var(--ease) 3s forwards;
+  }
+  [data-animate-stagger]:not(.is-visible) > * {
+    animation: data-animate-fallback 0.8s var(--ease) 3s forwards;
+  }
+  @keyframes data-animate-fallback {
+    to {
+      opacity: 1;
+      transform: translateY(0) translateZ(0);
+    }
+  }
 }
 
 /* Reduced motion — show everything immediately */
