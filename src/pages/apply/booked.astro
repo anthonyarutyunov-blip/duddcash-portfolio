@@ -1,0 +1,138 @@
+---
+// Post-application confirmation. Two states share this page:
+// default = application received (no Cal.com booking yet)
+// ?b=1    = call booked through the embedded calendar
+import FunnelLayout from '../../layouts/FunnelLayout.astro';
+---
+
+<FunnelLayout title="You're In" description="Application received.">
+  <section class="b-hero">
+    <div class="container b-hero__inner">
+      <p class="b-eyebrow" data-animate>Duddcash Studio</p>
+      <h1 class="b-headline" data-animate id="b-headline">You're in.</h1>
+      <p class="b-sub" data-animate id="b-sub">
+        Anthony reviews every application personally, usually the same day. You'll get an
+        email from anthony@duddcashstudios.com to lock in a time for the call.
+      </p>
+
+      <div class="b-next" data-animate-stagger>
+        <div class="b-next__item">
+          <span class="b-next__num">01</span>
+          <p class="b-next__text">Keep an eye on your inbox. The email comes from anthony@duddcashstudios.com.</p>
+        </div>
+        <div class="b-next__item">
+          <span class="b-next__num">02</span>
+          <p class="b-next__text">The call is thirty minutes. We talk through your venues, your cadence, and what a month of content looks like.</p>
+        </div>
+        <div class="b-next__item">
+          <span class="b-next__num">03</span>
+          <p class="b-next__text">In the meantime, see the work. It says more than we ever could on a call.</p>
+        </div>
+      </div>
+
+      <div class="b-actions" data-animate>
+        <a href="https://duddcashstudios.com/work" class="btn btn--primary b-cta"><span>See the work</span>
+          <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+        <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer" class="btn--text link-reveal b-ig">@duddcash</a>
+      </div>
+    </div>
+  </section>
+</FunnelLayout>
+
+<style>
+  .b-hero {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    padding: 14vh 0 var(--space-3xl);
+  }
+
+  .b-hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    max-width: 860px;
+  }
+
+  .b-eyebrow {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .b-headline {
+    font-family: var(--font-display);
+    font-size: max(7vw, 52px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+  }
+
+  .b-sub {
+    font-size: var(--text-lg);
+    line-height: 1.65;
+    color: #3a3a3a;
+    max-width: 600px;
+  }
+
+  .b-next {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .b-next__item {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: var(--space-lg);
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--color-border);
+    align-items: baseline;
+  }
+
+  .b-next__num {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .b-next__text {
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: #3a3a3a;
+    max-width: 560px;
+  }
+
+  .b-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .b-cta {
+    min-height: 48px;
+  }
+
+  .b-ig {
+    color: var(--color-muted);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('b') === '1') {
+      var h = document.getElementById('b-headline');
+      var s = document.getElementById('b-sub');
+      if (h) h.textContent = "You're on the calendar.";
+      if (s)
+        s.textContent =
+          'The call is confirmed and the invite is on its way to your inbox. Here is what happens next.';
+    }
+  })();
+</script>

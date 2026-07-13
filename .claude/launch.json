@@ -6,6 +6,12 @@
       "runtimeExecutable": "/Users/anthonyarutyunov/.local/nodejs/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "port": 4321
+    },
+    {
+      "name": "portfolio-netlify",
+      "runtimeExecutable": "/Users/anthonyarutyunov/.local/nodejs/bin/netlify",
+      "runtimeArgs": ["dev"],
+      "port": 8888
     }
   ]
 }

@@ -1,0 +1,90 @@
+---
+// Soft disqualification page. Low-budget or just-exploring applicants land
+// here instead of the calendar. Gracious, keeps the door open, no hard sell.
+import FunnelLayout from '../../layouts/FunnelLayout.astro';
+---
+
+<FunnelLayout title="Thanks" description="Thanks for reaching out.">
+  <section class="n-hero">
+    <div class="container n-hero__inner">
+      <p class="n-eyebrow" data-animate>Duddcash Studio</p>
+      <h1 class="n-headline" data-animate>Thanks for the honesty.</h1>
+      <p class="n-sub" data-animate>
+        Based on what you shared, a monthly partnership probably isn't the right investment
+        for you today, and we'd rather tell you that now than waste thirty minutes of your
+        time on a call.
+      </p>
+      <p class="n-sub" data-animate>
+        When the budget and timing line up, we'd genuinely love to talk. Until then, follow
+        the work, and if anything changes, the door is open at
+        <a href="mailto:action@duddcashstudios.com" class="link-reveal n-link">action@duddcashstudios.com</a>.
+      </p>
+      <div class="n-actions" data-animate>
+        <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer" class="btn btn--primary n-cta"><span>Follow the work</span>
+          <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+        <a href="https://duddcashstudios.com" class="btn--text link-reveal n-site">duddcashstudios.com</a>
+      </div>
+    </div>
+  </section>
+</FunnelLayout>
+
+<style>
+  .n-hero {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    padding: 14vh 0 var(--space-3xl);
+  }
+
+  .n-hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-width: 760px;
+  }
+
+  .n-eyebrow {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .n-headline {
+    font-family: var(--font-display);
+    font-size: max(6vw, 44px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+  }
+
+  .n-sub {
+    font-size: var(--text-lg);
+    line-height: 1.65;
+    color: #3a3a3a;
+    max-width: 620px;
+  }
+
+  .n-link {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .n-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+    margin-top: var(--space-md);
+  }
+
+  .n-cta {
+    min-height: 48px;
+  }
+
+  .n-site {
+    color: var(--color-muted);
+  }
+</style>

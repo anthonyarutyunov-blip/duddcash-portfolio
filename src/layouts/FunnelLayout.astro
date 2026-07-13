@@ -1,0 +1,187 @@
+---
+// Standalone layout for unlisted funnel pages (/apply and friends).
+// Mirrors BaseLayout's atmosphere (gradient bg, spotlight, Lenis, scroll
+// animations) but drops the site Header/Footer/intro so visitors stay on
+// the page, and adds noindex so the page never surfaces in search.
+import { ClientRouter } from 'astro:transitions';
+import '../styles/tailwind.css';
+import '../styles/global.css';
+import '../styles/animations.css';
+import { BackgroundGradientAnimation } from '../components/ui/background-gradient-animation';
+import SpotlightBackground from '../components/ui/spotlight-background';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'Duddcash — Video & Photo Production',
+  ogImage = '/og-image.jpg',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title} | Duddcash</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={`${title} | Duddcash`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <link
+      rel="preload"
+      href="/fonts/inter-variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/clash-display-medium.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        src: url('/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-display: swap;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('/fonts/clash-display-medium.woff2') format('woff2');
+        font-weight: 500;
+        font-display: swap;
+        font-style: normal;
+      }
+    </style>
+
+    <ClientRouter />
+
+    <script is:inline>
+      (function(){
+        if(/^((?!chrome|android).)*safari/i.test(navigator.userAgent)){
+          document.documentElement.classList.add('safari');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="gradient-bg">
+      <BackgroundGradientAnimation
+        client:load
+        gradientBackgroundStart="rgb(234, 234, 234)"
+        gradientBackgroundEnd="rgb(219, 219, 219)"
+        firstColor="173, 169, 150"
+        secondColor="200, 195, 180"
+        thirdColor="180, 190, 200"
+        fourthColor="210, 200, 185"
+        fifthColor="190, 185, 175"
+        pointerColor="195, 190, 180"
+        size="80%"
+        blendingValue="hard-light"
+        interactive={true}
+        containerClassName="!fixed !inset-0 !w-full !h-full !z-0"
+      />
+    </div>
+
+    <SpotlightBackground client:load />
+
+    <div class="site-content">
+      <main>
+        <slot />
+      </main>
+    </div>
+
+    <script>
+      import Lenis from 'lenis';
+
+      let lenis: InstanceType<typeof Lenis> | null = null;
+      let lenisRafId: number | null = null;
+
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+
+      function initLenis() {
+        if (lenisRafId !== null) {
+          cancelAnimationFrame(lenisRafId);
+          lenisRafId = null;
+        }
+        if (lenis) lenis.destroy();
+
+        if (isMobile || isSafari) {
+          (window as any).__lenis = null;
+          return;
+        }
+
+        lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+        });
+        (window as any).__lenis = lenis;
+
+        function raf(time: number) {
+          lenis!.raf(time);
+          lenisRafId = requestAnimationFrame(raf);
+        }
+        lenisRafId = requestAnimationFrame(raf);
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      function initAnimations() {
+        document.querySelectorAll('[data-animate], [data-animate-stagger]').forEach((el) => {
+          observer.observe(el);
+        });
+      }
+
+      initLenis();
+      initAnimations();
+
+      document.addEventListener('astro:after-swap', () => {
+        window.scrollTo(0, 0);
+        initLenis();
+        initAnimations();
+      });
+    </script>
+  </body>
+</html>

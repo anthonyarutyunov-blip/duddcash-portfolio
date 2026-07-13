@@ -1,0 +1,1033 @@
+---
+// Unlisted client-application funnel page. Not linked from site nav,
+// noindex via FunnelLayout. Reached only by direct link (emails, decks, bio).
+import FunnelLayout from '../layouts/FunnelLayout.astro';
+import LogoMarquee from '../components/home/LogoMarquee.astro';
+
+// v1 hero film: Wynn "The Year of Excess" residency film.
+// Swap to the studio VSL's Bunny video ID once filmed.
+const FILM_VIDEO_ID = 'ba823cf7-8001-4ed9-bf4b-ba292ab1c4e4';
+const BUNNY_CDN = 'vz-4fcbca30-3f7.b-cdn.net';
+const filmPoster = `https://${BUNNY_CDN}/${FILM_VIDEO_ID}/thumbnail.jpg`;
+const filmSrc = `https://${BUNNY_CDN}/${FILM_VIDEO_ID}/play_1080p.mp4`;
+
+// Cal.com booking link, e.g. "duddcash/strategy-call". Leave empty until
+// Anthony creates the free Cal.com account; the form then falls back to
+// "we'll email you to schedule" and every lead is still captured.
+const CAL_LINK = '';
+
+const pillars = [
+  {
+    n: '01',
+    title: 'Cut the same night',
+    body: 'Recaps delivered while the night is still live online. Speed is the difference between content and news.',
+  },
+  {
+    n: '02',
+    title: 'Built for volume',
+    body: 'One crew on a consistent cadence. A growing bank of content your brand owns, not a one-off delivery.',
+  },
+  {
+    n: '03',
+    title: 'One cinematic identity',
+    body: 'Every venue, every campaign, every post carries the same considered look. No more mismatched freelancers.',
+  },
+  {
+    n: '04',
+    title: 'We come from this world',
+    body: 'Hospitality, nightlife, culture. You are not training anyone. We already know where to stand.',
+  },
+];
+
+const work = [
+  {
+    client: 'Wynn Nightlife',
+    detail: 'Residency films, F1 weekend, World Cup. An ongoing partnership since 2024.',
+  },
+  {
+    client: 'TAO Group Hospitality',
+    detail: 'Content across one of the biggest names in hospitality.',
+  },
+  {
+    client: 'Insomniac + Austin City Limits',
+    detail: 'Festival recaps and aftermovies, turned around while the weekend still matters.',
+  },
+  {
+    client: 'Mastercard',
+    detail: 'Creator Series campaign work.',
+  },
+  {
+    client: 'Lululemon',
+    detail: 'Brand and community content, from neon studios to night runs.',
+  },
+  {
+    client: 'Chipotle',
+    detail: 'Social content packages built for feeds, not archives.',
+  },
+];
+
+const steps = [
+  {
+    n: '01',
+    title: 'Apply',
+    body: 'Two minutes. Tell us about the brand, the budget, and the timeline.',
+  },
+  {
+    n: '02',
+    title: 'Strategy call',
+    body: 'Thirty minutes with Anthony. We map what a month of content looks like for you.',
+  },
+  {
+    n: '03',
+    title: 'First month live',
+    body: 'Crew scheduled, cadence set, first deliveries on your feed.',
+  },
+];
+---
+
+<FunnelLayout
+  title="Work With Us"
+  description="Duddcash partners with a small number of brands to deliver a month of cinematic content, every month."
+>
+  <!-- ============ HERO ============ -->
+  <section class="f-hero">
+    <div class="f-hero__inner container">
+      <p class="f-eyebrow" data-animate>Duddcash Studio &middot; Content Partnerships</p>
+      <h1 class="f-hero__headline" data-animate>
+        Built for brands<br />that never go quiet.
+      </h1>
+      <p class="f-hero__sub" data-animate>
+        We partner with a small number of hospitality groups, venues, and brands to plan,
+        shoot, and deliver a month of cinematic content, every month. The same crew behind
+        work for Wynn, TAO Group, Mastercard, and Lululemon.
+      </p>
+      <div class="f-hero__actions" data-animate>
+        <a href="#apply" class="btn btn--primary f-cta"><span>Start the conversation</span>
+          <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+        <a href="#film" class="btn--text link-reveal f-watch">Watch the work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FILM ============ -->
+  <section class="f-film" id="film">
+    <div class="container">
+      <div class="f-section-head" data-animate>
+        <span class="f-section-num">01</span>
+        <h2 class="f-section-title">The work</h2>
+      </div>
+      <div class="f-player" id="player" data-animate>
+        <img src={filmPoster} alt="Duddcash film still" class="f-player__poster" id="player-poster" loading="lazy" />
+        <button class="f-player__play" id="player-play" aria-label="Play film">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <video
+          class="f-player__video"
+          id="player-video"
+          src={filmSrc}
+          poster={filmPoster}
+          controls
+          playsinline
+          preload="none"
+          style="display:none;"
+        ></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRUSTED BY ============ -->
+  <LogoMarquee />
+
+  <!-- ============ PILLARS ============ -->
+  <section class="f-pillars">
+    <div class="container">
+      <div class="f-section-head" data-animate>
+        <span class="f-section-num">02</span>
+        <h2 class="f-section-title">What a partnership looks like</h2>
+      </div>
+      <div class="f-pillars__grid" data-animate-stagger>
+        {pillars.map((p) => (
+          <div class="f-pillar">
+            <span class="f-pillar__num">{p.n}</span>
+            <h3 class="f-pillar__title">{p.title}</h3>
+            <p class="f-pillar__body">{p.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SELECTED WORK ============ -->
+  <section class="f-work">
+    <div class="container">
+      <div class="f-section-head" data-animate>
+        <span class="f-section-num">03</span>
+        <h2 class="f-section-title">Selected work</h2>
+      </div>
+      <div class="f-work__list" data-animate-stagger>
+        {work.map((w) => (
+          <div class="f-work__row">
+            <span class="f-work__client">{w.client}</span>
+            <span class="f-work__detail">{w.detail}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="f-how">
+    <div class="container">
+      <div class="f-section-head" data-animate>
+        <span class="f-section-num">04</span>
+        <h2 class="f-section-title">How it works</h2>
+      </div>
+      <div class="f-how__grid" data-animate-stagger>
+        {steps.map((s) => (
+          <div class="f-how__step">
+            <span class="f-pillar__num">{s.n}</span>
+            <h3 class="f-pillar__title">{s.title}</h3>
+            <p class="f-pillar__body">{s.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ APPLICATION ============ -->
+  <section class="f-apply" id="apply">
+    <div class="container">
+      <div class="f-apply__card" data-animate>
+        <div class="f-apply__head">
+          <p class="f-eyebrow">Application</p>
+          <h2 class="f-apply__title">Tell us about the brand.</h2>
+          <p class="f-apply__sub">
+            We take on a handful of new partners at a time, so each one gets our full
+            attention. This takes about two minutes.
+          </p>
+        </div>
+
+        <div class="f-progress" aria-hidden="true">
+          <span class="f-progress__step is-active" data-progress="1">01 &middot; You</span>
+          <span class="f-progress__line"></span>
+          <span class="f-progress__step" data-progress="2">02 &middot; The brand</span>
+          <span class="f-progress__line"></span>
+          <span class="f-progress__step" data-progress="3">03 &middot; The call</span>
+        </div>
+
+        <form id="apply-form" novalidate>
+          <p class="sr-only" aria-hidden="true">
+            <label>Leave this field empty: <input name="website-url" tabindex="-1" autocomplete="off" /></label>
+          </p>
+
+          <!-- STEP 1: contact -->
+          <fieldset class="f-step" data-step="1">
+            <div class="f-form-row">
+              <div class="f-form-group">
+                <label class="f-label" for="af-name">Name *</label>
+                <input class="f-input" type="text" id="af-name" name="name" required autocomplete="name" placeholder="Your name" />
+              </div>
+              <div class="f-form-group">
+                <label class="f-label" for="af-company">Company / brand *</label>
+                <input class="f-input" type="text" id="af-company" name="company" required autocomplete="organization" placeholder="Brand or group" />
+              </div>
+            </div>
+            <div class="f-form-row">
+              <div class="f-form-group">
+                <label class="f-label" for="af-email">Email *</label>
+                <input class="f-input" type="email" id="af-email" name="email" required autocomplete="email" placeholder="you@company.com" />
+              </div>
+              <div class="f-form-group">
+                <label class="f-label" for="af-phone">Phone</label>
+                <input class="f-input" type="tel" id="af-phone" name="phone" autocomplete="tel" placeholder="Optional" />
+              </div>
+            </div>
+            <p class="f-error" id="err-1" role="alert" style="display:none;">Please fill in your name, brand, and a valid email.</p>
+            <div class="f-step__actions">
+              <button type="button" class="btn btn--primary f-cta" id="next-1"><span>Continue</span>
+                <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          </fieldset>
+
+          <!-- STEP 2: qualification -->
+          <fieldset class="f-step" data-step="2" style="display:none;">
+            <div class="f-q">
+              <p class="f-label">What best describes you? *</p>
+              <div class="f-pills" role="radiogroup" data-field="business_type">
+                <button type="button" class="f-pill" data-value="Restaurant or hospitality group">Restaurant or hospitality group</button>
+                <button type="button" class="f-pill" data-value="Hotel or resort">Hotel or resort</button>
+                <button type="button" class="f-pill" data-value="Nightlife, events, or festivals">Nightlife, events, or festivals</button>
+                <button type="button" class="f-pill" data-value="Brand or business">Brand or business</button>
+                <button type="button" class="f-pill" data-value="Agency or other">Agency or other</button>
+              </div>
+            </div>
+            <div class="f-q">
+              <p class="f-label">Your role *</p>
+              <div class="f-pills" role="radiogroup" data-field="role">
+                <button type="button" class="f-pill" data-value="Owner or founder">Owner or founder</button>
+                <button type="button" class="f-pill" data-value="Marketing lead">Marketing lead</button>
+                <button type="button" class="f-pill" data-value="Other">Other</button>
+              </div>
+            </div>
+            <div class="f-q">
+              <p class="f-label">Monthly content budget *</p>
+              <div class="f-pills" role="radiogroup" data-field="budget">
+                <button type="button" class="f-pill" data-value="Under $3k">Under $3k</button>
+                <button type="button" class="f-pill" data-value="$3k to $5k">$3k to $5k</button>
+                <button type="button" class="f-pill" data-value="$5k to $10k">$5k to $10k</button>
+                <button type="button" class="f-pill" data-value="$10k+">$10k+</button>
+                <button type="button" class="f-pill" data-value="No budget yet">No budget yet</button>
+              </div>
+            </div>
+            <div class="f-q">
+              <p class="f-label">When would you want to start? *</p>
+              <div class="f-pills" role="radiogroup" data-field="timeline">
+                <button type="button" class="f-pill" data-value="As soon as possible">As soon as possible</button>
+                <button type="button" class="f-pill" data-value="In the next 1 to 3 months">In the next 1 to 3 months</button>
+                <button type="button" class="f-pill" data-value="Just exploring">Just exploring</button>
+              </div>
+            </div>
+            <div class="f-q">
+              <label class="f-label" for="af-notes">Anything we should know about the brand?</label>
+              <textarea class="f-input f-textarea" id="af-notes" name="notes" rows="3" placeholder="Venues, campaigns, what you have in mind. Optional."></textarea>
+            </div>
+            <p class="f-error" id="err-2" role="alert" style="display:none;">Please answer the four questions above.</p>
+            <div class="f-step__actions">
+              <button type="button" class="btn--text link-reveal f-back" id="back-2">Back</button>
+              <button type="button" class="btn btn--primary f-cta" id="next-2"><span>Continue</span>
+                <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          </fieldset>
+
+          <!-- STEP 3: booking / confirmation -->
+          <fieldset class="f-step" data-step="3" style="display:none;">
+            <div class="f-booked">
+              <h3 class="f-pillar__title">You're a fit.</h3>
+              <p class="f-apply__sub" id="booking-copy">
+                Application received. Anthony reviews every application personally, usually
+                the same day, and you'll get an email from anthony@duddcashstudios.com to
+                lock in a time for the call.
+              </p>
+              <div id="cal-embed"></div>
+              <div class="f-step__actions">
+                <a href="/apply/booked" class="btn btn--primary f-cta" id="finish-btn"><span>Done</span></a>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="f-footer">
+    <div class="container f-footer__inner">
+      <span class="f-footer__brand">DUDDCASH</span>
+      <div class="f-footer__links">
+        <a href="mailto:action@duddcashstudios.com" class="link-reveal">action@duddcashstudios.com</a>
+        <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer" class="link-reveal">@duddcash</a>
+      </div>
+      <p class="f-footer__legal">
+        &copy; 2026 Duddcash Studio. Your information is used only to respond to your
+        application and is never shared or sold.
+      </p>
+    </div>
+  </footer>
+</FunnelLayout>
+
+<style define:vars={{ calLink: CAL_LINK }}>
+  /* ============ shared ============ */
+  .f-eyebrow {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .f-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+  }
+
+  .f-section-num {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .f-section-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .f-cta {
+    min-height: 48px;
+  }
+
+  /* ============ hero ============ */
+  .f-hero {
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    padding-top: 12vh;
+  }
+
+  .f-hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    max-width: 1100px;
+  }
+
+  .f-hero__headline {
+    font-family: var(--font-display);
+    font-size: max(6.2vw, 46px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+  }
+
+  .f-hero__sub {
+    font-size: var(--text-lg);
+    line-height: 1.65;
+    color: #3a3a3a;
+    max-width: 620px;
+  }
+
+  .f-hero__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .f-watch {
+    color: var(--color-muted);
+  }
+
+  /* ============ film ============ */
+  .f-film {
+    padding: var(--space-3xl) 0;
+  }
+
+  .f-player {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #0e0e0e;
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.35);
+  }
+
+  .f-player__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease), opacity 0.5s var(--ease);
+  }
+
+  .f-player:hover .f-player__poster {
+    transform: scale(1.025);
+  }
+
+  .f-player__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.4s var(--ease), background 0.3s ease;
+    z-index: 2;
+  }
+
+  .f-player__play svg {
+    margin-left: 4px;
+  }
+
+  .f-player__play:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+    background: #fff;
+  }
+
+  .f-player__play:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 3px;
+  }
+
+  .f-player__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ============ pillars / how ============ */
+  .f-pillars,
+  .f-how {
+    padding: var(--space-3xl) 0;
+  }
+
+  .f-pillars__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .f-how__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .f-pillar,
+  .f-how__step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .f-pillar__num {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .f-pillar__title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .f-pillar__body {
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: #4a4a4a;
+  }
+
+  /* ============ selected work ============ */
+  .f-work {
+    padding: var(--space-3xl) 0;
+  }
+
+  .f-work__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .f-work__row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 2fr;
+    gap: var(--space-lg);
+    align-items: baseline;
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: padding-left 0.5s var(--ease);
+  }
+
+  .f-work__row:hover {
+    padding-left: var(--space-sm);
+  }
+
+  .f-work__client {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .f-work__detail {
+    font-size: var(--text-base);
+    color: #4a4a4a;
+    line-height: 1.6;
+  }
+
+  /* ============ application ============ */
+  .f-apply {
+    padding: var(--space-3xl) 0 calc(var(--space-3xl) * 1.2);
+  }
+
+  .f-apply__card {
+    max-width: 780px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    padding: clamp(28px, 4.5vw, 56px);
+    box-shadow: 0 24px 70px -30px rgba(0, 0, 0, 0.25);
+  }
+
+  .f-apply__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .f-apply__title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .f-apply__sub {
+    font-size: var(--text-base);
+    color: #4a4a4a;
+    line-height: 1.65;
+    max-width: 540px;
+  }
+
+  .f-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .f-progress__step {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #b0aea8;
+    white-space: nowrap;
+    transition: color 0.4s ease;
+  }
+
+  .f-progress__step.is-active {
+    color: #111;
+  }
+
+  .f-progress__line {
+    flex: 1;
+    min-width: 24px;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  fieldset.f-step {
+    border: none;
+  }
+
+  .f-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+  }
+
+  .f-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .f-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .f-input {
+    font: inherit;
+    font-size: max(16px, var(--text-base));
+    padding: 13px 16px;
+    border: 1px solid #c8c6c0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-text);
+    transition: border-color 0.25s ease, background 0.25s ease;
+    width: 100%;
+  }
+
+  .f-input::placeholder {
+    color: #9a988f;
+  }
+
+  .f-input:focus {
+    outline: none;
+    border-color: #111;
+    background: #fff;
+  }
+
+  .f-textarea {
+    resize: vertical;
+    min-height: 84px;
+  }
+
+  .f-q {
+    margin-bottom: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .f-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .f-pill {
+    font-size: var(--text-base);
+    padding: 11px 18px;
+    min-height: 44px;
+    border: 1px solid #c8c6c0;
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.55);
+    color: #333;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .f-pill:hover {
+    border-color: #111;
+    color: #111;
+  }
+
+  .f-pill:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 2px;
+  }
+
+  .f-pill.is-selected {
+    background: #111;
+    border-color: #111;
+    color: #fff;
+  }
+
+  .f-error {
+    font-size: var(--text-sm);
+    color: #a03020;
+    margin-bottom: var(--space-md);
+  }
+
+  .f-step__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+  }
+
+  .f-back {
+    color: var(--color-muted);
+  }
+
+  .f-booked {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* ============ footer ============ */
+  .f-footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-2xl) 0;
+  }
+
+  .f-footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .f-footer__brand {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    font-size: var(--text-base);
+  }
+
+  .f-footer__links {
+    display: flex;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+    font-size: var(--text-base);
+  }
+
+  .f-footer__legal {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    max-width: 560px;
+  }
+
+  /* ============ responsive ============ */
+  @media (max-width: 900px) {
+    .f-pillars__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .f-hero {
+      min-height: 78vh;
+    }
+
+    .f-hero__headline {
+      font-size: max(9.5vw, 40px);
+    }
+
+    .f-how__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .f-form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .f-work__row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .f-progress__step {
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .f-pillars__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{ CAL_LINK }}>
+  (function () {
+    // ---------- video player ----------
+    var playBtn = document.getElementById('player-play');
+    var poster = document.getElementById('player-poster');
+    var video = document.getElementById('player-video');
+    if (playBtn && video && poster) {
+      playBtn.addEventListener('click', function () {
+        poster.style.display = 'none';
+        playBtn.style.display = 'none';
+        video.style.display = 'block';
+        video.play();
+      });
+    }
+
+    // ---------- lead identity + attribution ----------
+    function uuid() {
+      return 'xxxxxxxxyxxx4xxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0;
+        var v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      }) + Date.now().toString(36);
+    }
+
+    var leadId;
+    try {
+      leadId = localStorage.getItem('dc_lead_id');
+      if (!leadId) {
+        leadId = uuid();
+        localStorage.setItem('dc_lead_id', leadId);
+      }
+    } catch (e) {
+      leadId = uuid();
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var attribution = {
+      utm_source: params.get('utm_source') || '',
+      utm_medium: params.get('utm_medium') || '',
+      utm_content: params.get('utm_content') || '',
+      utm_campaign: params.get('utm_campaign') || '',
+      el: params.get('el') || '',
+      referrer: document.referrer || '',
+    };
+
+    // ---------- form state ----------
+    var form = document.getElementById('apply-form');
+    if (!form) return;
+
+    var answers = {};
+    var contact = {};
+
+    document.querySelectorAll('.f-pills').forEach(function (group) {
+      var field = group.getAttribute('data-field');
+      group.querySelectorAll('.f-pill').forEach(function (pill) {
+        pill.addEventListener('click', function () {
+          group.querySelectorAll('.f-pill').forEach(function (p) {
+            p.classList.remove('is-selected');
+          });
+          pill.classList.add('is-selected');
+          answers[field] = pill.getAttribute('data-value');
+        });
+      });
+    });
+
+    function showStep(n) {
+      document.querySelectorAll('.f-step').forEach(function (s) {
+        s.style.display = s.getAttribute('data-step') === String(n) ? 'block' : 'none';
+      });
+      document.querySelectorAll('.f-progress__step').forEach(function (p) {
+        p.classList.toggle('is-active', Number(p.getAttribute('data-progress')) <= n);
+      });
+      var card = document.querySelector('.f-apply__card');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function send(event, extra) {
+      var payload = Object.assign(
+        {
+          lead_id: leadId,
+          event: event,
+          page: window.location.pathname,
+          honeypot: form.querySelector('[name="website-url"]').value || '',
+        },
+        attribution,
+        contact,
+        answers,
+        extra || {}
+      );
+      var body = JSON.stringify(payload);
+      var url = '/.netlify/functions/capture-lead';
+      // sendBeacon survives navigation; fetch as fallback with one retry
+      var sent = false;
+      try {
+        if (navigator.sendBeacon) {
+          sent = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+        }
+      } catch (e) {}
+      if (!sent) {
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {
+          setTimeout(function () {
+            fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
+          }, 1500);
+        });
+      }
+    }
+
+    // ---------- step 1 ----------
+    document.getElementById('next-1').addEventListener('click', function () {
+      var name = document.getElementById('af-name').value.trim();
+      var company = document.getElementById('af-company').value.trim();
+      var email = document.getElementById('af-email').value.trim();
+      var phone = document.getElementById('af-phone').value.trim();
+      var err = document.getElementById('err-1');
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+      if (!name || !company || !emailOk) {
+        err.style.display = 'block';
+        return;
+      }
+      err.style.display = 'none';
+      contact = { name: name, company: company, email: email, phone: phone };
+      send('partial');
+      showStep(2);
+    });
+
+    // ---------- step 2 ----------
+    document.getElementById('back-2').addEventListener('click', function () {
+      showStep(1);
+    });
+
+    document.getElementById('next-2').addEventListener('click', function () {
+      var err = document.getElementById('err-2');
+      var required = ['business_type', 'role', 'budget', 'timeline'];
+      var missing = required.some(function (f) {
+        return !answers[f];
+      });
+      if (missing) {
+        err.style.display = 'block';
+        return;
+      }
+      err.style.display = 'none';
+      answers.notes = document.getElementById('af-notes').value.trim();
+
+      var lowBudget = answers.budget === 'Under $3k' || answers.budget === 'No budget yet';
+      var exploring = answers.timeline === 'Just exploring';
+
+      if (lowBudget || exploring) {
+        send('disqualified');
+        window.location.href = '/apply/not-yet';
+        return;
+      }
+
+      send('qualified');
+      showStep(3);
+      initBooking();
+    });
+
+    // ---------- step 3: booking ----------
+    function initBooking() {
+      if (!CAL_LINK) return; // fallback copy already in the DOM
+
+      var copy = document.getElementById('booking-copy');
+      if (copy) copy.textContent = 'Pick a time that works. The call is thirty minutes with Anthony.';
+      var finish = document.getElementById('finish-btn');
+      if (finish) finish.style.display = 'none';
+
+      // Cal.com official embed snippet
+      (function (C, A, L) {
+        var p = function (a, ar) { a.q.push(ar); };
+        var d = C.document;
+        C.Cal = C.Cal || function () {
+          var cal = C.Cal, ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {}; cal.q = cal.q || [];
+            d.head.appendChild(d.createElement('script')).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            var api = function () { p(api, arguments); };
+            var namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === 'string') { cal.ns[namespace] = api; p(api, ar); } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        };
+      })(window, 'https://app.cal.com/embed/embed.js', 'init');
+
+      window.Cal('init', { origin: 'https://cal.com' });
+      window.Cal('inline', {
+        elementOrSelector: '#cal-embed',
+        calLink: CAL_LINK,
+        config: {
+          name: contact.name || '',
+          email: contact.email || '',
+        },
+      });
+      window.Cal('on', {
+        action: 'bookingSuccessful',
+        callback: function () {
+          send('booked');
+          window.location.href = '/apply/booked?b=1';
+        },
+      });
+    }
+  })();
+</script>
