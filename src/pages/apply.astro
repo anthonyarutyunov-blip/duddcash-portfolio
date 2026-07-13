@@ -1,8 +1,20 @@
 ---
 // Unlisted client-application funnel page. Not linked from site nav,
 // noindex via FunnelLayout. Reached only by direct link (emails, decks, bio).
+// Design language = the main site: Waves hero, InfiniteGrid square texture,
+// MagneticCTA, TrustedByCarousel logos, dark FeaturedWork bento, GlobeSection,
+// holographic application card with GradientDots.
 import FunnelLayout from '../layouts/FunnelLayout.astro';
-import LogoMarquee from '../components/home/LogoMarquee.astro';
+import { Waves } from '../components/ui/wave-background';
+import { ScrollIndicator } from '../components/ui/scroll-indicator';
+import { MagneticCTA } from '../components/ui/magnetic-cta';
+import { TextReveal } from '../components/ui/text-reveal';
+import { ShimmerText } from '../components/ui/shimmer-text';
+import { GradientDots } from '../components/ui/gradient-dots';
+import { InfiniteGrid } from '../components/ui/the-infinite-grid';
+import TrustedByCarousel from '../components/home/TrustedByCarousel';
+import GlobeSection from '../components/home/GlobeSection';
+import FeaturedWork from '../components/funnel/FeaturedWork';
 
 // v1 hero film: Wynn "The Year of Excess" residency film.
 // Swap to the studio VSL's Bunny video ID once filmed.
@@ -18,69 +30,20 @@ const CAL_LINK = '';
 
 const pillars = [
   {
-    n: '01',
     title: 'Cut the same night',
     body: 'Recaps delivered while the night is still live online. Speed is the difference between content and news.',
   },
   {
-    n: '02',
     title: 'Built for volume',
     body: 'One crew on a consistent cadence. A growing bank of content your brand owns, not a one-off delivery.',
   },
   {
-    n: '03',
     title: 'One cinematic identity',
     body: 'Every venue, every campaign, every post carries the same considered look. No more mismatched freelancers.',
   },
   {
-    n: '04',
     title: 'We come from this world',
     body: 'Hospitality, nightlife, culture. You are not training anyone. We already know where to stand.',
-  },
-];
-
-const work = [
-  {
-    client: 'Wynn Nightlife',
-    detail: 'Residency films, F1 weekend, World Cup. An ongoing partnership since 2024.',
-  },
-  {
-    client: 'TAO Group Hospitality',
-    detail: 'Content across one of the biggest names in hospitality.',
-  },
-  {
-    client: 'Insomniac + Austin City Limits',
-    detail: 'Festival recaps and aftermovies, turned around while the weekend still matters.',
-  },
-  {
-    client: 'Mastercard',
-    detail: 'Creator Series campaign work.',
-  },
-  {
-    client: 'Lululemon',
-    detail: 'Brand and community content, from neon studios to night runs.',
-  },
-  {
-    client: 'Chipotle',
-    detail: 'Social content packages built for feeds, not archives.',
-  },
-];
-
-const steps = [
-  {
-    n: '01',
-    title: 'Apply',
-    body: 'Two minutes. Tell us about the brand, the budget, and the timeline.',
-  },
-  {
-    n: '02',
-    title: 'Strategy call',
-    body: 'Thirty minutes with Anthony. We map what a month of content looks like for you.',
-  },
-  {
-    n: '03',
-    title: 'First month live',
-    body: 'Crew scheduled, cadence set, first deliveries on your feed.',
   },
 ];
 ---
@@ -90,32 +53,43 @@ const steps = [
   description="Duddcash partners with a small number of brands to deliver a month of cinematic content, every month."
 >
   <!-- ============ HERO ============ -->
-  <section class="f-hero">
-    <div class="f-hero__inner container">
+  <section class="f-hero" id="hero">
+    <Waves client:load strokeColor="rgba(100, 90, 80, 0.15)" backgroundColor="transparent" />
+    <div class="f-hero__fade-bottom"></div>
+    <div class="f-hero__content">
       <p class="f-eyebrow" data-animate>Duddcash Studio &middot; Content Partnerships</p>
       <h1 class="f-hero__headline" data-animate>
         Built for brands<br />that never go quiet.
       </h1>
       <p class="f-hero__sub" data-animate>
         We partner with a small number of hospitality groups, venues, and brands to plan,
-        shoot, and deliver a month of cinematic content, every month. The same crew behind
-        work for Wynn, TAO Group, Mastercard, and Lululemon.
+        shoot, and deliver a month of cinematic content, every month.
       </p>
       <div class="f-hero__actions" data-animate>
-        <a href="#apply" class="btn btn--primary f-cta"><span>Start the conversation</span>
-          <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </a>
-        <a href="#film" class="btn--text link-reveal f-watch">Watch the work</a>
+        <MagneticCTA client:load href="#apply">Start the Conversation</MagneticCTA>
       </div>
+      <ScrollIndicator client:load />
     </div>
   </section>
 
   <!-- ============ FILM ============ -->
   <section class="f-film" id="film">
-    <div class="container">
-      <div class="f-section-head" data-animate>
-        <span class="f-section-num">01</span>
-        <h2 class="f-section-title">The work</h2>
+    <div class="f-container">
+      <div class="f-film__head" data-animate>
+        <TextReveal
+          client:visible
+          text="The work speaks."
+          staggerDelay={0.1}
+          initialDelay={0.1}
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontWeight: 500,
+            letterSpacing: '-0.025em',
+            lineHeight: 1.1,
+            color: 'var(--color-text)',
+          }}
+        />
       </div>
       <div class="f-player" id="player" data-animate>
         <img src={filmPoster} alt="Duddcash film still" class="f-player__poster" id="player-poster" loading="lazy" />
@@ -136,210 +110,297 @@ const steps = [
     </div>
   </section>
 
-  <!-- ============ TRUSTED BY ============ -->
-  <LogoMarquee />
+  <!-- ============ TRUSTED BY THE BEST (logos) ============ -->
+  <TrustedByCarousel client:visible />
 
-  <!-- ============ PILLARS ============ -->
-  <section class="f-pillars">
-    <div class="container">
-      <div class="f-section-head" data-animate>
-        <span class="f-section-num">02</span>
-        <h2 class="f-section-title">What a partnership looks like</h2>
-      </div>
-      <div class="f-pillars__grid" data-animate-stagger>
-        {pillars.map((p) => (
-          <div class="f-pillar">
-            <span class="f-pillar__num">{p.n}</span>
-            <h3 class="f-pillar__title">{p.title}</h3>
-            <p class="f-pillar__body">{p.body}</p>
-          </div>
-        ))}
-      </div>
+  <!-- ============ GRID ZONE: pillars → featured work → application ============ -->
+  <div class="f-grid-zone">
+    <div class="f-grid-zone__bg">
+      <div class="f-grid-zone__fade-in"></div>
+      <div class="f-grid-zone__fade-out"></div>
+      <InfiniteGrid client:visible height="100%" speedX={0.3} speedY={0.3} spotlightSize={350} />
     </div>
-  </section>
+    <div class="f-grid-zone__content">
 
-  <!-- ============ SELECTED WORK ============ -->
-  <section class="f-work">
-    <div class="container">
-      <div class="f-section-head" data-animate>
-        <span class="f-section-num">03</span>
-        <h2 class="f-section-title">Selected work</h2>
-      </div>
-      <div class="f-work__list" data-animate-stagger>
-        {work.map((w) => (
-          <div class="f-work__row">
-            <span class="f-work__client">{w.client}</span>
-            <span class="f-work__detail">{w.detail}</span>
+      <!-- Pillars: connected flow -->
+      <section class="f-pillars">
+        <div class="f-container">
+          <div class="f-pillars__head" data-animate>
+            <ShimmerText
+              client:visible
+              duration={3}
+              delay={0.2}
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(2rem, 4vw, 3.5rem)',
+                fontWeight: 500,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                color: 'var(--color-text)',
+              }}
+            >
+              What a partnership looks like.
+            </ShimmerText>
+            <p class="f-pillars__sub">One crew. One look. Every month. Here is how the engine runs.</p>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
 
-  <!-- ============ HOW IT WORKS ============ -->
-  <section class="f-how">
-    <div class="container">
-      <div class="f-section-head" data-animate>
-        <span class="f-section-num">04</span>
-        <h2 class="f-section-title">How it works</h2>
-      </div>
-      <div class="f-how__grid" data-animate-stagger>
-        {steps.map((s) => (
-          <div class="f-how__step">
-            <span class="f-pillar__num">{s.n}</span>
-            <h3 class="f-pillar__title">{s.title}</h3>
-            <p class="f-pillar__body">{s.body}</p>
+          <div class="f-flow" data-animate-stagger>
+            {pillars.map((p, i) => (
+              <>
+                <div class="f-flow__card">
+                  <div class="f-flow__card-border" aria-hidden="true"></div>
+                  <div class="f-flow__card-inner">
+                    <h3 class="f-flow__title">{p.title}</h3>
+                    <p class="f-flow__body">{p.body}</p>
+                  </div>
+                </div>
+                {i < pillars.length - 1 && (
+                  <div class="f-flow__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 40 24" fill="none">
+                      <path class="f-flow__arrow-path" d="M2 12 H30 M24 5 L32 12 L24 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                )}
+              </>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ APPLICATION ============ -->
-  <section class="f-apply" id="apply">
-    <div class="container">
-      <div class="f-apply__card" data-animate>
-        <div class="f-apply__head">
-          <p class="f-eyebrow">Application</p>
-          <h2 class="f-apply__title">Tell us about the brand.</h2>
-          <p class="f-apply__sub">
-            We take on a handful of new partners at a time, so each one gets our full
-            attention. This takes about two minutes.
-          </p>
         </div>
+      </section>
 
-        <div class="f-progress" aria-hidden="true">
-          <span class="f-progress__step is-active" data-progress="1">01 &middot; You</span>
-          <span class="f-progress__line"></span>
-          <span class="f-progress__step" data-progress="2">02 &middot; The brand</span>
-          <span class="f-progress__line"></span>
-          <span class="f-progress__step" data-progress="3">03 &middot; The call</span>
+      <!-- Featured work: same format as the site's Our Work grid -->
+      <div style="min-height: 400px;"><FeaturedWork client:load /></div>
+
+      <!-- ============ APPLICATION (holographic card) ============ -->
+      <section class="f-apply" id="apply">
+        <div class="f-apply__card">
+          <div class="f-apply__card-border" aria-hidden="true"></div>
+          <div class="f-apply__card-inner">
+            <div class="f-apply__dots" aria-hidden="true">
+              <GradientDots
+                client:visible
+                dotSize={4}
+                spacing={8}
+                duration={25}
+                backgroundColor="rgba(240, 238, 235, 0.85)"
+                colors={[
+                  'rgba(195, 185, 165, 0.9)',
+                  'rgba(175, 190, 170, 0.8)',
+                  'rgba(185, 175, 195, 0.7)',
+                  'rgba(200, 185, 165, 0.85)',
+                ]}
+                style={{ opacity: 0.45 }}
+              />
+            </div>
+
+            <div class="f-apply__content">
+              <div class="f-apply__head" data-animate>
+                <TextReveal
+                  client:visible
+                  text="Tell us about the brand."
+                  staggerDelay={0.1}
+                  initialDelay={0.1}
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(1.9rem, 4vw, 3.2rem)',
+                    fontWeight: 500,
+                    letterSpacing: '-0.025em',
+                    lineHeight: 1.1,
+                    color: 'var(--color-text)',
+                  }}
+                />
+                <p class="f-apply__sub">
+                  We take on a handful of new partners at a time, so each one gets our full
+                  attention. This takes about two minutes.
+                </p>
+              </div>
+
+              <!-- How it works: inline flow strip -->
+              <div class="f-steps" data-animate aria-label="How it works">
+                <div class="f-steps__item">
+                  <span class="f-steps__name">Apply</span>
+                  <span class="f-steps__desc">two minutes</span>
+                </div>
+                <span class="f-steps__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 32 12" fill="none"><path d="M0 6 H26 M21 1 L27 6 L21 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <div class="f-steps__item">
+                  <span class="f-steps__name">Strategy call</span>
+                  <span class="f-steps__desc">thirty minutes</span>
+                </div>
+                <span class="f-steps__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 32 12" fill="none"><path d="M0 6 H26 M21 1 L27 6 L21 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <div class="f-steps__item">
+                  <span class="f-steps__name">First month live</span>
+                  <span class="f-steps__desc">on your feed</span>
+                </div>
+              </div>
+
+              <div class="f-progress" aria-hidden="true">
+                <span class="f-progress__step is-active" data-progress="1">01 &middot; You</span>
+                <span class="f-progress__line"></span>
+                <span class="f-progress__step" data-progress="2">02 &middot; The brand</span>
+                <span class="f-progress__line"></span>
+                <span class="f-progress__step" data-progress="3">03 &middot; The call</span>
+              </div>
+
+              <form id="apply-form" novalidate>
+                <p class="sr-only" aria-hidden="true">
+                  <label>Leave this field empty: <input name="website-url" tabindex="-1" autocomplete="off" /></label>
+                </p>
+
+                <!-- STEP 1: contact -->
+                <fieldset class="f-step" data-step="1">
+                  <div class="f-form-row">
+                    <div class="f-form-group">
+                      <label class="f-label" for="af-name">Name *</label>
+                      <input class="f-input" type="text" id="af-name" name="name" required autocomplete="name" placeholder="Your name" />
+                    </div>
+                    <div class="f-form-group">
+                      <label class="f-label" for="af-company">Company / brand *</label>
+                      <input class="f-input" type="text" id="af-company" name="company" required autocomplete="organization" placeholder="Brand or group" />
+                    </div>
+                  </div>
+                  <div class="f-form-row">
+                    <div class="f-form-group">
+                      <label class="f-label" for="af-email">Email *</label>
+                      <input class="f-input" type="email" id="af-email" name="email" required autocomplete="email" placeholder="you@company.com" />
+                    </div>
+                    <div class="f-form-group">
+                      <label class="f-label" for="af-phone">Phone</label>
+                      <input class="f-input" type="tel" id="af-phone" name="phone" autocomplete="tel" placeholder="Optional" />
+                    </div>
+                  </div>
+                  <p class="f-error" id="err-1" role="alert" style="display:none;">Please fill in your name, brand, and a valid email.</p>
+                  <div class="f-step__actions">
+                    <button type="button" class="fm-btn" id="next-1">
+                      <span class="fm-btn__border" aria-hidden="true"></span>
+                      <span class="fm-btn__shimmer" aria-hidden="true"></span>
+                      <span class="fm-btn__text">Continue</span>
+                    </button>
+                  </div>
+                </fieldset>
+
+                <!-- STEP 2: qualification -->
+                <fieldset class="f-step" data-step="2" style="display:none;">
+                  <div class="f-q">
+                    <p class="f-label">What best describes you? *</p>
+                    <div class="f-pills" role="radiogroup" data-field="business_type">
+                      <button type="button" class="f-pill" data-value="Restaurant or hospitality group">Restaurant or hospitality group</button>
+                      <button type="button" class="f-pill" data-value="Hotel or resort">Hotel or resort</button>
+                      <button type="button" class="f-pill" data-value="Nightlife, events, or festivals">Nightlife, events, or festivals</button>
+                      <button type="button" class="f-pill" data-value="Brand or business">Brand or business</button>
+                      <button type="button" class="f-pill" data-value="Agency or other">Agency or other</button>
+                    </div>
+                  </div>
+                  <div class="f-q">
+                    <p class="f-label">Your role *</p>
+                    <div class="f-pills" role="radiogroup" data-field="role">
+                      <button type="button" class="f-pill" data-value="Owner or founder">Owner or founder</button>
+                      <button type="button" class="f-pill" data-value="Marketing lead">Marketing lead</button>
+                      <button type="button" class="f-pill" data-value="Other">Other</button>
+                    </div>
+                  </div>
+                  <div class="f-q">
+                    <p class="f-label">Monthly content budget *</p>
+                    <div class="f-pills" role="radiogroup" data-field="budget">
+                      <button type="button" class="f-pill" data-value="Under $3k">Under $3k</button>
+                      <button type="button" class="f-pill" data-value="$3k to $5k">$3k to $5k</button>
+                      <button type="button" class="f-pill" data-value="$5k to $10k">$5k to $10k</button>
+                      <button type="button" class="f-pill" data-value="$10k+">$10k+</button>
+                      <button type="button" class="f-pill" data-value="No budget yet">No budget yet</button>
+                    </div>
+                  </div>
+                  <div class="f-q">
+                    <p class="f-label">When would you want to start? *</p>
+                    <div class="f-pills" role="radiogroup" data-field="timeline">
+                      <button type="button" class="f-pill" data-value="As soon as possible">As soon as possible</button>
+                      <button type="button" class="f-pill" data-value="In the next 1 to 3 months">In the next 1 to 3 months</button>
+                      <button type="button" class="f-pill" data-value="Just exploring">Just exploring</button>
+                    </div>
+                  </div>
+                  <div class="f-q">
+                    <label class="f-label" for="af-notes">Anything we should know about the brand?</label>
+                    <textarea class="f-input f-textarea" id="af-notes" name="notes" rows="3" placeholder="Venues, campaigns, what you have in mind. Optional."></textarea>
+                  </div>
+                  <p class="f-error" id="err-2" role="alert" style="display:none;">Please answer the four questions above.</p>
+                  <div class="f-step__actions">
+                    <button type="button" class="btn--text link-reveal f-back" id="back-2">Back</button>
+                    <button type="button" class="fm-btn" id="next-2">
+                      <span class="fm-btn__border" aria-hidden="true"></span>
+                      <span class="fm-btn__shimmer" aria-hidden="true"></span>
+                      <span class="fm-btn__text">Continue</span>
+                    </button>
+                  </div>
+                </fieldset>
+
+                <!-- STEP 3: booking / confirmation -->
+                <fieldset class="f-step" data-step="3" style="display:none;">
+                  <div class="f-booked">
+                    <h3 class="f-booked__title">You're a fit.</h3>
+                    <p class="f-apply__sub" id="booking-copy">
+                      Application received. Anthony reviews every application personally, usually
+                      the same day, and you'll get an email from anthony@duddcashstudios.com to
+                      lock in a time for the call.
+                    </p>
+                    <div id="cal-embed"></div>
+                    <div class="f-step__actions">
+                      <a href="/apply/booked" class="fm-btn" id="finish-btn">
+                        <span class="fm-btn__border" aria-hidden="true"></span>
+                        <span class="fm-btn__shimmer" aria-hidden="true"></span>
+                        <span class="fm-btn__text">Done</span>
+                      </a>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+          </div>
         </div>
+      </section>
+    </div>
+  </div>
 
-        <form id="apply-form" novalidate>
-          <p class="sr-only" aria-hidden="true">
-            <label>Leave this field empty: <input name="website-url" tabindex="-1" autocomplete="off" /></label>
-          </p>
+  <!-- ============ GLOBAL REACH + OUR GOAL ============ -->
+  <GlobeSection client:visible />
 
-          <!-- STEP 1: contact -->
-          <fieldset class="f-step" data-step="1">
-            <div class="f-form-row">
-              <div class="f-form-group">
-                <label class="f-label" for="af-name">Name *</label>
-                <input class="f-input" type="text" id="af-name" name="name" required autocomplete="name" placeholder="Your name" />
-              </div>
-              <div class="f-form-group">
-                <label class="f-label" for="af-company">Company / brand *</label>
-                <input class="f-input" type="text" id="af-company" name="company" required autocomplete="organization" placeholder="Brand or group" />
-              </div>
-            </div>
-            <div class="f-form-row">
-              <div class="f-form-group">
-                <label class="f-label" for="af-email">Email *</label>
-                <input class="f-input" type="email" id="af-email" name="email" required autocomplete="email" placeholder="you@company.com" />
-              </div>
-              <div class="f-form-group">
-                <label class="f-label" for="af-phone">Phone</label>
-                <input class="f-input" type="tel" id="af-phone" name="phone" autocomplete="tel" placeholder="Optional" />
-              </div>
-            </div>
-            <p class="f-error" id="err-1" role="alert" style="display:none;">Please fill in your name, brand, and a valid email.</p>
-            <div class="f-step__actions">
-              <button type="button" class="btn btn--primary f-cta" id="next-1"><span>Continue</span>
-                <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </button>
-            </div>
-          </fieldset>
-
-          <!-- STEP 2: qualification -->
-          <fieldset class="f-step" data-step="2" style="display:none;">
-            <div class="f-q">
-              <p class="f-label">What best describes you? *</p>
-              <div class="f-pills" role="radiogroup" data-field="business_type">
-                <button type="button" class="f-pill" data-value="Restaurant or hospitality group">Restaurant or hospitality group</button>
-                <button type="button" class="f-pill" data-value="Hotel or resort">Hotel or resort</button>
-                <button type="button" class="f-pill" data-value="Nightlife, events, or festivals">Nightlife, events, or festivals</button>
-                <button type="button" class="f-pill" data-value="Brand or business">Brand or business</button>
-                <button type="button" class="f-pill" data-value="Agency or other">Agency or other</button>
-              </div>
-            </div>
-            <div class="f-q">
-              <p class="f-label">Your role *</p>
-              <div class="f-pills" role="radiogroup" data-field="role">
-                <button type="button" class="f-pill" data-value="Owner or founder">Owner or founder</button>
-                <button type="button" class="f-pill" data-value="Marketing lead">Marketing lead</button>
-                <button type="button" class="f-pill" data-value="Other">Other</button>
-              </div>
-            </div>
-            <div class="f-q">
-              <p class="f-label">Monthly content budget *</p>
-              <div class="f-pills" role="radiogroup" data-field="budget">
-                <button type="button" class="f-pill" data-value="Under $3k">Under $3k</button>
-                <button type="button" class="f-pill" data-value="$3k to $5k">$3k to $5k</button>
-                <button type="button" class="f-pill" data-value="$5k to $10k">$5k to $10k</button>
-                <button type="button" class="f-pill" data-value="$10k+">$10k+</button>
-                <button type="button" class="f-pill" data-value="No budget yet">No budget yet</button>
-              </div>
-            </div>
-            <div class="f-q">
-              <p class="f-label">When would you want to start? *</p>
-              <div class="f-pills" role="radiogroup" data-field="timeline">
-                <button type="button" class="f-pill" data-value="As soon as possible">As soon as possible</button>
-                <button type="button" class="f-pill" data-value="In the next 1 to 3 months">In the next 1 to 3 months</button>
-                <button type="button" class="f-pill" data-value="Just exploring">Just exploring</button>
-              </div>
-            </div>
-            <div class="f-q">
-              <label class="f-label" for="af-notes">Anything we should know about the brand?</label>
-              <textarea class="f-input f-textarea" id="af-notes" name="notes" rows="3" placeholder="Venues, campaigns, what you have in mind. Optional."></textarea>
-            </div>
-            <p class="f-error" id="err-2" role="alert" style="display:none;">Please answer the four questions above.</p>
-            <div class="f-step__actions">
-              <button type="button" class="btn--text link-reveal f-back" id="back-2">Back</button>
-              <button type="button" class="btn btn--primary f-cta" id="next-2"><span>Continue</span>
-                <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </button>
-            </div>
-          </fieldset>
-
-          <!-- STEP 3: booking / confirmation -->
-          <fieldset class="f-step" data-step="3" style="display:none;">
-            <div class="f-booked">
-              <h3 class="f-pillar__title">You're a fit.</h3>
-              <p class="f-apply__sub" id="booking-copy">
-                Application received. Anthony reviews every application personally, usually
-                the same day, and you'll get an email from anthony@duddcashstudios.com to
-                lock in a time for the call.
-              </p>
-              <div id="cal-embed"></div>
-              <div class="f-step__actions">
-                <a href="/apply/booked" class="btn btn--primary f-cta" id="finish-btn"><span>Done</span></a>
-              </div>
-            </div>
-          </fieldset>
-        </form>
+  <section class="f-goal-zone">
+    <svg class="f-goal-zone__grid" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <pattern id="apply-goal-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#apply-goal-grid)" />
+    </svg>
+    <div class="f-goal" data-animate>
+      <div class="f-goal__content">
+        <h2 class="f-goal__label">Our Goal</h2>
+        <p class="f-goal__text">
+          Our goal at DUDDCASH is, simply put, to tell engaging stories with riveting visuals.
+          Whether your company wants a fast paced, action packed advertisement, or a subtle
+          &ldquo;do more with less&rdquo; approach, we want to help YOU achieve it. Through
+          Storyboarding, Directing, Shooting, and/or Editing, we can be the missing piece of
+          your puzzle. With a vast catalog of content ranging from car rallies to restaurants
+          and even festivals, we have and will do whatever it takes to get the job done right.
+        </p>
+        <div class="f-goal__cta" data-animate>
+          <MagneticCTA client:visible href="#apply">Apply to Work With Us</MagneticCTA>
+        </div>
       </div>
     </div>
   </section>
-
-  <!-- ============ FOOTER ============ -->
-  <footer class="f-footer">
-    <div class="container f-footer__inner">
-      <span class="f-footer__brand">DUDDCASH</span>
-      <div class="f-footer__links">
-        <a href="mailto:action@duddcashstudios.com" class="link-reveal">action@duddcashstudios.com</a>
-        <a href="https://instagram.com/duddcash" target="_blank" rel="noopener noreferrer" class="link-reveal">@duddcash</a>
-      </div>
-      <p class="f-footer__legal">
-        &copy; 2026 Duddcash Studio. Your information is used only to respond to your
-        application and is never shared or sold.
-      </p>
-    </div>
-  </footer>
 </FunnelLayout>
 
-<style define:vars={{ calLink: CAL_LINK }}>
+<style>
   /* ============ shared ============ */
+  .f-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 3.9vw;
+  }
+
   .f-eyebrow {
     font-size: var(--text-sm);
     font-weight: 600;
@@ -348,54 +409,45 @@ const steps = [
     color: var(--color-muted);
   }
 
-  .f-section-head {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-lg);
-    margin-bottom: var(--space-xl);
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-lg);
-  }
-
-  .f-section-num {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--color-muted);
-    letter-spacing: 0.1em;
-  }
-
-  .f-section-title {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 500;
-    letter-spacing: -0.02em;
-  }
-
-  .f-cta {
-    min-height: 48px;
-  }
-
-  /* ============ hero ============ */
+  /* ============ hero (mirrors homepage hero) ============ */
   .f-hero {
-    min-height: 88vh;
+    position: relative;
+    min-height: 100vh;
     display: flex;
     align-items: center;
-    padding-top: 12vh;
+    justify-content: center;
+    text-align: center;
+    padding: 10vh 3.9vw 0;
   }
 
-  .f-hero__inner {
+  .f-hero__fade-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 220px;
+    background: linear-gradient(to bottom, transparent, var(--color-bg));
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .f-hero__content {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-xl);
-    max-width: 1100px;
+    width: 100%;
   }
 
   .f-hero__headline {
     font-family: var(--font-display);
-    font-size: max(6.2vw, 46px);
+    font-size: max(6.5vw, 48px);
     font-weight: 500;
     letter-spacing: -0.03em;
     line-height: 1.0;
+    color: var(--color-text);
   }
 
   .f-hero__sub {
@@ -407,18 +459,23 @@ const steps = [
 
   .f-hero__actions {
     display: flex;
-    align-items: center;
-    gap: var(--space-xl);
-    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .f-watch {
-    color: var(--color-muted);
+  @media (max-width: 768px) {
+    .f-hero__headline {
+      font-size: max(9vw, 38px);
+    }
   }
 
   /* ============ film ============ */
   .f-film {
-    padding: var(--space-3xl) 0;
+    padding: var(--space-2xl) 0 var(--space-3xl);
+  }
+
+  .f-film__head {
+    text-align: center;
+    margin-bottom: var(--space-xl);
   }
 
   .f-player {
@@ -483,119 +540,246 @@ const steps = [
     object-fit: cover;
   }
 
-  /* ============ pillars / how ============ */
-  .f-pillars,
-  .f-how {
+  /* ============ grid zone (square texture like homepage) ============ */
+  .f-grid-zone {
+    position: relative;
+  }
+
+  .f-grid-zone__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .f-grid-zone__fade-in {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 250px;
+    background: linear-gradient(to bottom, var(--color-bg) 30%, transparent);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .f-grid-zone__fade-out {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 300px;
+    background: linear-gradient(to top, var(--color-bg) 20%, transparent);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .f-grid-zone__content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============ pillars flow ============ */
+  .f-pillars {
     padding: var(--space-3xl) 0;
   }
 
-  .f-pillars__grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-xl);
+  .f-pillars__head {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
   }
 
-  .f-how__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-xl);
-  }
-
-  .f-pillar,
-  .f-how__step {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .f-pillar__num {
-    font-size: var(--text-sm);
-    font-weight: 600;
+  .f-pillars__sub {
     color: var(--color-muted);
-    letter-spacing: 0.1em;
-  }
-
-  .f-pillar__title {
-    font-family: var(--font-display);
-    font-size: var(--text-xl);
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .f-pillar__body {
     font-size: var(--text-base);
-    line-height: 1.65;
-    color: #4a4a4a;
+    margin-top: var(--space-md);
+    font-style: italic;
   }
 
-  /* ============ selected work ============ */
-  .f-work {
-    padding: var(--space-3xl) 0;
+  .f-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
   }
 
-  .f-work__list {
+  .f-flow__card {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .f-flow__card-border {
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 18px;
+    background: linear-gradient(
+      135deg,
+      rgba(180, 170, 150, 0.35) 0%,
+      rgba(220, 210, 195, 0.15) 25%,
+      rgba(160, 200, 220, 0.28) 50%,
+      rgba(200, 180, 220, 0.2) 75%,
+      rgba(210, 195, 170, 0.35) 100%
+    );
+    background-size: 300% 300%;
+    animation: fBorderFlow 9s ease-in-out infinite;
+  }
+
+  @keyframes fBorderFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .f-flow__card-inner {
+    position: relative;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 17px;
+    padding: clamp(20px, 2.2vw, 32px);
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
   }
 
-  .f-work__row {
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) 2fr;
-    gap: var(--space-lg);
-    align-items: baseline;
-    padding: var(--space-lg) 0;
-    border-bottom: 1px solid var(--color-border);
-    transition: padding-left 0.5s var(--ease);
+  .f-flow__card:hover .f-flow__card-inner {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 44px -18px rgba(0, 0, 0, 0.25);
   }
 
-  .f-work__row:hover {
-    padding-left: var(--space-sm);
-  }
-
-  .f-work__client {
+  .f-flow__title {
     font-family: var(--font-display);
-    font-size: var(--text-xl);
+    font-size: clamp(17px, 1.4vw, 22px);
     font-weight: 500;
     letter-spacing: -0.01em;
+    line-height: 1.15;
   }
 
-  .f-work__detail {
-    font-size: var(--text-base);
-    color: #4a4a4a;
+  .f-flow__body {
+    font-size: max(13px, 0.85vw);
     line-height: 1.6;
+    color: #4a4a4a;
   }
 
-  /* ============ application ============ */
+  .f-flow__arrow {
+    display: flex;
+    align-items: center;
+    flex: 0 0 34px;
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .f-flow__arrow svg {
+    width: 100%;
+  }
+
+  .f-flow__arrow-path {
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+    animation: fArrowDraw 2.4s var(--ease) infinite;
+  }
+
+  @keyframes fArrowDraw {
+    0% { stroke-dashoffset: 60; opacity: 0; }
+    35% { stroke-dashoffset: 0; opacity: 1; }
+    75% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+
+  @media (max-width: 900px) {
+    .f-flow {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2px;
+    }
+
+    .f-flow__arrow {
+      flex: none;
+      justify-content: center;
+      padding: 6px 0;
+    }
+
+    .f-flow__arrow svg {
+      width: 24px;
+      transform: rotate(90deg);
+    }
+  }
+
+  /* ============ application: holographic card ============ */
   .f-apply {
-    padding: var(--space-3xl) 0 calc(var(--space-3xl) * 1.2);
+    padding: var(--space-2xl) 3.9vw calc(var(--space-3xl) * 1.2);
+    display: flex;
+    justify-content: center;
   }
 
   .f-apply__card {
-    max-width: 780px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.62);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    border-radius: 20px;
-    padding: clamp(28px, 4.5vw, 56px);
-    box-shadow: 0 24px 70px -30px rgba(0, 0, 0, 0.25);
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    width: 100%;
+  }
+
+  .f-apply__card-border {
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 28px;
+    background: linear-gradient(
+      135deg,
+      rgba(180, 170, 150, 0.3) 0%,
+      rgba(220, 210, 195, 0.15) 20%,
+      rgba(160, 200, 220, 0.25) 40%,
+      rgba(200, 180, 220, 0.2) 60%,
+      rgba(180, 210, 200, 0.25) 80%,
+      rgba(210, 195, 170, 0.3) 100%
+    );
+    background-size: 400% 400%;
+    animation: fBorderFlow 10s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  .f-apply__card-inner {
+    position: relative;
+    z-index: 1;
+    background: rgba(240, 238, 235, 0.42);
+    backdrop-filter: blur(24px) saturate(1.3);
+    -webkit-backdrop-filter: blur(24px) saturate(1.3);
+    border-radius: 27px;
+    padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 4vw, 4rem);
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+      0 1px 0 rgba(255, 255, 255, 0.35) inset,
+      0 0 60px rgba(180, 170, 150, 0.2),
+      0 30px 80px -20px rgba(0, 0, 0, 0.08);
+  }
+
+  .f-apply__dots {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 27px;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+  }
+
+  .f-apply__card:hover .f-apply__dots {
+    opacity: 1 !important;
+    filter: brightness(1.4) saturate(1.3);
+  }
+
+  .f-apply__content {
+    position: relative;
+    z-index: 2;
   }
 
   .f-apply__head {
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    align-items: center;
+    gap: var(--space-md);
     margin-bottom: var(--space-xl);
-  }
-
-  .f-apply__title {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 500;
-    letter-spacing: -0.02em;
   }
 
   .f-apply__sub {
@@ -605,6 +789,46 @@ const steps = [
     max-width: 540px;
   }
 
+  /* how-it-works strip */
+  .f-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.5vw, 18px);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .f-steps__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .f-steps__name {
+    font-family: var(--font-display);
+    font-size: clamp(13px, 1.1vw, 16px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .f-steps__desc {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .f-steps__arrow {
+    width: 30px;
+    color: rgba(0, 0, 0, 0.35);
+    flex-shrink: 0;
+  }
+
+  /* progress */
   .f-progress {
     display: flex;
     align-items: center;
@@ -631,9 +855,10 @@ const steps = [
     flex: 1;
     min-width: 24px;
     height: 1px;
-    background: var(--color-border);
+    background: rgba(0, 0, 0, 0.15);
   }
 
+  /* form */
   fieldset.f-step {
     border: none;
   }
@@ -663,11 +888,11 @@ const steps = [
     font: inherit;
     font-size: max(16px, var(--text-base));
     padding: 13px 16px;
-    border: 1px solid #c8c6c0;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
     color: var(--color-text);
-    transition: border-color 0.25s ease, background 0.25s ease;
+    transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
     width: 100%;
   }
 
@@ -679,6 +904,7 @@ const steps = [
     outline: none;
     border-color: #111;
     background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
   }
 
   .f-textarea {
@@ -703,9 +929,9 @@ const steps = [
     font-size: var(--text-base);
     padding: 11px 18px;
     min-height: 44px;
-    border: 1px solid #c8c6c0;
+    border: 1px solid rgba(0, 0, 0, 0.18);
     border-radius: 40px;
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.5);
     color: #333;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -714,6 +940,7 @@ const steps = [
   .f-pill:hover {
     border-color: #111;
     color: #111;
+    background: rgba(255, 255, 255, 0.8);
   }
 
   .f-pill:focus-visible {
@@ -751,76 +978,201 @@ const steps = [
     gap: var(--space-md);
   }
 
-  /* ============ footer ============ */
-  .f-footer {
-    border-top: 1px solid var(--color-border);
-    padding: var(--space-2xl) 0;
+  .f-booked__title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
 
-  .f-footer__inner {
+  /* magnetic form button (vanilla twin of MagneticCTA) */
+  .fm-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 16px 36px;
+    border-radius: 60px;
+    background: rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+    transition: background 0.4s ease, transform 0.2s ease;
+    border: none;
+    font: inherit;
+  }
+
+  .fm-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  .fm-btn__border {
+    position: absolute;
+    inset: 0;
+    border-radius: 60px;
+    padding: 1.5px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.05),
+      rgba(120, 100, 80, 0.3),
+      rgba(0, 0, 0, 0.05),
+      rgba(0, 0, 0, 0.15)
+    );
+    background-size: 300% 300%;
+    animation: fmBorderRotate 4s linear infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  @keyframes fmBorderRotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .fm-btn__shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(200, 180, 140, 0.15) 45%,
+      rgba(255, 255, 255, 0.25) 50%,
+      rgba(200, 180, 140, 0.15) 55%,
+      transparent 70%
+    );
+    background-size: 250% 100%;
+    animation: fmShimmerSweep 2s ease-in-out infinite;
+    border-radius: 60px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .fm-btn:hover .fm-btn__shimmer {
+    opacity: 1;
+  }
+
+  @keyframes fmShimmerSweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -50% 0; }
+  }
+
+  .fm-btn__text {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(14px, 1vw, 16px);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  /* ============ our goal (grid texture like the about page) ============ */
+  .f-goal-zone {
+    position: relative;
+    padding: var(--space-3xl) 3.9vw;
+    overflow: hidden;
+  }
+
+  .f-goal-zone__grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .f-goal {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .f-goal__content {
+    max-width: 760px;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    align-items: center;
+    gap: var(--space-lg);
   }
 
-  .f-footer__brand {
+  .f-goal__label {
     font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
     font-weight: 500;
-    letter-spacing: 0.18em;
-    font-size: var(--text-base);
+    letter-spacing: -0.02em;
   }
 
-  .f-footer__links {
-    display: flex;
-    gap: var(--space-xl);
-    flex-wrap: wrap;
+  .f-goal__text {
     font-size: var(--text-base);
+    line-height: 1.75;
+    color: #3a3a3a;
   }
 
-  .f-footer__legal {
-    font-size: var(--text-sm);
-    color: var(--color-muted);
-    max-width: 560px;
+  .f-goal__cta {
+    margin-top: var(--space-md);
   }
 
   /* ============ responsive ============ */
-  @media (max-width: 900px) {
-    .f-pillars__grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
   @media (max-width: 768px) {
-    .f-hero {
-      min-height: 78vh;
-    }
-
-    .f-hero__headline {
-      font-size: max(9.5vw, 40px);
-    }
-
-    .f-how__grid {
-      grid-template-columns: 1fr;
-    }
-
     .f-form-row {
       grid-template-columns: 1fr;
-    }
-
-    .f-work__row {
-      grid-template-columns: 1fr;
-      gap: 6px;
     }
 
     .f-progress__step {
       font-size: 11px;
     }
+
+    .f-steps__arrow {
+      width: 20px;
+    }
+
+    .f-apply {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .f-apply__card-inner {
+      border-radius: 20px;
+      padding: 1.75rem 1.1rem;
+    }
+
+    .f-apply__card-border {
+      border-radius: 21px;
+    }
+
+    .f-apply__dots {
+      border-radius: 20px;
+    }
   }
 
-  @media (max-width: 560px) {
-    .f-pillars__grid {
-      grid-template-columns: 1fr;
-    }
+  /* Safari: kill expensive effects (site-wide pattern) */
+  :global(.safari) .f-apply__card-inner {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(240, 238, 235, 0.85);
+  }
+
+  :global(.safari) .f-apply__dots {
+    display: none;
+  }
+
+  :global(.safari) .f-flow__card-inner {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  :global(.safari) .fm-btn__border,
+  :global(.safari) .fm-btn__shimmer,
+  :global(.safari) .f-flow__card-border,
+  :global(.safari) .f-apply__card-border,
+  :global(.safari) .f-flow__arrow-path {
+    animation: none;
   }
 </style>
 
@@ -838,6 +1190,19 @@ const steps = [
         video.play();
       });
     }
+
+    // ---------- magnetic pull on form buttons ----------
+    document.querySelectorAll('.fm-btn').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var r = btn.getBoundingClientRect();
+        var dx = (e.clientX - (r.left + r.width / 2)) * 0.18;
+        var dy = (e.clientY - (r.top + r.height / 2)) * 0.18;
+        btn.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      });
+      btn.addEventListener('mouseleave', function () {
+        btn.style.transform = 'translate(0,0)';
+      });
+    });
 
     // ---------- lead identity + attribution ----------
     function uuid() {
@@ -915,7 +1280,6 @@ const steps = [
       );
       var body = JSON.stringify(payload);
       var url = '/.netlify/functions/capture-lead';
-      // sendBeacon survives navigation; fetch as fallback with one retry
       var sent = false;
       try {
         if (navigator.sendBeacon) {

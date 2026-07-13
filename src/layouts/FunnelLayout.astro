@@ -9,6 +9,7 @@ import '../styles/global.css';
 import '../styles/animations.css';
 import { BackgroundGradientAnimation } from '../components/ui/background-gradient-animation';
 import SpotlightBackground from '../components/ui/spotlight-background';
+import Footer from '../components/global/Footer.astro';
 
 interface Props {
   title: string;
@@ -115,6 +116,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <main>
         <slot />
       </main>
+      <Footer />
     </div>
 
     <script>
