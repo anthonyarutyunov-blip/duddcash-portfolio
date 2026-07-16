@@ -123,10 +123,13 @@ export const BackgroundGradientAnimation = ({
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [interactive, isMobile]);
 
-  // Mobile: static gradient only — no animated blobs, no blur, no compositing layers
-  // will-change: transform promotes the fixed layer to its own compositor layer,
-  // preventing repaints during scroll
-  if (isMobile) {
+  // Mobile AND Safari: static gradient only — no animated blobs, no blur, no
+  // compositing layers. Safari's compositor struggles with continuously
+  // animated blurred layers at viewport size (visible as glitchy/laggy
+  // scrolling), so it gets the same cheap static branch as mobile.
+  // will-change: transform promotes the fixed layer to its own compositor
+  // layer, preventing repaints during scroll.
+  if (isLite) {
     return (
       <div
         className={cn(

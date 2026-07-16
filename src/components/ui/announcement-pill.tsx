@@ -56,55 +56,62 @@ export function AnnouncementPill() {
       {visible && (
         <motion.a
           href={announcement.href}
+          data-astro-reload
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          onClick={() => {
-            // Don't count a click-through as "dismissed" — but do hide it for
-            // this session so it doesn't reappear when they come back via nav.
+          onClick={(e) => {
+            // Force a full-page navigation. Astro's ClientRouter treats a
+            // same-path ?query link as an in-page navigation and swallows it
+            // (Safari especially — clicks appeared to do nothing / need
+            // multiple taps). location.assign is deterministic everywhere.
+            e.preventDefault()
             try {
               localStorage.setItem(DISMISS_KEY, announcement.id)
             } catch {}
+            window.location.assign(announcement.href)
           }}
           style={{
             position: "fixed",
-            bottom: isMobile ? 16 : 28,
+            bottom: isMobile ? 14 : 28,
             // No transform-based centering — framer-motion owns `transform`
             // for the entrance animation and would overwrite it.
-            left: isMobile ? 16 : 28,
-            right: isMobile ? 16 : "auto",
+            left: isMobile ? 14 : 28,
+            right: isMobile ? 14 : "auto",
             margin: isMobile ? "0 auto" : undefined,
             width: "fit-content",
             zIndex: 9000,
             display: "flex",
             alignItems: "center",
-            gap: 12,
-            padding: "10px 14px 10px 10px",
-            maxWidth: isMobile ? "calc(100vw - 32px)" : 380,
+            gap: isMobile ? 8 : 12,
+            padding: isMobile ? "6px 10px 6px 6px" : "10px 14px 10px 10px",
+            maxWidth: isMobile ? "min(300px, calc(100vw - 28px))" : 380,
             background: "rgba(17,17,17,0.92)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
             border: "1px solid rgba(255,255,255,0.12)",
-            borderRadius: 14,
+            borderRadius: isMobile ? 10 : 14,
             boxShadow: "0 12px 40px rgba(0,0,0,0.35)",
             textDecoration: "none",
             cursor: "pointer",
+            // Kill the 300ms tap delay / double-tap requirement on touch
+            touchAction: "manipulation",
           }}
         >
           {announcement.image && (
             <img
               src={announcement.image}
               alt=""
-              width={52}
-              height={38}
+              width={isMobile ? 34 : 52}
+              height={isMobile ? 25 : 38}
               loading="lazy"
               decoding="async"
               style={{
-                width: 52,
-                height: 38,
+                width: isMobile ? 34 : 52,
+                height: isMobile ? 25 : 38,
                 objectFit: "cover",
-                borderRadius: 8,
+                borderRadius: isMobile ? 5 : 8,
                 flexShrink: 0,
               }}
             />
@@ -112,12 +119,12 @@ export function AnnouncementPill() {
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 9,
+                fontSize: isMobile ? 7 : 9,
                 fontWeight: 700,
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 color: "rgba(120,160,255,0.9)",
-                marginBottom: 3,
+                marginBottom: isMobile ? 2 : 3,
               }}
             >
               {announcement.label}
@@ -125,7 +132,7 @@ export function AnnouncementPill() {
             <div
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: 13,
+                fontSize: isMobile ? 10.5 : 13,
                 fontWeight: 500,
                 color: "#fff",
                 lineHeight: 1.25,
@@ -140,7 +147,7 @@ export function AnnouncementPill() {
           <span
             style={{
               color: "rgba(255,255,255,0.45)",
-              fontSize: 16,
+              fontSize: isMobile ? 13 : 16,
               flexShrink: 0,
               marginLeft: 2,
             }}
@@ -166,6 +173,7 @@ export function AnnouncementPill() {
               cursor: "pointer",
               color: "rgba(255,255,255,0.6)",
               padding: 0,
+              touchAction: "manipulation",
             }}
           >
             <X size={11} />

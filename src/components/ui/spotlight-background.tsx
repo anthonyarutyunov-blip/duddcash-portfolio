@@ -9,11 +9,15 @@ const SpotlightBackground = () => {
   const [isSafari] = useState(() =>
     typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
   );
+  // Touch devices have no cursor — the spotlight is dead weight there
+  const [isMobile] = useState(() =>
+    typeof window !== "undefined" && (window.innerWidth <= 768 || "ontouchstart" in window)
+  );
 
   useEffect(() => {
     // Safari: skip entirely — the 8% opacity soft-light spotlight costs a full-viewport
     // compositing pass on every mouse move for a barely-visible effect
-    if (isSafari) return;
+    if (isSafari || isMobile) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       posRef.current.x = e.clientX;
@@ -43,10 +47,10 @@ const SpotlightBackground = () => {
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [isSafari]);
+  }, [isSafari, isMobile]);
 
-  // Safari: render nothing
-  if (isSafari) return null;
+  // Safari + touch devices: render nothing
+  if (isSafari || isMobile) return null;
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-[2]">

@@ -380,3 +380,17 @@ p + p {
     grid-column: span 12 !important;
   }
 }
+
+/* ── Fullscreen video ──
+   Keep the video's true aspect ratio in fullscreen (letterbox on black)
+   instead of cropping/stretching portrait or 4:3 videos to fill a 16:9
+   screen. The player's inline style uses object-fit: cover for the grid,
+   so these need !important. */
+video:fullscreen {
+  object-fit: contain !important;
+  background: #000;
+}
+video:-webkit-full-screen {
+  object-fit: contain !important;
+  background: #000;
+}

@@ -288,11 +288,18 @@ function getSharedObserver() {
 /*  Gallery Image — lazy-loaded with shared IntersectionObserver      */
 /* ------------------------------------------------------------------ */
 
+// Mobile: no per-image reveal animation. Dozens of staggered opacity/transform
+// transitions firing during touch scroll made scrolling feel sticky — images
+// render immediately instead.
+const GALLERY_REDUCED_MOTION =
+  typeof window !== "undefined" && window.innerWidth <= 768
+
 function GalleryImage({ photo, index }: { photo: Photo; index: number }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(GALLERY_REDUCED_MOTION)
 
   useEffect(() => {
+    if (GALLERY_REDUCED_MOTION) return
     const el = ref.current
     if (!el) return
     const obs = getSharedObserver()
@@ -311,8 +318,14 @@ function GalleryImage({ photo, index }: { photo: Photo; index: number }) {
       style={{
         height: SIZE_MAP[photo.size],
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${index * 0.06}s, transform 0.6s ease ${index * 0.06}s`,
+        transform: GALLERY_REDUCED_MOTION
+          ? undefined
+          : visible
+            ? "translateY(0)"
+            : "translateY(24px)",
+        transition: GALLERY_REDUCED_MOTION
+          ? undefined
+          : `opacity 0.6s ease ${index * 0.06}s, transform 0.6s ease ${index * 0.06}s`,
       }}
     >
       <img

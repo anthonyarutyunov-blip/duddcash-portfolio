@@ -288,6 +288,7 @@ export function VideoPlayer({
         loop
         playsInline
         preload="metadata"
+        controlsList="nodownload"
         style={{
           width: "100%",
           height: "100%",
