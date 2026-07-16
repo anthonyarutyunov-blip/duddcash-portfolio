@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "timestamp": "2026-07-16T17:44:10.820Z",
+  "timestamp": "2026-07-16T20:58:09.589Z",
   "tabLayouts": {
     "Featured": {
       "items": [
@@ -20,14 +20,14 @@
           "size": "l"
         },
         {
-          "itemId": "new-project-1778024854775",
+          "itemId": "new-project-1784233356128",
           "order": 3,
-          "size": "l"
+          "size": "m"
         },
         {
-          "itemId": "arnold-palmer-mastercard",
+          "itemId": "new-project-1778024854775",
           "order": 4,
-          "size": "m"
+          "size": "l"
         },
         {
           "itemId": "lululemon-yet",
@@ -35,18 +35,23 @@
           "size": "m"
         },
         {
-          "itemId": "fwd-hospitality",
+          "itemId": "arnold-palmer-mastercard",
           "order": 6,
           "size": "m"
         },
         {
-          "itemId": "new-single-1784222408344",
+          "itemId": "fwd-hospitality",
           "order": 7,
           "size": "m"
         },
         {
-          "itemId": "tao",
+          "itemId": "new-single-1784222408344",
           "order": 8,
+          "size": "m"
+        },
+        {
+          "itemId": "tao",
+          "order": 9,
           "size": "m"
         }
       ]
@@ -137,18 +142,33 @@
           "size": "l"
         },
         {
-          "itemId": "searching-spec",
+          "itemId": "new-project-1778024854775",
           "order": 1,
+          "size": "l"
+        },
+        {
+          "itemId": "new-single-1784234841754",
+          "order": 2,
+          "size": "l"
+        },
+        {
+          "itemId": "new-single-1784222408344",
+          "order": 3,
+          "size": "l"
+        },
+        {
+          "itemId": "searching-spec",
+          "order": 4,
+          "size": "l"
+        },
+        {
+          "itemId": "new-single-1775797777079",
+          "order": 5,
           "size": "m"
         },
         {
           "itemId": "new-single-1775791543025",
-          "order": 2,
-          "size": "m"
-        },
-        {
-          "itemId": "new-single-1775797777079",
-          "order": 3,
+          "order": 6,
           "size": "m"
         }
       ]
@@ -254,12 +274,12 @@
           "size": "m"
         },
         {
-          "itemId": "hyper-montage-rome",
+          "itemId": "new-single-1784235175310",
           "order": 3,
-          "size": "m"
+          "size": "l"
         },
         {
-          "itemId": "santino-car",
+          "itemId": "hyper-montage-rome",
           "order": 4,
           "size": "m"
         }
@@ -847,9 +867,25 @@
       "projectId": "movie-premier-work",
       "videos": [
         {
+          "videoId": "6e0cd48f-658d-4ce0-9cdb-2c31b4932f26",
+          "order": 0
+        },
+        {
+          "videoId": "c894cee5-08a3-4920-bf22-15627572811d",
+          "order": 1
+        },
+        {
           "videoId": "494299f2-ffbc-4afe-8e82-3eeab8cfc8e8",
-          "order": 9999,
+          "order": 2,
           "size": "m"
+        },
+        {
+          "videoId": "df7910d8-8bd3-4be9-ba08-3fcf80b26e76",
+          "order": 3
+        },
+        {
+          "videoId": "87b7783d-fa30-4ae8-9b5d-9048fa1ea2c8",
+          "order": 4
         }
       ]
     },
@@ -1068,6 +1104,11 @@
           "videoId": "6414cd11-e127-424a-b521-0549f3d5ed66",
           "order": 9999,
           "size": "l"
+        },
+        {
+          "videoId": "3522e850-8c04-4043-a255-6f6ec9436d11",
+          "order": 9999,
+          "size": "l"
         }
       ]
     },
@@ -1078,9 +1119,44 @@
           "videoId": "3ccd86d8-d731-43b3-afca-0f6829ab140e",
           "order": 0,
           "size": "l"
+        },
+        {
+          "videoId": "4fd58e9b-08af-49b0-bd76-2e645d31dce7",
+          "order": 9999,
+          "size": "xl"
         }
       ],
       "sectionTitle": "Chris Lake"
+    },
+    {
+      "projectId": "new-single-1784222408344",
+      "videos": [
+        {
+          "videoId": "7245c38e-81d7-4278-8517-7a3fe71cd057",
+          "order": 9999,
+          "size": "xl"
+        }
+      ]
+    },
+    {
+      "projectId": "new-single-1784234841754",
+      "videos": [
+        {
+          "videoId": "86266000-115e-445c-b5c2-b9458fe5a165",
+          "order": 9999,
+          "size": "xl"
+        }
+      ]
+    },
+    {
+      "projectId": "new-single-1784235175310",
+      "videos": [
+        {
+          "videoId": "07cd0088-5a13-4abf-bacd-7de5dc7261db",
+          "order": 9999,
+          "size": "xl"
+        }
+      ]
     }
   ],
   "contentEdits": [
@@ -1803,6 +1879,66 @@
       "itemId": "new-project-1784222536941",
       "field": "customThumbnail",
       "value": "/gallery/electric-forest-98e49472.jpg"
+    },
+    {
+      "itemId": "new-project-1784233356128",
+      "field": "role",
+      "value": "Cam Op / Editor"
+    },
+    {
+      "itemId": "new-project-1784233356128",
+      "field": "credits",
+      "value": "[{\"label\":\"Client\",\"value\":\"Mercedes\"},{\"label\":\"Director\",\"value\":\"Tom Bender\"},{\"label\":\"Cam Op \",\"value\":\"Benjamin Gugick\"}]"
+    },
+    {
+      "itemId": "new-project-1784233356128",
+      "field": "customThumbnail",
+      "value": "/gallery/mercedes-maybach-x-devil-wears-prada-2-01922c32.jpg"
+    },
+    {
+      "itemId": "new-project-1784222536941",
+      "field": "client",
+      "value": "2026"
+    },
+    {
+      "itemId": "new-single-1784222408344",
+      "field": "role",
+      "value": "Director"
+    },
+    {
+      "itemId": "new-single-1784234841754",
+      "field": "role",
+      "value": "Director"
+    },
+    {
+      "itemId": "new-single-1784234841754",
+      "field": "customThumbnail",
+      "value": "/gallery/sony-tough-sd-spec-e27ddc90.jpg"
+    },
+    {
+      "itemId": "new-single-1784222408344",
+      "field": "customThumbnail",
+      "value": "/gallery/bulova-watch-creative-spec-ad-33300425.jpg"
+    },
+    {
+      "itemId": "new-project-1784221303582",
+      "field": "client",
+      "value": "Wynn Las Vegas 2026"
+    },
+    {
+      "itemId": "new-single-1784235175310",
+      "field": "customThumbnail",
+      "value": "/gallery/japanese-chicago-d35a9d22.jpg"
+    },
+    {
+      "itemId": "new-single-1784235175310",
+      "field": "role",
+      "value": "Director"
+    },
+    {
+      "itemId": "new-project-1784222536941",
+      "field": "section:Madeon:role",
+      "value": "Shooter / Lead Editor"
     }
   ],
   "newVideos": [
@@ -1953,22 +2089,91 @@
       "aspectRatio": "4/3"
     },
     {
+      "projectId": "new-project-1784233356128",
+      "videoId": "86efd847-b7b4-4838-baec-88b761b2c37e",
+      "title": "Carousel Video 2",
+      "aspectRatio": "4/5"
+    },
+    {
+      "projectId": "new-project-1784233356128",
+      "videoId": "b12cef08-1e94-4e45-a79c-3f787d47f915",
+      "title": "Carousel Video 3",
+      "aspectRatio": "4/5"
+    },
+    {
+      "projectId": "new-project-1784233356128",
+      "videoId": "1f2ade95-0290-4b84-9021-33cc18a28c73",
+      "title": "Carousel Video 4",
+      "aspectRatio": "4/5"
+    },
+    {
+      "projectId": "new-project-1784233356128",
+      "videoId": "6c0bf86f-1a5c-4ea2-b4a9-32d83b2fad70",
+      "title": "Carousel Video 5",
+      "aspectRatio": "4/5"
+    },
+    {
+      "projectId": "new-project-1784233356128",
+      "videoId": "bbc944bd-0430-49f5-a26d-8a7d167c0ba3",
+      "title": "Carousel Video 5",
+      "aspectRatio": "4/5"
+    },
+    {
+      "projectId": "new-project-1784233356128",
+      "videoId": "ca8e9894-0756-429b-ade2-a168006af136",
+      "title": "Carousel Video 6",
+      "aspectRatio": "4/5"
+    },
+    {
       "projectId": "new-project-1784221303582",
-      "videoId": "c8144cee-f385-42ad-b107-b258e6f51cf9",
+      "videoId": "3522e850-8c04-4043-a255-6f6ec9436d11",
       "title": "Sean Vignette",
       "aspectRatio": "4/3"
     },
     {
       "projectId": "new-project-1784221303582",
-      "videoId": "7cf2b61f-51e6-4a88-b360-c73588e49ce5",
+      "videoId": "6872e119-ee9e-49a2-9401-130f82d3744f",
       "title": "Carson Vignette",
       "aspectRatio": "4/3"
     },
     {
       "projectId": "new-project-1784221303582",
-      "videoId": "6414cd11-e127-424a-b521-0549f3d5ed66",
+      "videoId": "75925fb3-4ddc-49c5-804b-2153bbf6414d",
       "title": "Christian Vignette",
       "aspectRatio": "4/3"
+    },
+    {
+      "projectId": "new-project-1784222536941",
+      "sectionTitle": "Madeon",
+      "videoId": "31937c08-304f-4aae-98f9-771a9683c3cf",
+      "title": "Super Platnium",
+      "aspectRatio": "9/16"
+    },
+    {
+      "projectId": "new-project-1784222536941",
+      "sectionTitle": "Chris Lake",
+      "videoId": "4fd58e9b-08af-49b0-bd76-2e645d31dce7",
+      "title": "Chris Lake @EF 2026",
+      "aspectRatio": "4/3"
+    },
+    {
+      "projectId": "new-project-1784222536941",
+      "sectionTitle": "Madeon",
+      "videoId": "f3b51497-117f-4036-b8aa-d9169fe31b6b",
+      "title": "Car Crash Baby",
+      "aspectRatio": "9/16"
+    },
+    {
+      "projectId": "movie-premier-work",
+      "videoId": "6e0cd48f-658d-4ce0-9cdb-2c31b4932f26",
+      "title": "Michael Theatre Pop In",
+      "aspectRatio": "9/16"
+    },
+    {
+      "projectId": "movie-premier-work",
+      "videoId": "c894cee5-08a3-4920-bf22-15627572811d",
+      "title": "Scary Movie 6 Premier LA",
+      "aspectRatio": "9/16"
     }
   ],
   "newProjects": [
@@ -2014,7 +2219,7 @@
       "id": "new-project-1784221303582",
       "type": "project",
       "title": "Wynn World Cup Campaign 2026",
-      "client": "Wynn Las Vegas",
+      "client": "Wynn Las Vegas 2026",
       "categories": [
         "Featured",
         "Branded & Social"
@@ -2034,7 +2239,9 @@
         "Spec Creative"
       ],
       "videoId": "7245c38e-81d7-4278-8517-7a3fe71cd057",
-      "aspectRatio": "4/3"
+      "aspectRatio": "4/3",
+      "role": "Director",
+      "customThumbnail": "/gallery/bulova-watch-creative-spec-ad-33300425.jpg"
     },
     {
       "id": "new-project-1784222536941",
@@ -2101,7 +2308,47 @@
             }
           ]
         }
-      ]
+      ],
+      "client": "2026"
+    },
+    {
+      "id": "new-project-1784233356128",
+      "type": "project",
+      "title": "Mercedes Maybach x Devil Wears Prada 2",
+      "client": "Mercedes Maybach",
+      "description": "Shot for the Devil Wears Prada 2 premier in NYC",
+      "categories": [
+        "Featured",
+        "Entertainment"
+      ],
+      "videoId": "2bc2dbdb-9483-4001-ab77-9e874ef03d6f",
+      "aspectRatio": "4/5",
+      "role": "Cam Op / Editor",
+      "customThumbnail": "/gallery/mercedes-maybach-x-devil-wears-prada-2-01922c32.jpg"
+    },
+    {
+      "id": "new-single-1784234841754",
+      "type": "single",
+      "title": "Sony TOUGH SD Spec",
+      "categories": [
+        "Spec Creative"
+      ],
+      "videoId": "86266000-115e-445c-b5c2-b9458fe5a165",
+      "aspectRatio": "4/3",
+      "role": "Director",
+      "customThumbnail": "/gallery/sony-tough-sd-spec-e27ddc90.jpg"
+    },
+    {
+      "id": "new-single-1784235175310",
+      "type": "single",
+      "title": "Japanese Chicago",
+      "categories": [
+        "Travel"
+      ],
+      "videoId": "07cd0088-5a13-4abf-bacd-7de5dc7261db",
+      "aspectRatio": "16/9",
+      "customThumbnail": "/gallery/japanese-chicago-d35a9d22.jpg",
+      "role": "Director"
     }
   ],
   "videoEdits": [
@@ -2248,7 +2495,7 @@
     {
       "videoId": "494299f2-ffbc-4afe-8e82-3eeab8cfc8e8",
       "field": "description",
-      "value": "Scarlett Johansson × Channing Tatum"
+      "value": "Scarlett Johanson × Channing Tatum"
     },
     {
       "videoId": "df7910d8-8bd3-4be9-ba08-3fcf80b26e76",
@@ -2494,11 +2741,52 @@
       "videoId": "b30dadae-7ba3-4bb5-8850-6f25c5926c64",
       "field": "description",
       "value": "Multicam Work"
+    },
+    {
+      "videoId": "2bc2dbdb-9483-4001-ab77-9e874ef03d6f",
+      "field": "title",
+      "value": "Carousel Video 1"
+    },
+    {
+      "videoId": "31937c08-304f-4aae-98f9-771a9683c3cf",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "f3b51497-117f-4036-b8aa-d9169fe31b6b",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "6e0cd48f-658d-4ce0-9cdb-2c31b4932f26",
+      "field": "description",
+      "value": "Michael Movie Premier"
+    },
+    {
+      "videoId": "86266000-115e-445c-b5c2-b9458fe5a165",
+      "field": "description",
+      "value": "2026"
+    },
+    {
+      "videoId": "7245c38e-81d7-4278-8517-7a3fe71cd057",
+      "field": "description",
+      "value": "2026"
+    },
+    {
+      "videoId": "07cd0088-5a13-4abf-bacd-7de5dc7261db",
+      "field": "description",
+      "value": "2026"
     }
   ],
   "removedVideos": [
     "https://player.mediadelivery.net/play/633708/dd29af91-22dd-4a91-9d69-1145e03c0c54",
     "d8a4b789-1c3b-4786-9395-01245f015405",
-    "https://player.mediadelivery.net/play/633708/8820925c-2e19-4f53-b4af-8a9ea04c4694"
+    "https://player.mediadelivery.net/play/633708/8820925c-2e19-4f53-b4af-8a9ea04c4694",
+    "c8144cee-f385-42ad-b107-b258e6f51cf9",
+    "7cf2b61f-51e6-4a88-b360-c73588e49ce5",
+    "6414cd11-e127-424a-b521-0549f3d5ed66",
+    "abc8d069-e532-4321-a9a7-8e53cabb570a",
+    "116d934a-74d2-483a-bc85-a617f2d6d89b",
+    "3ccd86d8-d731-43b3-afca-0f6829ab140e"
   ]
 }
