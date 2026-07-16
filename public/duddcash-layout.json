@@ -1,42 +1,52 @@
 {
   "version": 1,
-  "timestamp": "2026-05-06T00:34:43.324615+00:00",
+  "timestamp": "2026-07-16T17:44:10.820Z",
   "tabLayouts": {
     "Featured": {
       "items": [
         {
-          "itemId": "nike-boxing-spec",
+          "itemId": "new-project-1784221303582",
           "order": 0,
           "size": "l"
         },
         {
-          "itemId": "wynn-nightlife",
+          "itemId": "nike-boxing-spec",
           "order": 1,
           "size": "l"
         },
         {
-          "itemId": "new-project-1778024854775",
+          "itemId": "wynn-nightlife",
           "order": 2,
           "size": "l"
         },
         {
-          "itemId": "arnold-palmer-mastercard",
+          "itemId": "new-project-1778024854775",
           "order": 3,
-          "size": "m"
+          "size": "l"
         },
         {
-          "itemId": "lululemon-yet",
+          "itemId": "arnold-palmer-mastercard",
           "order": 4,
           "size": "m"
         },
         {
-          "itemId": "fwd-hospitality",
+          "itemId": "lululemon-yet",
           "order": 5,
           "size": "m"
         },
         {
-          "itemId": "tao",
+          "itemId": "fwd-hospitality",
           "order": 6,
+          "size": "m"
+        },
+        {
+          "itemId": "new-single-1784222408344",
+          "order": 7,
+          "size": "m"
+        },
+        {
+          "itemId": "tao",
+          "order": 8,
           "size": "m"
         }
       ]
@@ -64,13 +74,18 @@
           "size": "s"
         },
         {
-          "itemId": "chc-apres-ski",
+          "itemId": "new-project-1784222536941",
           "order": 4,
+          "size": "l"
+        },
+        {
+          "itemId": "chc-apres-ski",
+          "order": 5,
           "size": "xs"
         },
         {
           "itemId": "jacquees-hob-cleveland",
-          "order": 5,
+          "order": 6,
           "size": "m"
         }
       ]
@@ -1025,6 +1040,47 @@
           "size": "m"
         }
       ]
+    },
+    {
+      "projectId": "new-project-1784221303582",
+      "videos": [
+        {
+          "videoId": "https://player.mediadelivery.net/play/633708/8820925c-2e19-4f53-b4af-8a9ea04c4694",
+          "order": 9999,
+          "size": "l"
+        },
+        {
+          "videoId": "8820925c-2e19-4f53-b4af-8a9ea04c4694",
+          "order": 9999,
+          "size": "xl"
+        },
+        {
+          "videoId": "c8144cee-f385-42ad-b107-b258e6f51cf9",
+          "order": 9999,
+          "size": "l"
+        },
+        {
+          "videoId": "7cf2b61f-51e6-4a88-b360-c73588e49ce5",
+          "order": 9999,
+          "size": "l"
+        },
+        {
+          "videoId": "6414cd11-e127-424a-b521-0549f3d5ed66",
+          "order": 9999,
+          "size": "l"
+        }
+      ]
+    },
+    {
+      "projectId": "new-project-1784222536941",
+      "videos": [
+        {
+          "videoId": "3ccd86d8-d731-43b3-afca-0f6829ab140e",
+          "order": 0,
+          "size": "l"
+        }
+      ],
+      "sectionTitle": "Chris Lake"
     }
   ],
   "contentEdits": [
@@ -1707,6 +1763,46 @@
       "itemId": "new-project-1778024854775",
       "field": "title",
       "value": "Meta — Spec Ad"
+    },
+    {
+      "itemId": "new-project-1784221303582",
+      "field": "role",
+      "value": "Creative Direction, Cam Ops, Lead Editor"
+    },
+    {
+      "itemId": "new-project-1784221303582",
+      "field": "customThumbnail",
+      "value": "/gallery/wynn-world-cup-campaign-2026-164a234a.jpg"
+    },
+    {
+      "itemId": "new-project-1784221303582",
+      "field": "credits",
+      "value": "[{\"label\":\"DP/EP\",\"value\":\"Vaitari Anderson\"},{\"label\":\"Director of Production\",\"value\":\"Natasha Riou\"},{\"label\":\"1st AD\",\"value\":\"Hadleigh Arnst\"},{\"label\":\"Production Manager\",\"value\":\"Mia Heavner\"},{\"label\":\"DP\",\"value\":\"Julio Castillo\"},{\"label\":\"1st AC\",\"value\":\"Adam Chapel\"},{\"label\":\"Camera Ops\",\"value\":\"Calo Shiban\"},{\"label\":\"Camera Ops\",\"value\":\"Anthony Arutyunov\"},{\"label\":\"Camera Ops\",\"value\":\"Mark Dabu\"},{\"label\":\"Drone Pilot\",\"value\":\"Juan Quinones\"},{\"label\":\"Gaffer\",\"value\":\"Eric Pool\"},{\"label\":\"Gaffer\",\"value\":\"Bill Allen\"},{\"label\":\"Gaffer\",\"value\":\"Mike Silverberg\"},{\"label\":\"Photographer\",\"value\":\"Sabin Orr\"},{\"label\":\"PA\",\"value\":\"Williem Van Burgen\"},{\"label\":\"PA\",\"value\":\"Nico Colon\"},{\"label\":\"PA\",\"value\":\"John D'Angelo\"},{\"label\":\"PA\",\"value\":\"Jermiah Walker\"},{\"label\":\"HMUA\",\"value\":\"Jenna Amato\"},{\"label\":\"Encore Beach Club\",\"value\":\"Alex Schenberg\"},{\"label\":\"Casino Floor\",\"value\":\"Roberto Loya\"},{\"label\":\"South Atrium\",\"value\":\"Kip Hufford\"},{\"label\":\"Aft\",\"value\":\"Janet Garcia\"},{\"label\":\"LoD Show\",\"value\":\"Mathew Scherbring\"},{\"label\":\"Encore Theatre\",\"value\":\"Lee Czembowski\"},{\"label\":\"Awakening Rotunda\",\"value\":\"Saklad Bryan\"},{\"label\":\"Awakening Rotunda\",\"value\":\"Melanie Kenn\"},{\"label\":\"Zero Bond \",\"value\":\"Park Daniel\"},{\"label\":\"Golf\",\"value\":\"Scott Cowan\"},{\"label\":\"Retail\",\"value\":\"Angelica Santos\"},{\"label\":\"Red Bull\",\"value\":\"Matt Romero\"},{\"label\":\"LV Lights\",\"value\":\"Will Martin\"},{\"label\":\"Uniforms\",\"value\":\"Mariano Alvarenieves\"},{\"label\":\"Hero Talent\",\"value\":\"Sean Garnier\"},{\"label\":\"Hero Talent\",\"value\":\"Christian Pinzo\"},{\"label\":\"Hero Talent\",\"value\":\"Carson Locker\"},{\"label\":\"Featured Talent\",\"value\":\"Lucho\"},{\"label\":\"Featured Talent\",\"value\":\"Alexander Cruz (Zander)\"},{\"label\":\"Featured Talent\",\"value\":\"Sarge Adam (Sarge)\"}]"
+    },
+    {
+      "itemId": "new-project-1784221303582",
+      "field": "title",
+      "value": "Wynn World Cup Campaign 2026"
+    },
+    {
+      "itemId": "new-project-1784221303582",
+      "field": "description",
+      "value": "Provided creative direction and cinematography across a two-day production at Wynn Las Vegas, delivering campaign content promoting the FIFA World Cup experience at Wynn."
+    },
+    {
+      "itemId": "new-project-1784222536941",
+      "field": "description",
+      "value": "Shot & Edited Multi-cam for Madeon"
+    },
+    {
+      "itemId": "new-project-1784222536941",
+      "field": "role",
+      "value": "Shooter/ Editor"
+    },
+    {
+      "itemId": "new-project-1784222536941",
+      "field": "customThumbnail",
+      "value": "/gallery/electric-forest-98e49472.jpg"
     }
   ],
   "newVideos": [
@@ -1849,6 +1945,30 @@
       "videoId": "9fd37b9c-a020-4369-ae77-8838da605a72",
       "title": "Meta — Spec Ad",
       "aspectRatio": "16/9"
+    },
+    {
+      "projectId": "new-project-1784221303582",
+      "videoId": "8820925c-2e19-4f53-b4af-8a9ea04c4694",
+      "title": "Wynn World Cup (Hero Cut)",
+      "aspectRatio": "4/3"
+    },
+    {
+      "projectId": "new-project-1784221303582",
+      "videoId": "c8144cee-f385-42ad-b107-b258e6f51cf9",
+      "title": "Sean Vignette",
+      "aspectRatio": "4/3"
+    },
+    {
+      "projectId": "new-project-1784221303582",
+      "videoId": "7cf2b61f-51e6-4a88-b360-c73588e49ce5",
+      "title": "Carson Vignette",
+      "aspectRatio": "4/3"
+    },
+    {
+      "projectId": "new-project-1784221303582",
+      "videoId": "6414cd11-e127-424a-b521-0549f3d5ed66",
+      "title": "Christian Vignette",
+      "aspectRatio": "4/3"
     }
   ],
   "newProjects": [
@@ -1889,6 +2009,99 @@
       "description": "What started as a spec ad inspired by the brilliant work of director Josh Safdie back in January is finally ready for viewing. So grateful to all the people that helped out on this and the countless lessons we learned throughout the process of filming and editing. It’s unlike anything we’ve made in the past and we truly hope this Social Ad/Short film gives at least one person out there the inspiration to go create!",
       "role": "Produced, Directed, Shot & Edited by us.",
       "customThumbnail": "/gallery/meta-spec-ad.jpg"
+    },
+    {
+      "id": "new-project-1784221303582",
+      "type": "project",
+      "title": "Wynn World Cup Campaign 2026",
+      "client": "Wynn Las Vegas",
+      "categories": [
+        "Featured",
+        "Branded & Social"
+      ],
+      "videoId": "https://player.mediadelivery.net/play/633708/8820925c-2e19-4f53-b4af-8a9ea04c4694",
+      "aspectRatio": "4/3",
+      "role": "Creative Direction, Cam Ops, Lead Editor",
+      "customThumbnail": "/gallery/wynn-world-cup-campaign-2026-164a234a.jpg",
+      "description": "Provided creative direction and cinematography across a two-day production at Wynn Las Vegas, delivering campaign content promoting the FIFA World Cup experience at Wynn."
+    },
+    {
+      "id": "new-single-1784222408344",
+      "type": "single",
+      "title": "Bulova Watch Creative Spec Ad",
+      "categories": [
+        "Featured",
+        "Spec Creative"
+      ],
+      "videoId": "7245c38e-81d7-4278-8517-7a3fe71cd057",
+      "aspectRatio": "4/3"
+    },
+    {
+      "id": "new-project-1784222536941",
+      "type": "project",
+      "title": "Electric Forest",
+      "categories": [
+        "Nightlife"
+      ],
+      "videoId": "3ccd86d8-d731-43b3-afca-0f6829ab140e",
+      "aspectRatio": "4/3",
+      "description": "Shot & Edited Multi-cam for Madeon",
+      "role": "Shooter/ Editor",
+      "customThumbnail": "/gallery/electric-forest-98e49472.jpg",
+      "sections": [
+        {
+          "title": "Chris Lake",
+          "description": "Non Client Work*",
+          "videos": [
+            {
+              "videoId": "3ccd86d8-d731-43b3-afca-0f6829ab140e",
+              "title": "Chris Lake @EF 2026",
+              "aspectRatio": "4/3"
+            }
+          ]
+        },
+        {
+          "title": "Madeon",
+          "description": "Multicam Work",
+          "videos": [
+            {
+              "videoId": "abc8d069-e532-4321-a9a7-8e53cabb570a",
+              "title": "Car Crash Baby",
+              "aspectRatio": "9/16"
+            },
+            {
+              "videoId": "116d934a-74d2-483a-bc85-a617f2d6d89b",
+              "title": "Super Platnium",
+              "aspectRatio": "9/16"
+            },
+            {
+              "videoId": "3835caa5-607c-4456-aca6-683369701f36",
+              "title": "Hi!",
+              "aspectRatio": "9/16"
+            },
+            {
+              "videoId": "1564c700-4eac-4ffd-9f3e-4c4f3d0085fa",
+              "title": "ICARUS",
+              "aspectRatio": "9/16"
+            },
+            {
+              "videoId": "168a7846-2a44-47d4-9b43-647dfdce9c85",
+              "title": "Miracle",
+              "aspectRatio": "9/16"
+            },
+            {
+              "videoId": "08ab32ea-37f0-40e1-b257-1ca43eda4e64",
+              "title": "Technicolor",
+              "aspectRatio": "9/16"
+            },
+            {
+              "videoId": "b30dadae-7ba3-4bb5-8850-6f25c5926c64",
+              "title": "Shelter",
+              "aspectRatio": "9/16"
+            }
+          ]
+        }
+      ]
     }
   ],
   "videoEdits": [
@@ -2231,10 +2444,61 @@
       "videoId": "5a92afe6-e60e-4cc0-beb0-5f4035f8e92e",
       "field": "title",
       "value": "Mau P Live @XS 2025"
+    },
+    {
+      "videoId": "168a7846-2a44-47d4-9b43-647dfdce9c85",
+      "field": "title",
+      "value": "Mircacle"
+    },
+    {
+      "videoId": "168a7846-2a44-47d4-9b43-647dfdce9c85",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "3ccd86d8-d731-43b3-afca-0f6829ab140e",
+      "field": "title",
+      "value": "Chris Lake @EF 2026"
+    },
+    {
+      "videoId": "3ccd86d8-d731-43b3-afca-0f6829ab140e",
+      "field": "description",
+      "value": "Non Client Work*"
+    },
+    {
+      "videoId": "abc8d069-e532-4321-a9a7-8e53cabb570a",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "116d934a-74d2-483a-bc85-a617f2d6d89b",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "3835caa5-607c-4456-aca6-683369701f36",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "1564c700-4eac-4ffd-9f3e-4c4f3d0085fa",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "08ab32ea-37f0-40e1-b257-1ca43eda4e64",
+      "field": "description",
+      "value": "Multicam Work"
+    },
+    {
+      "videoId": "b30dadae-7ba3-4bb5-8850-6f25c5926c64",
+      "field": "description",
+      "value": "Multicam Work"
     }
   ],
   "removedVideos": [
     "https://player.mediadelivery.net/play/633708/dd29af91-22dd-4a91-9d69-1145e03c0c54",
-    "d8a4b789-1c3b-4786-9395-01245f015405"
+    "d8a4b789-1c3b-4786-9395-01245f015405",
+    "https://player.mediadelivery.net/play/633708/8820925c-2e19-4f53-b4af-8a9ea04c4694"
   ]
 }

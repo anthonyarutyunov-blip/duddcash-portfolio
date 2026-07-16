@@ -113,6 +113,9 @@ export function getMergedItems(
       order: 9999,
       thumbnailVideoId: np.videoId,
       videos: [{ videoId: np.videoId, title: np.title, aspectRatio: np.aspectRatio }],
+      // Optional grouped "folders" — when present the expanded view renders
+      // section tabs instead of a flat video grid.
+      sections: np.sections,
       customThumbnail: np.customThumbnail,
     } as any
   })

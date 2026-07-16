@@ -44,6 +44,13 @@ export interface NewVideo {
   aspectRatio: string
 }
 
+export interface NewProjectSection {
+  title: string
+  description?: string
+  role?: string
+  videos: { videoId: string; title?: string; aspectRatio?: string; description?: string }[]
+}
+
 export interface NewProject {
   id: string
   type: "project" | "single"
@@ -55,6 +62,8 @@ export interface NewProject {
   videoId: string
   aspectRatio: string
   customThumbnail?: string
+  /** Optional grouped sub-sections ("folders") for multi-part projects */
+  sections?: NewProjectSection[]
 }
 
 export interface LayoutOverrides {
