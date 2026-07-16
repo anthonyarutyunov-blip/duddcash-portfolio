@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "timestamp": "2026-07-16T20:58:09.589Z",
+  "timestamp": "2026-07-16T21:22:48.851Z",
   "tabLayouts": {
     "Featured": {
       "items": [
@@ -103,33 +103,38 @@
           "size": "l"
         },
         {
-          "itemId": "prizepicks",
+          "itemId": "new-project-1784221303582",
           "order": 1,
+          "size": "l"
+        },
+        {
+          "itemId": "prizepicks",
+          "order": 2,
           "size": "m"
         },
         {
           "itemId": "academy-holiday",
-          "order": 2,
+          "order": 3,
           "size": "s"
         },
         {
           "itemId": "chipotle-behind-the-line",
-          "order": 3,
-          "size": "xs"
-        },
-        {
-          "itemId": "pringles-big-game",
           "order": 4,
           "size": "xs"
         },
         {
-          "itemId": "marine-layer-fall24",
+          "itemId": "pringles-big-game",
           "order": 5,
           "size": "xs"
         },
         {
-          "itemId": "evian-f1-2024",
+          "itemId": "marine-layer-fall24",
           "order": 6,
+          "size": "xs"
+        },
+        {
+          "itemId": "evian-f1-2024",
+          "order": 7,
           "size": "xs"
         }
       ]

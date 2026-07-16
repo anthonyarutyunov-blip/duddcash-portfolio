@@ -352,13 +352,14 @@ function VideoGrid({
   const [copiedVideoId, setCopiedVideoId] = useState<string | null>(null)
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null)
 
-  // Pagination — only render a subset of videos at a time
-  // On mobile, videos go full-width so show fewer per page
+  // Pagination is DISABLED — every video renders on one page. Auto-splitting
+  // grids into "Page 1 / Page 2" confused visitors (Madeon, Devil Wears Prada).
+  // Players are IO-gated (only play when visible) so one page stays cheap.
   const [isMobileView] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
   const VIDEOS_PER_PAGE = isMobileView ? 4 : 6
   const [currentPage, setCurrentPage] = useState(0)
   const totalPages = Math.ceil(orderedVideos.length / VIDEOS_PER_PAGE)
-  const needsPagination = orderedVideos.length > VIDEOS_PER_PAGE && !editMode
+  const needsPagination = false
   const gridContainerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -1120,10 +1121,52 @@ function SectionTabs({
   editMode: boolean
   itemId: string
 }) {
-  const [activeTab, setActiveTab] = useState(0)
+  // Initial folder: honor ?folder= deep links, or auto-open the folder that
+  // contains a ?video= deep link (otherwise a shared video inside a non-first
+  // folder would never scroll into view).
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === "undefined") return 0
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const folder = params.get("folder")
+      if (folder) {
+        const idx = sections.findIndex(
+          (s) => s.title.toLowerCase() === folder.toLowerCase()
+        )
+        if (idx >= 0) return idx
+      }
+      const video = params.get("video")
+      if (video) {
+        const idx = sections.findIndex((s) =>
+          getMergedVideos(projectId, s.title, s.videos).some(
+            (v) => v.videoId === video
+          )
+        )
+        if (idx >= 0) return idx
+      }
+    } catch {}
+    return 0
+  })
+  const [copiedFolder, setCopiedFolder] = useState(false)
   const [isMobileTabs] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768)
   const contentRef = useRef<HTMLDivElement>(null)
   const tabBarRef = useRef<HTMLDivElement>(null)
+
+  // Copy a share link for the currently active folder. Routes through /v/ so
+  // the link preview (iMessage, Slack…) shows the project thumbnail.
+  const handleCopyFolderLink = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      const section = sections[activeTab]
+      if (!section) return
+      const url = `${window.location.origin}/v/${encodeURIComponent(projectId)}?folder=${encodeURIComponent(section.title)}`
+      navigator.clipboard.writeText(url).then(() => {
+        setCopiedFolder(true)
+        setTimeout(() => setCopiedFolder(false), 2000)
+      })
+    },
+    [sections, activeTab, projectId]
+  )
 
   // Handle tab switch — on mobile, use native scroll (bypass Lenis)
   const handleTabSwitch = useCallback((tabIndex: number) => {
@@ -1196,6 +1239,37 @@ function SectionTabs({
             {section.title}
           </button>
         ))}
+
+        {/* Copy share link for the active folder */}
+        <button
+          onClick={handleCopyFolderLink}
+          title="Copy link to this folder"
+          aria-label="Copy link to this folder"
+          style={{
+            background: "none",
+            border: "none",
+            marginLeft: "auto",
+            padding: isMobileTabs ? "8px 10px" : "10px 14px",
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            cursor: "pointer",
+            color: copiedFolder ? "rgba(74,222,128,0.9)" : "rgba(255,255,255,0.35)",
+            transition: "color 0.2s ease",
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            if (!copiedFolder) e.currentTarget.style.color = "rgba(255,255,255,0.7)"
+          }}
+          onMouseLeave={(e) => {
+            if (!copiedFolder) e.currentTarget.style.color = "rgba(255,255,255,0.35)"
+          }}
+        >
+          <Link size={12} />
+          <span style={{ fontSize: isMobileTabs ? 9 : 11, letterSpacing: "0.04em" }}>
+            {copiedFolder ? "Copied" : "Share"}
+          </span>
+        </button>
       </div>
 
       <div ref={contentRef}>

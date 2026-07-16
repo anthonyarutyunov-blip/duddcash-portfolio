@@ -46,7 +46,7 @@ export function VideoPlayer({
     typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
   )
 
-  // Fullscreen handler (mobile only)
+  // Fullscreen handler
   const handleFullscreen = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     const video = videoRef.current
@@ -312,6 +312,44 @@ export function VideoPlayer({
         }}
       />
 
+      {/* Loading spinner — visible while the video is buffering (in view but
+          not yet playing). Fades in after a short delay so it never flashes
+          on fast connections. */}
+      {isVisible && !readyToShow && !isPaused && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 2,
+            pointerEvents: "none",
+            opacity: 0,
+            animation: "vp-spinner-fade 0.3s ease 0.5s forwards",
+          }}
+        >
+          <div
+            style={{
+              width: isMobile ? 28 : 36,
+              height: isMobile ? 28 : 36,
+              borderRadius: "50%",
+              border: "2.5px solid rgba(255,255,255,0.25)",
+              borderTopColor: "rgba(255,255,255,0.9)",
+              animation: "vp-spinner-rotate 0.8s linear infinite",
+              boxShadow: "0 0 20px rgba(0,0,0,0.3)",
+            }}
+          />
+          <style>{`
+            @keyframes vp-spinner-rotate {
+              to { transform: rotate(360deg); }
+            }
+            @keyframes vp-spinner-fade {
+              to { opacity: 1; }
+            }
+          `}</style>
+        </div>
+      )}
+
       {/* Center play/pause flash indicator */}
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
@@ -353,27 +391,32 @@ export function VideoPlayer({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Fullscreen button — mobile only */}
-        {isMobile && (
-          <div
-            onClick={handleFullscreen}
-            role="button"
-            aria-label="Fullscreen"
-            style={{
-              background: "rgba(0,0,0,0.5)",
-              borderRadius: "50%",
-              width: 28,
-              height: 28,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              transition: "background 0.2s ease",
-            }}
-          >
-            <Maximize size={13} color="#fff" />
-          </div>
-        )}
+        {/* Fullscreen button — all devices */}
+        <div
+          onClick={handleFullscreen}
+          role="button"
+          aria-label="Fullscreen"
+          title="Fullscreen"
+          style={{
+            background: "rgba(0,0,0,0.5)",
+            borderRadius: "50%",
+            width: isMobile ? 28 : 32,
+            height: isMobile ? 28 : 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "background 0.2s ease",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(0,0,0,0.7)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "rgba(0,0,0,0.5)")
+          }
+        >
+          <Maximize size={isMobile ? 13 : 15} color="#fff" />
+        </div>
 
         {/* Mute/unmute button */}
         <div

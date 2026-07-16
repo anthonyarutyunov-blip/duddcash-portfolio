@@ -243,6 +243,7 @@ export function PortfolioCard({
               src={customThumb || thumbnailUrl(primaryVideoId)}
               alt={item.title}
               loading="lazy"
+              decoding="async"
               style={{
                 width: "100%",
                 height: "100%",

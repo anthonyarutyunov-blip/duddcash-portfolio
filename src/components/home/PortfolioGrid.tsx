@@ -155,7 +155,7 @@ export default function PortfolioGrid() {
   }, [])
 
 
-  // Read filter and project/video from URL query params
+  // Read filter from URL query params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const urlFilter = params.get("filter")
@@ -169,46 +169,64 @@ export default function PortfolioGrid() {
         }
       }, 300)
     }
-
-    // Auto-expand project from share link: ?project=wynn-nightlife&video=abc123
-    const projectParam = params.get("project")
-    if (projectParam) {
-      const match = portfolioItems.find((p) => p.id === projectParam)
-      if (match) {
-        // Switch to All tab to ensure project is visible
-        setFilter("All")
-        setTimeout(() => {
-          setExpandedId(projectParam)
-          const videoParam = params.get("video")
-          if (videoParam) {
-            // Poll for the video DOM element — it may not render immediately on
-            // slow mobile networks, after pagination, or before hydration completes.
-            // Check every 100ms up to 5s. As soon as it exists, scroll to it.
-            const deadline = Date.now() + 5000
-            const pollForVideo = () => {
-              const videoEl = document.querySelector(
-                `[data-video-id="${videoParam}"]`
-              )
-              if (videoEl) {
-                const lenis = (window as any).__lenis
-                if (lenis) {
-                  lenis.scrollTo(videoEl, { offset: -200, duration: 1.0 })
-                } else {
-                  videoEl.scrollIntoView({ behavior: "smooth", block: "start" })
-                }
-                return
-              }
-              if (Date.now() < deadline) {
-                setTimeout(pollForVideo, 100)
-              }
-            }
-            // Start polling after the expand animation begins (~400ms)
-            setTimeout(pollForVideo, 400)
-          }
-        }, 400)
-      }
-    }
   }, [])
+
+  // Auto-expand project from share link: ?project=wynn-nightlife&video=abc123
+  // Runs against BOTH base items and editor-added projects (which only exist
+  // in overrides). If the id isn't in base data, wait for overrides to load
+  // before deciding — otherwise share links to new-* projects silently fail.
+  const deepLinkHandled = useRef(false)
+  useEffect(() => {
+    if (deepLinkHandled.current) return
+    const params = new URLSearchParams(window.location.search)
+    const projectParam = params.get("project")
+    if (!projectParam) {
+      deepLinkHandled.current = true
+      return
+    }
+
+    const inBase = portfolioItems.some((p) => p.id === projectParam)
+    const inNew = overrides?.newProjects?.some((p) => p.id === projectParam)
+    if (!inBase && !inNew) {
+      // Overrides not loaded yet — this effect re-runs when they arrive
+      if (overrides === null) return
+      deepLinkHandled.current = true
+      return
+    }
+
+    deepLinkHandled.current = true
+    // Switch to All tab to ensure project is visible
+    setFilter("All")
+    setTimeout(() => {
+      setExpandedId(projectParam)
+      const videoParam = params.get("video")
+      if (videoParam) {
+        // Poll for the video DOM element — it may not render immediately on
+        // slow mobile networks, after pagination, or before hydration completes.
+        // Check every 100ms up to 5s. As soon as it exists, scroll to it.
+        const deadline = Date.now() + 5000
+        const pollForVideo = () => {
+          const videoEl = document.querySelector(
+            `[data-video-id="${videoParam}"]`
+          )
+          if (videoEl) {
+            const lenis = (window as any).__lenis
+            if (lenis) {
+              lenis.scrollTo(videoEl, { offset: -200, duration: 1.0 })
+            } else {
+              videoEl.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+            return
+          }
+          if (Date.now() < deadline) {
+            setTimeout(pollForVideo, 100)
+          }
+        }
+        // Start polling after the expand animation begins (~400ms)
+        setTimeout(pollForVideo, 400)
+      }
+    }, 400)
+  }, [overrides])
 
   // Close expanded card when filter changes
   useEffect(() => {

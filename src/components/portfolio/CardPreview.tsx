@@ -43,6 +43,7 @@ export function CardPreview({ videoId, active }: CardPreviewProps) {
       playsInline
       preload="none"
       onCanPlayThrough={() => setReady(true)}
+      onPlaying={() => setReady(true)}
       style={{
         position: "absolute",
         inset: 0,

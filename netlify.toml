@@ -46,3 +46,12 @@
   for = "/logos/*"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
+
+# Safety net: /v/<id> pages are pre-built per project at deploy time. If a
+# share link points at a project added in the editor AFTER the last deploy,
+# no static page exists yet — redirect to the homepage deep-link instead of
+# 404ing. (Non-forced: only applies when no static file matches.)
+[[redirects]]
+  from = "/v/*"
+  to = "/?project=:splat"
+  status = 302

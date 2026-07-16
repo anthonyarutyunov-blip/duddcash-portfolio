@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const effectiveDate = 'July 16, 2026';
+---
+
+<BaseLayout
+  title="Terms of Use"
+  description="Terms of use for duddcashstudios.com."
+>
+  <section class="legal">
+    <div class="legal__inner">
+      <h1 class="legal__title">Terms of Use</h1>
+      <p class="legal__date">Effective date: {effectiveDate}</p>
+
+      <p>
+        Welcome to duddcashstudios.com, the portfolio website of Duddcash
+        Studios. By using this site you agree to these terms.
+      </p>
+
+      <h2>Content ownership</h2>
+      <p>All films, photography, graphics, and text on this site are the
+      property of Duddcash Studios or our clients and collaborators, and are
+      protected by copyright. Client work is displayed for portfolio purposes
+      with the relevant trademarks and content remaining the property of their
+      respective owners. You may not copy, download, redistribute, or use any
+      content from this site without written permission.</p>
+
+      <h2>Permitted use</h2>
+      <p>You're welcome to browse the site and share links to it. You may not
+      scrape the site, use automated tools to bulk-download content, attempt to
+      interfere with the site's operation, or use our content to train
+      machine-learning models without permission.</p>
+
+      <h2>Inquiries and applications</h2>
+      <p>Submitting a form on this site is an inquiry, not a contract. Any
+      engagement with Duddcash Studios is governed by a separate written
+      agreement. We may decline any inquiry at our discretion.</p>
+
+      <h2>Third-party links</h2>
+      <p>The site links to third-party platforms (such as Instagram and
+      scheduling tools). We aren't responsible for the content or practices of
+      those services.</p>
+
+      <h2>Disclaimer</h2>
+      <p>The site is provided "as is" without warranties of any kind. To the
+      fullest extent permitted by law, Duddcash Studios is not liable for any
+      damages arising from your use of the site.</p>
+
+      <h2>Changes</h2>
+      <p>We may update these terms from time to time; the effective date above
+      reflects the latest revision.</p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions:
+        <a href="mailto:action@duddcashstudios.com">action@duddcashstudios.com</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .legal {
+    padding: 140px 3.9vw 100px;
+    min-height: 70vh;
+  }
+
+  .legal__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    color: var(--color-text);
+  }
+
+  .legal__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .legal__date {
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-bottom: 40px;
+  }
+
+  .legal__inner h2 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 36px 0 12px;
+  }
+
+  .legal__inner p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-muted);
+    margin-bottom: 14px;
+  }
+
+  .legal__inner ul {
+    margin: 0 0 14px 20px;
+    padding: 0;
+  }
+
+  .legal__inner li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-muted);
+    margin-bottom: 6px;
+    list-style: disc;
+  }
+
+  .legal__inner a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 768px) {
+    .legal {
+      padding: 110px 20px 70px;
+    }
+  }
+</style>

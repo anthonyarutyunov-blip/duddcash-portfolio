@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const effectiveDate = 'July 16, 2026';
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="How Duddcash Studios collects, uses, and protects your information."
+>
+  <section class="legal">
+    <div class="legal__inner">
+      <h1 class="legal__title">Privacy Policy</h1>
+      <p class="legal__date">Effective date: {effectiveDate}</p>
+
+      <p>
+        Duddcash Studios ("we," "us") operates duddcashstudios.com. This policy
+        explains what information we collect when you use our site, how we use
+        it, and the choices you have.
+      </p>
+
+      <h2>Information we collect</h2>
+      <p><strong>Information you give us.</strong> When you submit our contact
+      or application forms, we collect the details you provide — typically your
+      name, email address, company or brand name, and any project information
+      you share. We use this only to respond to your inquiry, evaluate your
+      project, and communicate with you about our services.</p>
+      <p><strong>Information collected automatically.</strong> Our hosting and
+      video-delivery providers may automatically log standard technical data
+      such as IP address, browser type, and pages requested for security and
+      performance purposes. We do not run advertising trackers, and we do not
+      sell personal information.</p>
+      <p><strong>Local storage.</strong> The site uses your browser's local
+      storage for functional purposes only — for example, remembering site
+      layout preferences and whether you've dismissed an announcement. This
+      data stays in your browser and is not used to track you across other
+      sites.</p>
+
+      <h2>How we use information</h2>
+      <ul>
+        <li>To respond to inquiries and applications you send us</li>
+        <li>To provide, operate, and improve the website</li>
+        <li>To protect against spam and abuse</li>
+        <li>To comply with legal obligations</li>
+      </ul>
+
+      <h2>Service providers</h2>
+      <p>We rely on a small number of vendors to run this site. They process
+      data only as needed to provide their services to us:</p>
+      <ul>
+        <li><strong>Netlify</strong> — website hosting and form handling</li>
+        <li><strong>Bunny.net</strong> — video streaming and content delivery</li>
+        <li><strong>Google Workspace</strong> — storage of form submissions and email</li>
+        <li><strong>Cal.com</strong> — call scheduling, if you book a call with us</li>
+      </ul>
+
+      <h2>Data retention</h2>
+      <p>We keep inquiry and application information for as long as needed to
+      handle your request and for reasonable business record-keeping. You can
+      ask us to delete your information at any time.</p>
+
+      <h2>Your rights</h2>
+      <p>Depending on where you live, you may have rights to access, correct,
+      or delete personal information we hold about you, and to object to or
+      restrict certain processing. To exercise any of these rights, email us at
+      the address below and we will respond promptly.</p>
+
+      <h2>Children</h2>
+      <p>Our site and services are not directed to children under 13, and we
+      do not knowingly collect personal information from them.</p>
+
+      <h2>Changes to this policy</h2>
+      <p>If we make material changes, we will update this page and revise the
+      effective date above.</p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions or requests:
+        <a href="mailto:action@duddcashstudios.com">action@duddcashstudios.com</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .legal {
+    padding: 140px 3.9vw 100px;
+    min-height: 70vh;
+  }
+
+  .legal__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    color: var(--color-text);
+  }
+
+  .legal__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .legal__date {
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-bottom: 40px;
+  }
+
+  .legal__inner h2 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 36px 0 12px;
+  }
+
+  .legal__inner p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-muted);
+    margin-bottom: 14px;
+  }
+
+  .legal__inner ul {
+    margin: 0 0 14px 20px;
+    padding: 0;
+  }
+
+  .legal__inner li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-muted);
+    margin-bottom: 6px;
+    list-style: disc;
+  }
+
+  .legal__inner a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 768px) {
+    .legal {
+      padding: 110px 20px 70px;
+    }
+  }
+</style>

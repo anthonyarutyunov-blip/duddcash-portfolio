@@ -31,6 +31,9 @@ export function ContentEditor({ item, onClose, onSaved }: ContentEditorProps) {
   const [customThumbnail, setCustomThumbnail] = useState(
     item.customThumbnail ?? ""
   )
+  const [selectedCats, setSelectedCats] = useState<string[]>(
+    () => [...item.categories]
+  )
   const [thumbPreviewError, setThumbPreviewError] = useState(false)
   const titleRef = useRef<HTMLInputElement>(null)
 
@@ -38,7 +41,19 @@ export function ContentEditor({ item, onClose, onSaved }: ContentEditorProps) {
     titleRef.current?.focus()
   }, [])
 
+  const toggleCat = (cat: string) => {
+    setSelectedCats((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    )
+  }
+
+  const catsChanged =
+    JSON.stringify([...selectedCats].sort()) !==
+    JSON.stringify([...item.categories].sort())
+  const catsValid = selectedCats.length > 0
+
   const handleSave = () => {
+    if (!catsValid) return
     const ov = loadOverrides()
 
     if (title !== item.title) setContentEdit(ov, item.id, "title", title)
@@ -50,6 +65,8 @@ export function ContentEditor({ item, onClose, onSaved }: ContentEditorProps) {
       setContentEdit(ov, item.id, "role", role)
     if (customThumbnail !== (item.customThumbnail ?? ""))
       setContentEdit(ov, item.id, "customThumbnail", customThumbnail)
+    if (catsChanged)
+      setContentEdit(ov, item.id, "categories", JSON.stringify(selectedCats))
 
     saveOverrides(ov)
     onSaved()
@@ -176,6 +193,49 @@ export function ContentEditor({ item, onClose, onSaved }: ContentEditorProps) {
               }}
             />
           </FormField>
+
+          <FormField label="Tabs (where this appears)">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {allCategories
+                .filter((cat) => cat !== "All")
+                .map((cat) => {
+                  const active = selectedCats.includes(cat)
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => toggleCat(cat)}
+                      style={{
+                        padding: "6px 12px",
+                        fontSize: 11,
+                        fontWeight: 500,
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        border: active
+                          ? "1px solid rgba(74,222,128,0.6)"
+                          : "1px solid rgba(255,255,255,0.15)",
+                        borderRadius: 999,
+                        cursor: "pointer",
+                        background: active
+                          ? "rgba(74,222,128,0.15)"
+                          : "rgba(255,255,255,0.04)",
+                        color: active
+                          ? "rgba(74,222,128,0.95)"
+                          : "rgba(255,255,255,0.5)",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  )
+                })}
+            </div>
+            {!catsValid && (
+              <p style={{ fontSize: 11, color: "rgba(255,120,120,0.8)", margin: "6px 0 0" }}>
+                Pick at least one tab.
+              </p>
+            )}
+          </FormField>
         </div>
 
         {/* Actions */}
@@ -190,7 +250,14 @@ export function ContentEditor({ item, onClose, onSaved }: ContentEditorProps) {
           <button onClick={onClose} style={cancelBtnStyle}>
             Cancel
           </button>
-          <button onClick={handleSave} style={saveBtnStyle}>
+          <button
+            onClick={handleSave}
+            style={{
+              ...saveBtnStyle,
+              opacity: catsValid ? 1 : 0.4,
+              cursor: catsValid ? "pointer" : "not-allowed",
+            }}
+          >
             Save Changes
           </button>
         </div>

@@ -57,6 +57,13 @@ export function getMergedItems(
       else if (edit.field === "role") clone.role = edit.value
       else if (edit.field === "client" && "client" in clone) clone.client = edit.value
       else if (edit.field === "customThumbnail") clone.customThumbnail = edit.value || undefined
+      else if (edit.field === "categories") {
+        // Tab tagging — value is a JSON array of category names
+        try {
+          const cats = JSON.parse(edit.value)
+          if (Array.isArray(cats) && cats.length > 0) clone.categories = cats
+        } catch {}
+      }
       else if (edit.field === "credits") {
         try { clone.credits = JSON.parse(edit.value) } catch {}
       } else if (edit.field.startsWith("section:") && clone.type === "project" && clone.sections) {
@@ -132,6 +139,12 @@ export function getMergedItems(
       else if (edit.field === "role") clone.role = edit.value
       else if (edit.field === "client" && "client" in clone) clone.client = edit.value
       else if (edit.field === "customThumbnail") clone.customThumbnail = edit.value || undefined
+      else if (edit.field === "categories") {
+        try {
+          const cats = JSON.parse(edit.value)
+          if (Array.isArray(cats) && cats.length > 0) clone.categories = cats
+        } catch {}
+      }
       else if (edit.field === "credits") {
         try { clone.credits = JSON.parse(edit.value) } catch {}
       }

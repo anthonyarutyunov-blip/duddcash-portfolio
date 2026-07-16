@@ -2,48 +2,93 @@
 // Per-project share pages with proper OG meta + redirect to expanded homepage view.
 // Used when someone shares a video link — generates proper link previews
 // (project title + thumbnail) for iMessage, Slack, Twitter, etc.
-// On actual page load, redirects to /?project={id}&video={videoFromUrl}.
+// On actual page load, redirects to /?project={id} (+ optional &video= / &folder=).
+//
+// Paths come from BOTH base portfolio data AND editor-added projects stored in
+// the published layout overrides (newProjects) — otherwise share links to
+// anything Anthony adds through the site editor would 404.
+// Content edits (renamed titles, custom thumbnails) are applied so the link
+// preview matches what's live on the site.
 import { portfolioItems, type PortfolioItem } from '../../../data/portfolio';
 import { thumbnailUrl } from '../../../lib/bunny';
+import overrides from '../../../data/layout-overrides.json';
+
+interface ShareMeta {
+  id: string;
+  title: string;
+  description: string;
+  /** Custom thumbnail path/URL if set, else empty */
+  customThumbnail: string;
+  /** Video id (or player URL — thumbnailUrl normalizes) for CDN thumbnail fallback */
+  thumbVideoId: string;
+}
 
 export async function getStaticPaths() {
-  return portfolioItems.map((item) => ({
-    params: { id: item.id },
-    props: { item },
+  const contentEdits: { itemId: string; field: string; value: string }[] =
+    (overrides as any).contentEdits || [];
+  const editFor = (id: string, field: string): string | undefined =>
+    contentEdits.find((e) => e.itemId === id && e.field === field)?.value;
+
+  function getThumbnailVideoId(item: PortfolioItem): string {
+    if (item.type === 'single') return item.video.videoId;
+    if (item.thumbnailVideoId) return item.thumbnailVideoId;
+    if (item.sections && item.sections.length > 0) {
+      const firstSectionVideo = item.sections[0].videos[0];
+      if (firstSectionVideo) return firstSectionVideo.videoId;
+    }
+    if (item.videos && item.videos.length > 0) return item.videos[0].videoId;
+    return '';
+  }
+
+  // Base items — with content edits applied so previews match the live site
+  const baseMetas: ShareMeta[] = portfolioItems.map((item) => ({
+    id: item.id,
+    title: editFor(item.id, 'title') ?? item.title,
+    description:
+      editFor(item.id, 'description') ?? item.description ?? '',
+    customThumbnail:
+      editFor(item.id, 'customThumbnail') ?? item.customThumbnail ?? '',
+    thumbVideoId: getThumbnailVideoId(item),
+  }));
+
+  // Editor-added projects from the published layout file
+  const baseIds = new Set(portfolioItems.map((i) => i.id));
+  const newMetas: ShareMeta[] = ((overrides as any).newProjects || [])
+    .filter((np: any) => !baseIds.has(np.id))
+    .map((np: any) => ({
+      id: np.id,
+      title: editFor(np.id, 'title') ?? np.title,
+      description: editFor(np.id, 'description') ?? np.description ?? '',
+      customThumbnail:
+        editFor(np.id, 'customThumbnail') ?? np.customThumbnail ?? '',
+      thumbVideoId: np.videoId ?? '',
+    }));
+
+  return [...baseMetas, ...newMetas].map((meta) => ({
+    params: { id: meta.id },
+    props: { meta },
   }));
 }
 
 interface Props {
-  item: PortfolioItem;
+  meta: ShareMeta;
 }
 
-const { item } = Astro.props;
+const { meta } = Astro.props;
 
-// Resolve the thumbnail video ID (used for OG image via Bunny CDN)
-function getThumbnailVideoId(item: PortfolioItem): string {
-  if (item.type === 'single') {
-    return item.video.videoId;
-  }
-  // Project — use explicit thumbnailVideoId or fall back to first video
-  if (item.thumbnailVideoId) return item.thumbnailVideoId;
-  if (item.sections && item.sections.length > 0) {
-    const firstSectionVideo = item.sections[0].videos[0];
-    if (firstSectionVideo) return firstSectionVideo.videoId;
-  }
-  if (item.videos && item.videos.length > 0) return item.videos[0].videoId;
-  return '';
-}
-
-const thumbVideoId = getThumbnailVideoId(item);
 // Prefer custom thumbnail if set (absolute URL), otherwise use Bunny CDN thumbnail
-const ogImage = item.customThumbnail
-  ? (item.customThumbnail.startsWith('http')
-      ? item.customThumbnail
-      : new URL(item.customThumbnail, Astro.site).href)
-  : (thumbVideoId ? thumbnailUrl(thumbVideoId) : new URL('/og-image.jpg', Astro.site).href);
+const ogImage = meta.customThumbnail
+  ? (meta.customThumbnail.startsWith('http')
+      ? meta.customThumbnail
+      : new URL(meta.customThumbnail, Astro.site).href)
+  : (meta.thumbVideoId
+      ? thumbnailUrl(meta.thumbVideoId)
+      : new URL('/og-image.jpg', Astro.site).href);
 
-const title = `${item.title} | Duddcash Studios`;
-const description = item.description || `Watch ${item.title} — video production by Duddcash Studios.`;
+const title = `${meta.title} | Duddcash Studios`;
+const description =
+  meta.description ||
+  `Watch ${meta.title} — video production by Duddcash Studios.`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -76,7 +121,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <!-- Preload fonts for the brief moment this page is visible -->
     <style>
       html, body {
         margin: 0;
@@ -110,20 +154,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <div class="loader">
-      <div class="loader__title">Loading {item.title}</div>
+      <div class="loader__title">Loading {meta.title}</div>
       <div class="loader__sub">duddcashstudios.com</div>
     </div>
 
-    <script define:vars={{ projectId: item.id }}>
-      // Redirect to homepage with project (and optional video) query params.
+    <script define:vars={{ projectId: meta.id }}>
+      // Redirect to homepage with project (and optional video/folder) params.
       // Client-side for speed; also has <noscript> fallback below.
       (function () {
         try {
           const urlParams = new URLSearchParams(window.location.search);
           const videoId = urlParams.get('video');
-          const target = videoId
-            ? `/?project=${encodeURIComponent(projectId)}&video=${encodeURIComponent(videoId)}`
-            : `/?project=${encodeURIComponent(projectId)}`;
+          const folder = urlParams.get('folder');
+          let target = `/?project=${encodeURIComponent(projectId)}`;
+          if (videoId) target += `&video=${encodeURIComponent(videoId)}`;
+          if (folder) target += `&folder=${encodeURIComponent(folder)}`;
           window.location.replace(target);
         } catch (e) {
           window.location.replace('/');
@@ -133,7 +178,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <!-- No-JS fallback: meta refresh to homepage with project param -->
     <noscript>
-      <meta http-equiv="refresh" content={`0;url=/?project=${item.id}`} />
+      <meta http-equiv="refresh" content={`0;url=/?project=${meta.id}`} />
     </noscript>
   </body>
 </html>
