@@ -25,15 +25,49 @@ function InstagramIcon({ size = 13 }: { size?: number }) {
 }
 
 /**
+ * Per-character hero title reveal — letters rise and settle with a stagger.
+ * CSS-only motion (transform/opacity), wrap-safe (no clipping), with a CSS
+ * failsafe that forces visibility if JS state never flips.
+ */
+function HeroTitle({ text, on }: { text: string; on: boolean }) {
+  let charIndex = 0
+  return (
+    <h1
+      className={`pitch-title${on ? " pitch-title--on" : ""}`}
+      aria-label={text}
+    >
+      {text.split(" ").map((word, wi) => (
+        <span key={wi} className="pitch-title__word" aria-hidden="true">
+          {word.split("").map((ch) => {
+            const d = charIndex++
+            return (
+              <span
+                key={d}
+                className="pitch-title__ch"
+                style={{ transitionDelay: `${0.05 + d * 0.03}s` }}
+              >
+                {ch}
+              </span>
+            )
+          })}
+          {wi < text.split(" ").length - 1 ? " " : ""}
+        </span>
+      ))}
+    </h1>
+  )
+}
+
+/**
  * The screening room — client-facing pitch page experience.
  *
  * Mounted client:only on /pitch-viewer/ (served rewritten at /p/<slug>).
  * Reads the pitch JSON injected into #__PITCH_DATA__ by the pitch-page
- * function. Handles the veil→hero handoff, the film program, and the
- * closing CTA. Native scroll; zero scroll hijacking.
+ * function. Native scroll; zero scroll hijacking.
  */
 export function PitchViewer() {
   const [pitch, setPitch] = useState<Pitch | null | undefined>(undefined)
+  const [revealed, setRevealed] = useState(false)
+  const [activeFilm, setActiveFilm] = useState(0)
 
   useEffect(() => {
     let data: Pitch | null = null
@@ -49,21 +83,23 @@ export function PitchViewer() {
   useEffect(() => {
     if (pitch === undefined) return
     const veil = document.getElementById("pitch-veil")
-    if (!veil) return
     const isIAB =
       /Instagram|FBAN|FBAV|FB_IAB|Messenger|MicroMessenger|Snapchat|TikTok|musical_ly|LinkedInApp|Twitter|Line\//i.test(
         navigator.userAgent
       )
     const hold = pitch === null ? 0 : isIAB ? 250 : 1400
     const t = setTimeout(() => {
-      veil.classList.add("pitch-veil--hidden")
-      // Remove from the tree once faded so it can never intercept input
-      setTimeout(() => veil.remove(), 1000)
+      setRevealed(true)
+      if (veil) {
+        veil.classList.add("pitch-veil--hidden")
+        // Remove from the tree once faded so it can never intercept input
+        setTimeout(() => veil.remove(), 1000)
+      }
     }, hold)
     return () => clearTimeout(t)
   }, [pitch])
 
-  // IO scroll reveals for .pitch-reveal elements
+  // IO scroll reveals for .pitch-reveal elements + active-film tracking
   const rootRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!pitch) return
@@ -82,7 +118,28 @@ export function PitchViewer() {
       { threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
     )
     els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
+
+    // Which film currently has the room — drives the side rail
+    const films = root.querySelectorAll("[data-film-idx]")
+    const filmIo = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = Number(
+              (entry.target as HTMLElement).dataset.filmIdx || 0
+            )
+            setActiveFilm(idx)
+          }
+        })
+      },
+      { threshold: 0.35 }
+    )
+    films.forEach((el) => filmIo.observe(el))
+
+    return () => {
+      io.disconnect()
+      filmIo.disconnect()
+    }
   }, [pitch])
 
   if (pitch === undefined) return null
@@ -106,6 +163,7 @@ export function PitchViewer() {
   const hero =
     pitch.items.find((it) => it.videoId === heroId) || pitch.items[0]
   const rest = pitch.items.filter((it) => it !== hero)
+  const program = [hero, ...rest]
 
   const preparedFor = pitch.clientName
     ? `Prepared for ${pitch.clientName}`
@@ -113,31 +171,68 @@ export function PitchViewer() {
   const dateLabel = new Date(
     pitch.updatedAt || pitch.createdAt || Date.now()
   ).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+  const watermark = (pitch.clientName || "DUDDCASH").toUpperCase()
+
+  const jumpToFilm = (idx: number) => {
+    const el = rootRef.current?.querySelector(`[data-film-idx="${idx}"]`)
+    el?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
     <div ref={rootRef}>
+      {/* ── Now-screening side rail (desktop) ── */}
+      {program.length > 1 && (
+        <nav className="pitch-rail" aria-label="Films">
+          {program.map((it, i) => (
+            <button
+              key={it.videoId}
+              className={`pitch-rail__stop${activeFilm === i ? " pitch-rail__stop--active" : ""}`}
+              onClick={() => jumpToFilm(i)}
+              aria-label={`Go to film ${i + 1}: ${it.title}`}
+            >
+              <span className="pitch-rail__num">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="pitch-rail__line" />
+            </button>
+          ))}
+        </nav>
+      )}
+
       {/* ── Hero ── */}
       <header className="pitch-hero">
+        <span className="pitch-hero__watermark" aria-hidden="true">
+          {watermark}
+        </span>
         <div className="pitch-container">
-          <p className="pitch-eyebrow pitch-reveal">
+          <p
+            className={`pitch-eyebrow pitch-hero-el${revealed ? " is-on" : ""}`}
+          >
             {preparedFor} · {dateLabel}
           </p>
-          <h1 className="pitch-title pitch-reveal">{pitch.title}</h1>
+          <HeroTitle text={pitch.title} on={revealed} />
           {pitch.note && (
-            <p className="pitch-note pitch-reveal">{pitch.note}</p>
+            <p
+              className={`pitch-note pitch-hero-el${revealed ? " is-on" : ""}`}
+              style={{ transitionDelay: "0.55s" }}
+            >
+              {pitch.note}
+            </p>
           )}
         </div>
         <div className="pitch-container">
-          <hr className="pitch-hero__rule" />
+          <hr
+            className={`pitch-hero__rule pitch-hero-el${revealed ? " is-on" : ""}`}
+            style={{ transitionDelay: "0.7s" }}
+          />
         </div>
       </header>
 
       {/* ── Program ── */}
       <section className="pitch-program">
         <div className="pitch-container">
-          <FilmBlock item={hero} index={1} />
-          {rest.map((item, i) => (
-            <FilmBlock key={item.videoId} item={item} index={i + 2} />
+          {program.map((item, i) => (
+            <FilmBlock key={item.videoId} item={item} index={i + 1} />
           ))}
         </div>
       </section>
@@ -189,22 +284,31 @@ function FilmBlock({ item, index }: { item: PitchItem; index: number }) {
     item.aspectRatio === "9/16" ||
     item.aspectRatio === "3/4" ||
     item.aspectRatio === "4/5"
+  const num = String(index).padStart(2, "0")
   return (
-    <article className="pitch-film pitch-reveal">
+    <article className="pitch-film pitch-reveal" data-film-idx={index - 1}>
       <div className="pitch-film__head">
-        <span className="pitch-film__index">
-          {String(index).padStart(2, "0")}
+        <span className="pitch-film__ghost" aria-hidden="true">
+          {num}
         </span>
-        <h2 className="pitch-film__title">{item.title}</h2>
+        <div className="pitch-film__headText">
+          <span className="pitch-film__kicker">
+            <span className="pitch-film__kicker-line" />
+            Film {num}
+          </span>
+          <h2 className="pitch-film__title">{item.title}</h2>
+          {item.description && (
+            <p className="pitch-film__desc">{item.description}</p>
+          )}
+        </div>
       </div>
-      {item.description ? (
-        <p className="pitch-film__desc">{item.description}</p>
-      ) : (
-        <div className="pitch-film__desc pitch-film__desc--empty" />
-      )}
       <div
         className={`pitch-film__stage${portrait ? " pitch-film__stage--portrait" : ""}`}
       >
+        <span className="pitch-corner pitch-corner--tl" aria-hidden="true" />
+        <span className="pitch-corner pitch-corner--tr" aria-hidden="true" />
+        <span className="pitch-corner pitch-corner--bl" aria-hidden="true" />
+        <span className="pitch-corner pitch-corner--br" aria-hidden="true" />
         <PitchPlayer
           videoId={item.videoId}
           posterUrl={item.posterUrl}

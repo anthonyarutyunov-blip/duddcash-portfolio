@@ -53,21 +53,17 @@ export function PitchPlayer({
     return w <= 768
   })
 
-  /** Attach the best source for this browser (called once, on first play) */
+  /** Attach the best source for this browser (called once, on first play).
+   *  Quality-first: hls.js pinned to the TOP rendition wherever MSE exists
+   *  (Chrome/Firefox/Edge AND Safari desktop). Native HLS ABR is never used —
+   *  verified parking at 240p indefinitely on good connections. iOS WebKit
+   *  (no MSE) gets the direct 1080p MP4: deterministic full quality. */
   const attachSource = useCallback(async (): Promise<void> => {
     const video = videoRef.current
     if (!video || video.dataset.attached) return
     video.dataset.attached = "1"
 
     const src = hlsUrl(videoId)
-    const canNative =
-      video.canPlayType("application/vnd.apple.mpegurl") !== ""
-
-    if (canNative) {
-      // Safari desktop + every iOS browser (WebKit): native HLS + Apple ABR
-      video.src = src
-      return
-    }
 
     try {
       const { default: Hls } = await import("hls.js")
@@ -76,10 +72,20 @@ export function PitchPlayer({
           // Never cap quality to the element size — a 1100px frame should
           // still receive the 2160p rendition when it exists
           capLevelToPlayerSize: false,
-          startLevel: -1,
-          maxBufferLength: 30,
+          // Assume a fast pipe so the FIRST fragment is already high quality
+          // (the default conservative estimate started screenings at 480p)
+          abrEwmaDefaultEstimate: 10_000_000,
+          maxBufferLength: 45,
         })
         hlsRef.current = hls
+        // A screening is quality-first: pin playback to the TOP rendition
+        // (1080p today, 2160p automatically once the library encodes it)
+        // instead of letting ABR coast at a low level.
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          const top = hls.levels.length - 1
+          hls.startLevel = top
+          hls.currentLevel = top
+        })
         let recovered = false
         hls.on(Hls.Events.ERROR, (_evt: any, data: any) => {
           if (!data?.fatal) return
@@ -103,6 +109,7 @@ export function PitchPlayer({
     } catch {
       // hls.js failed to load — fall through to MP4
     }
+    // iOS WebKit or any environment without MSE: top-quality MP4 directly
     video.src = videoUrl(videoId, "1080p")
   }, [videoId])
 

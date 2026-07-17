@@ -2,6 +2,8 @@
    Pitch viewer — "The Screening Room"
    Dark cinematic canvas. Clash Display + Inter, the site's
    easing (--ease) and fluid type patterns. Native scroll only.
+   All motion is transform/opacity (GPU-cheap), reduced-motion
+   respected, IAB failsafes on everything that starts hidden.
    ============================================================ */
 
 :root {
@@ -30,6 +32,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   min-height: 100svh;
+  overflow-x: hidden;
 }
 
 /* Subtle cinema vignette behind everything */
@@ -43,6 +46,19 @@ html {
       transparent 60%
     ),
     var(--pitch-bg);
+}
+
+/* Film grain — static texture tile (same feTurbulence data-URI technique the
+   site's intro uses). One fixed composited layer, no live filters. */
+.pitch-main::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  opacity: 0.045;
 }
 
 /* ── Arrival veil ── */
@@ -121,9 +137,93 @@ html {
   padding: 0 5vw;
 }
 
+/* ── Now-screening side rail (desktop only) ── */
+.pitch-rail {
+  position: fixed;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.pitch-rail__stop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.pitch-rail__num {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+.pitch-rail__line {
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: width 0.35s var(--ease), background 0.35s var(--ease);
+}
+
+.pitch-rail__stop:hover .pitch-rail__num {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.pitch-rail__stop--active .pitch-rail__num {
+  opacity: 1;
+  transform: translateX(0);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pitch-rail__stop--active .pitch-rail__line {
+  width: 34px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 900px) {
+  .pitch-rail {
+    display: none;
+  }
+}
+
 /* ── Hero ── */
 .pitch-hero {
+  position: relative;
   padding: clamp(84px, 14vh, 150px) 0 clamp(48px, 7vh, 90px);
+  overflow: hidden;
+}
+
+/* Oversized ghost watermark — client name, stroke only */
+.pitch-hero__watermark {
+  position: absolute;
+  top: clamp(6px, 2vh, 30px);
+  right: -0.06em;
+  font-family: var(--font-display);
+  font-size: clamp(100px, 19vw, 260px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.055);
+  pointer-events: none;
+  user-select: none;
 }
 
 .pitch-eyebrow {
@@ -135,6 +235,19 @@ html {
   margin: 0 0 22px;
 }
 
+/* Hero elements (eyebrow / note / rule) reveal when the veil lifts */
+.pitch-hero-el {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+.pitch-hero-el.is-on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Hero title: per-character rise ── */
 .pitch-title {
   font-family: var(--font-display);
   font-size: max(6vw, 44px);
@@ -143,6 +256,35 @@ html {
   line-height: 0.98;
   margin: 0 0 26px;
   color: var(--pitch-text);
+}
+
+.pitch-title__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.pitch-title__ch {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.55em) rotate(2.5deg);
+  transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+}
+
+.pitch-title--on .pitch-title__ch {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+}
+
+/* Failsafe: content must never stay invisible if the reveal state is missed */
+@keyframes pitch-force-visible {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pitch-title:not(.pitch-title--on) .pitch-title__ch,
+.pitch-hero-el:not(.is-on) {
+  animation: pitch-force-visible 0.8s var(--ease) 8.5s forwards;
 }
 
 .pitch-note {
@@ -156,7 +298,14 @@ html {
 
 .pitch-hero__rule {
   border: none;
-  border-top: 1px solid var(--pitch-line);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.16) 18%,
+    rgba(255, 255, 255, 0.16) 82%,
+    transparent
+  );
   margin: clamp(40px, 6vh, 70px) 0 0;
 }
 
@@ -166,36 +315,65 @@ html {
 }
 
 .pitch-film {
-  margin: 0 auto clamp(96px, 12vh, 160px);
+  margin: 0 auto clamp(110px, 14vh, 180px);
   max-width: 1100px;
+  scroll-margin-top: 40px;
 }
 
 .pitch-film:last-child {
   margin-bottom: 0;
 }
 
+/* Editorial numbering: giant ghost numeral behind a kicker + title block */
 .pitch-film__head {
-  display: flex;
-  align-items: baseline;
-  gap: 18px;
-  margin-bottom: 8px;
+  position: relative;
+  padding: clamp(18px, 3vw, 34px) 0 18px clamp(20px, 4vw, 48px);
+  margin-bottom: 6px;
 }
 
-.pitch-film__index {
+.pitch-film__ghost {
+  position: absolute;
+  top: -0.08em;
+  left: -0.03em;
   font-family: var(--font-display);
-  font-size: max(1.4vw, 15px);
+  font-size: clamp(72px, 9vw, 130px);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.24);
-  letter-spacing: 0.04em;
-  flex-shrink: 0;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+  user-select: none;
+}
+
+.pitch-film__headText {
+  position: relative;
+}
+
+.pitch-film__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pitch-faint);
+  margin-bottom: 10px;
+}
+
+.pitch-film__kicker-line {
+  display: inline-block;
+  width: 26px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .pitch-film__title {
   font-family: var(--font-display);
-  font-size: max(2.1vw, 21px);
+  font-size: max(2.4vw, 24px);
   font-weight: 500;
   letter-spacing: -0.015em;
-  line-height: 1.15;
+  line-height: 1.12;
   margin: 0;
   color: var(--pitch-text);
 }
@@ -205,14 +383,10 @@ html {
   line-height: 1.65;
   color: var(--pitch-muted);
   max-width: 40rem;
-  margin: 6px 0 18px calc(max(1.4vw, 15px) + 18px);
+  margin: 8px 0 0;
 }
 
-.pitch-film__desc--empty {
-  margin-bottom: 18px;
-}
-
-/* Portrait films: center at a width that caps height at ~80svh */
+/* Stage: the film frame with corner brackets */
 .pitch-film__stage {
   position: relative;
 }
@@ -222,11 +396,62 @@ html {
   margin: 0 auto;
 }
 
+.pitch-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+  transition: transform 0.45s var(--ease), border-color 0.45s var(--ease);
+  z-index: 2;
+}
+
+.pitch-corner--tl {
+  top: -9px;
+  left: -9px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.pitch-corner--tr {
+  top: -9px;
+  right: -9px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+.pitch-corner--bl {
+  bottom: -9px;
+  left: -9px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+.pitch-corner--br {
+  bottom: -9px;
+  right: -9px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+.pitch-film__stage:hover .pitch-corner {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.pitch-film__stage:hover .pitch-corner--tl {
+  transform: translate(-3px, -3px);
+}
+.pitch-film__stage:hover .pitch-corner--tr {
+  transform: translate(3px, -3px);
+}
+.pitch-film__stage:hover .pitch-corner--bl {
+  transform: translate(-3px, 3px);
+}
+.pitch-film__stage:hover .pitch-corner--br {
+  transform: translate(3px, 3px);
+}
+
 .pitch-film__links {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .pitch-film__master {
@@ -266,14 +491,7 @@ html {
    loads — if the reveal never fires, force visibility so content can never
    stay invisible (same pattern as the main site's data-animate fallback). */
 .pitch-reveal:not(.is-visible) {
-  animation: pitch-reveal-fallback 0.8s var(--ease) 2.5s forwards;
-}
-
-@keyframes pitch-reveal-fallback {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: pitch-force-visible 0.8s var(--ease) 2.5s forwards;
 }
 
 @media (max-width: 768px) {
@@ -281,13 +499,19 @@ html {
     transform: translateY(14px);
     transition-duration: 0.45s;
   }
+  .pitch-title__ch {
+    transition-duration: 0.45s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pitch-reveal {
+  .pitch-reveal,
+  .pitch-hero-el,
+  .pitch-title__ch {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
   }
   .pitch-veil {
     animation-delay: 2s;
@@ -296,9 +520,24 @@ html {
 
 /* ── Closing ── */
 .pitch-closing {
-  border-top: 1px solid var(--pitch-line);
+  position: relative;
   padding: clamp(70px, 10vh, 130px) 0 clamp(60px, 8vh, 100px);
   text-align: center;
+}
+
+.pitch-closing::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.14),
+    transparent
+  );
 }
 
 .pitch-closing__headline {
@@ -308,6 +547,10 @@ html {
   letter-spacing: -0.025em;
   line-height: 1;
   margin: 0 0 28px;
+  background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, 0.5));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .pitch-closing__contact {
