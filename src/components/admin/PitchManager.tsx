@@ -529,6 +529,10 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
                   padding: "0 16px 16px",
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+                  // Explicit row sizing — with plain "auto" rows this scroll
+                  // container resolved every row to 2px (tiles collapsed to
+                  // slivers) even though tiles measure 133px outside the grid
+                  gridAutoRows: "max-content",
                   gap: 8,
                   alignContent: "start",
                 }}
