@@ -193,6 +193,17 @@ export default function PortfolioGrid() {
   // before deciding — otherwise share links to new-* projects silently fail.
   const deepLinkHandled = useRef(false)
   useEffect(() => {
+    // Fade out the pre-paint loading veil (added in BaseLayout's head script
+    // for ?project= visits) once the landing sequence has settled.
+    const revealPage = () => {
+      const html = document.documentElement
+      if (!html.classList.contains("deeplink-loading")) return
+      html.classList.add("deeplink-ready")
+      setTimeout(() => {
+        html.classList.remove("deeplink-loading", "deeplink-ready")
+      }, 500)
+    }
+
     if (deepLinkHandled.current) return
     const params = new URLSearchParams(window.location.search)
     const projectParam = params.get("project")
@@ -207,6 +218,7 @@ export default function PortfolioGrid() {
       // Overrides not loaded yet — this effect re-runs when they arrive
       if (overrides === null) return
       deepLinkHandled.current = true
+      revealPage()
       return
     }
 
@@ -247,20 +259,30 @@ export default function PortfolioGrid() {
             `[data-video-id="${videoParam}"]`
           )
           if (videoEl) {
-            // Desktop (Lenis) gets one smooth glide; mobile lands instantly.
-            scrollToVideo(!!(window as any).__lenis)
+            // Under the veil everything lands instantly — no visible motion.
+            scrollToVideo(false)
             // Settle corrections — layout above the video keeps shifting as
             // thumbnails/players mount, so re-anchor after it calms down.
-            setTimeout(() => scrollToVideo(false), 700)
+            // Reveal the page right after the first correction: the visitor
+            // sees the video already in place instead of the page jumping.
+            setTimeout(() => {
+              scrollToVideo(false)
+              revealPage()
+            }, 700)
             setTimeout(() => scrollToVideo(false), 1600)
             return
           }
           if (Date.now() < deadline) {
             setTimeout(pollForVideo, 100)
+          } else {
+            revealPage()
           }
         }
         // Start polling after the expand render begins
         setTimeout(pollForVideo, 300)
+      } else {
+        // Project-only link: reveal once the expand + section scroll settles
+        setTimeout(revealPage, 650)
       }
     }, 250)
   }, [overrides])

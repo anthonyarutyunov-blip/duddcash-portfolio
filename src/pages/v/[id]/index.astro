@@ -122,11 +122,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="twitter:image" content={ogImage} />
 
     <style>
+      /* Dark to match the homepage deep-link veil — the whole journey from
+         tapping a share link to seeing the video is one continuous dark
+         screen instead of white flash → dark flash → content. */
       html, body {
         margin: 0;
         padding: 0;
-        background: #f2f2f2;
-        color: #111;
+        background: #141414;
+        color: #f2f2f2;
         font-family: system-ui, -apple-system, sans-serif;
         height: 100%;
         width: 100%;
@@ -138,7 +141,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         justify-content: center;
         height: 100vh;
         gap: 12px;
-        opacity: 0.7;
+        opacity: 0.85;
       }
       .loader__title {
         font-weight: 500;
@@ -148,7 +151,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       }
       .loader__sub {
         font-size: 12px;
-        color: #666;
+        color: #888;
       }
     </style>
   </head>

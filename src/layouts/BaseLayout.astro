@@ -87,12 +87,34 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <ClientRouter />
 
-    <!-- Detect Safari early for CSS-based perf optimizations -->
+    <!-- Detect WebKit early for CSS-based perf optimizations.
+         Every iOS browser (Safari, Chrome-on-iOS, Instagram/Facebook in-app
+         browsers) is WebKit under the hood, but only true Safari says
+         "Safari" in its UA — so match any iOS device too, or the in-app
+         browsers miss all the Safari perf opt-outs. -->
     <script is:inline>
       (function(){
-        if(/^((?!chrome|android).)*safari/i.test(navigator.userAgent)){
+        var ua = navigator.userAgent;
+        if(/^((?!chrome|android).)*safari/i.test(ua) || /iPhone|iPad|iPod/i.test(ua)){
           document.documentElement.classList.add('safari');
         }
+        // Deep-link veil: cover the page before first paint when arriving via
+        // a share link, so the expand/scroll landing sequence is invisible.
+        // PortfolioGrid removes it once anchored; failsafe clears it anyway.
+        try {
+          if (location.pathname === '/' && /(?:^|[?&])project=/.test(location.search)) {
+            var html = document.documentElement;
+            html.classList.add('deeplink-loading');
+            setTimeout(function(){
+              if (html.classList.contains('deeplink-loading')) {
+                html.classList.add('deeplink-ready');
+                setTimeout(function(){
+                  html.classList.remove('deeplink-loading', 'deeplink-ready');
+                }, 500);
+              }
+            }, 6000);
+          }
+        } catch (e) {}
       })();
     </script>
   </head>

@@ -394,3 +394,40 @@ video:-webkit-full-screen {
   object-fit: contain !important;
   background: #000;
 }
+
+/* ── Deep-link loading veil ──
+   When the page opens from a share link (?project=…), the landing sequence
+   (tab render → project expand → scroll to video → settle corrections) is
+   hidden behind this full-screen veil so the visitor never sees the page
+   jumping into position. Added to <html> pre-paint by the head script in
+   BaseLayout; PortfolioGrid fades it out once the target is anchored. */
+html.deeplink-loading::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #141414;
+  z-index: 99998;
+}
+html.deeplink-loading::after {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  z-index: 99999;
+  animation: deeplink-spin 0.8s linear infinite;
+}
+@keyframes deeplink-spin {
+  to { transform: rotate(360deg); }
+}
+html.deeplink-loading.deeplink-ready::before,
+html.deeplink-loading.deeplink-ready::after {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}

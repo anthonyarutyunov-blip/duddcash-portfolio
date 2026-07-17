@@ -18,6 +18,19 @@ const INTRO_DURATION = 5000
 function shouldPlayIntro(): boolean {
   if (typeof window === "undefined") return false
 
+  // In-app browsers (Instagram, Facebook, Messenger, TikTok, LinkedIn…) are
+  // heavily throttled WebViews — a 5s animated intro there reads as "the
+  // site is slow," and bio-link visitors hit it on every single open. Skip
+  // straight to content.
+  if (
+    /Instagram|FBAN|FBAV|FB_IAB|Messenger|MicroMessenger|Snapchat|TikTok|musical_ly|LinkedInApp|Twitter|Line\//i.test(
+      navigator.userAgent
+    )
+  ) {
+    sessionStorage.setItem("duddcash_visited", "1")
+    return false
+  }
+
   // First visit ever this session
   if (!sessionStorage.getItem("duddcash_visited")) {
     sessionStorage.setItem("duddcash_visited", "1")
@@ -41,6 +54,9 @@ export function IntroScreen() {
   const [phase, setPhase] = useState<"loading" | "flash" | "settle" | "done">("loading")
   const startTimeRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
+  const [isMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth <= 768
+  )
 
   useEffect(() => {
     setShouldPlay(shouldPlayIntro())
@@ -111,8 +127,9 @@ export function IntroScreen() {
                 color="rgba(255,255,255,0.06)"
                 backgroundColor="transparent"
                 duration={80}
-                blurIntensity="0.8em"
-                density={1}
+                // Mobile GPUs choke on large animated blur — lighter pattern
+                blurIntensity={isMobile ? "0.3em" : "0.8em"}
+                density={isMobile ? 0.6 : 1}
                 className="h-full w-full"
               />
             </div>
