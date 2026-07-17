@@ -125,7 +125,11 @@ export default function PortfolioGrid() {
     if (typeof window === "undefined") return "Featured"
     try {
       const params = new URLSearchParams(window.location.search)
-      if (params.get("project")) return "All"
+      // Deep links start on Featured (same weight as a normal visit) — the
+      // deep-link effect retargets to the project's own tab if it isn't
+      // Featured. The old "All" tab rendered EVERY project card, which made
+      // post-link browsing much heavier than a normal visit on phones.
+      if (params.get("project")) return "Featured"
       const urlFilter = params.get("filter")
       if (urlFilter && categories.includes(urlFilter as any)) {
         return urlFilter as "All" | Category
@@ -223,9 +227,29 @@ export default function PortfolioGrid() {
     }
 
     deepLinkHandled.current = true
-    // Switch to All tab to ensure project is visible (usually a no-op — the
-    // filter initializer already picked All for ?project= links)
-    setFilter("All")
+    // Open in the project's OWN tab, preferring Featured (which the filter
+    // initializer already picked — usually a no-op). Never "All": rendering
+    // every card on the site made post-link browsing far heavier than a
+    // normal visit, felt as sticky scrolling on phones.
+    let cats: string[] = []
+    const catEdit = (overrides?.contentEdits || []).find(
+      (e) => e.itemId === projectParam && e.field === "categories"
+    )
+    if (catEdit) {
+      try {
+        const parsed = JSON.parse(catEdit.value)
+        if (Array.isArray(parsed) && parsed.length > 0) cats = parsed
+      } catch {}
+    }
+    if (cats.length === 0) {
+      const baseItem = portfolioItems.find((p) => p.id === projectParam)
+      const newItem = overrides?.newProjects?.find((p) => p.id === projectParam)
+      cats = ((baseItem?.categories as any) ?? newItem?.categories ?? []) as string[]
+    }
+    const targetTab = (
+      cats.includes("Featured") ? "Featured" : cats[0] || "All"
+    ) as "All" | Category
+    setFilter(targetTab)
 
     // Everything below happens UNDER the loading veil. Strategy: pin the
     // target instantly, re-pin on EVERY layout shift (ResizeObserver on
@@ -235,29 +259,44 @@ export default function PortfolioGrid() {
     // a timer-based reveal fired, which read as "bouncing all over".
     const settleThenReveal = (anchor: () => void) => {
       let lastShift = performance.now()
+      let userScrolled = false
+      // The moment the visitor scrolls themselves, ALL automatic anchoring
+      // must stop — re-pinning while they browse yanks the page out of their
+      // hands (felt as glitchy/sticky scrolling after opening a link).
+      const markScroll = () => {
+        userScrolled = true
+      }
+      window.addEventListener("touchstart", markScroll, {
+        passive: true,
+        once: true,
+      })
+      window.addEventListener("wheel", markScroll, {
+        passive: true,
+        once: true,
+      })
+
       let ro: ResizeObserver | null = null
       try {
         ro = new ResizeObserver(() => {
           lastShift = performance.now()
-          anchor()
+          if (!userScrolled) anchor()
         })
         ro.observe(document.body)
       } catch {}
       const started = performance.now()
       const iv = setInterval(() => {
-        anchor()
+        if (!userScrolled) anchor()
         const quiet = performance.now() - lastShift > 500
         const timedOut = performance.now() - started > 6000
-        if (quiet || timedOut) {
+        if (quiet || timedOut || userScrolled) {
           clearInterval(iv)
-          anchor()
+          // Stop observing BEFORE the reveal — nothing may move the page
+          // after the visitor can see and touch it.
+          try { ro?.disconnect() } catch {}
+          window.removeEventListener("touchstart", markScroll)
+          window.removeEventListener("wheel", markScroll)
+          if (!userScrolled) anchor()
           revealPage()
-          // Quiet late corrections for stragglers, then stop watching
-          setTimeout(anchor, 900)
-          setTimeout(() => {
-            anchor()
-            try { ro?.disconnect() } catch {}
-          }, 2200)
         }
       }, 250)
     }

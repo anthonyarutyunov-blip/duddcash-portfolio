@@ -39,7 +39,13 @@ import { IntroScreen } from '../components/ui/intro-screen';
       <InfiniteGrid client:visible height="100%" speedX={0.3} speedY={0.3} spotlightSize={350} />
     </div>
     <div class="grid-section__content">
-      <div style="min-height: 300px;"><StickyScrollGallery client:visible /></div>
+      <!-- client:only — no server-rendered markup. The SSR HTML was the
+           DESKTOP 5-column layout (server can't know the viewport), so slow
+           in-app browsers started downloading dozens of full-size JPEGs
+           before hydration swapped in the 3-column mobile layout with the
+           lightweight WebP variants. Rendering client-side only means each
+           device builds the right layout with the right assets, once. -->
+      <div style="min-height: 300px;"><StickyScrollGallery client:only="react" /></div>
       <div style="min-height: 400px;"><PortfolioGrid client:load /></div>
       <ContactCTA />
     </div>

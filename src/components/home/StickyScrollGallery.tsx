@@ -449,7 +449,13 @@ function EditorialBreak({ reduced = false }: { reduced?: boolean }) {
 /* ------------------------------------------------------------------ */
 
 export default function StickyScrollGallery() {
-  const [isMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 640)
+  // innerWidth can read 0 during early hydration in some webviews —
+  // fall back to screen.width so desktop never gets the mobile branch
+  const [isMobile] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const w = window.innerWidth || window.screen?.width || 1024
+    return w <= 640
+  })
 
   return (
     <section className="gallery-container">
