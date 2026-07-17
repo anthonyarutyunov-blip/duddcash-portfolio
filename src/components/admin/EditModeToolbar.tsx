@@ -12,7 +12,8 @@ import {
   exportOverrides,
   hasOverrides,
 } from "../../lib/layout-store"
-import { Save, Download, Trash2, X, CheckCircle } from "lucide-react"
+import { Save, Download, Trash2, X, CheckCircle, Clapperboard } from "lucide-react"
+import { PitchManager } from "./PitchManager"
 
 interface EditModeToolbarProps {
   onExit: () => void
@@ -20,6 +21,7 @@ interface EditModeToolbarProps {
 
 export function EditModeToolbar({ onExit }: EditModeToolbarProps) {
   const [saved, setSaved] = useState(false)
+  const [showPitches, setShowPitches] = useState(false)
 
   const handleSave = useCallback(() => {
     const ov = loadOverrides()
@@ -117,6 +119,12 @@ export function EditModeToolbar({ onExit }: EditModeToolbarProps) {
         variant="default"
       />
       <ToolbarButton
+        icon={<Clapperboard size={14} />}
+        label="Pitches"
+        onClick={() => setShowPitches(true)}
+        variant="default"
+      />
+      <ToolbarButton
         icon={<Trash2 size={14} />}
         label="Discard"
         onClick={handleDiscard}
@@ -135,6 +143,8 @@ export function EditModeToolbar({ onExit }: EditModeToolbarProps) {
           50% { opacity: 0.4; }
         }
       `}</style>
+
+      {showPitches && <PitchManager onClose={() => setShowPitches(false)} />}
     </div>
   )
 }

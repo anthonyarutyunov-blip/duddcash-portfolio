@@ -28,3 +28,4 @@ pnpm-debug.log*
 
 # Large image formats
 *.tiff
+deno.lock

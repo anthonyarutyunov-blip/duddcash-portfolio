@@ -1,0 +1,459 @@
+/* ============================================================
+   Pitch viewer — "The Screening Room"
+   Dark cinematic canvas. Clash Display + Inter, the site's
+   easing (--ease) and fluid type patterns. Native scroll only.
+   ============================================================ */
+
+:root {
+  --pitch-bg: #141414;
+  --pitch-surface: #1c1c1e;
+  --pitch-text: #f2f2f2;
+  --pitch-muted: rgba(255, 255, 255, 0.62);
+  --pitch-faint: rgba(255, 255, 255, 0.38);
+  --pitch-line: rgba(255, 255, 255, 0.09);
+  --font-display: 'Clash Display', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+.pitch-body {
+  margin: 0;
+  background: var(--pitch-bg);
+  color: var(--pitch-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 100svh;
+}
+
+/* Subtle cinema vignette behind everything */
+.pitch-main {
+  position: relative;
+  min-height: 100svh;
+  background:
+    radial-gradient(
+      ellipse 120% 60% at 50% 0%,
+      rgba(255, 255, 255, 0.028),
+      transparent 60%
+    ),
+    var(--pitch-bg);
+}
+
+/* ── Arrival veil ── */
+.pitch-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pitch-bg);
+  transition: opacity 0.9s var(--ease);
+}
+
+.pitch-veil--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Failsafe: if JS never runs, reveal the page anyway after 8s */
+@keyframes pitch-veil-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.pitch-veil {
+  animation: pitch-veil-failsafe 0.9s var(--ease) 8s forwards;
+}
+
+.pitch-veil__inner {
+  text-align: center;
+  padding: 0 24px;
+  animation: pitch-veil-in 1.1s var(--ease) both;
+}
+
+@keyframes pitch-veil-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pitch-veil__eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pitch-faint);
+  margin-bottom: 18px;
+}
+
+.pitch-veil__title {
+  font-family: var(--font-display);
+  font-size: max(3.4vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--pitch-text);
+}
+
+.pitch-veil__client {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--pitch-muted);
+}
+
+/* ── Layout ── */
+.pitch-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 5vw;
+}
+
+/* ── Hero ── */
+.pitch-hero {
+  padding: clamp(84px, 14vh, 150px) 0 clamp(48px, 7vh, 90px);
+}
+
+.pitch-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pitch-faint);
+  margin: 0 0 22px;
+}
+
+.pitch-title {
+  font-family: var(--font-display);
+  font-size: max(6vw, 44px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  margin: 0 0 26px;
+  color: var(--pitch-text);
+}
+
+.pitch-note {
+  max-width: 34rem;
+  font-size: max(1.05vw, 15px);
+  line-height: 1.7;
+  color: var(--pitch-muted);
+  margin: 0 0 10px;
+  white-space: pre-line;
+}
+
+.pitch-hero__rule {
+  border: none;
+  border-top: 1px solid var(--pitch-line);
+  margin: clamp(40px, 6vh, 70px) 0 0;
+}
+
+/* ── Program (film list) ── */
+.pitch-program {
+  padding: clamp(40px, 6vh, 80px) 0 clamp(80px, 10vh, 140px);
+}
+
+.pitch-film {
+  margin: 0 auto clamp(96px, 12vh, 160px);
+  max-width: 1100px;
+}
+
+.pitch-film:last-child {
+  margin-bottom: 0;
+}
+
+.pitch-film__head {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-bottom: 8px;
+}
+
+.pitch-film__index {
+  font-family: var(--font-display);
+  font-size: max(1.4vw, 15px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.24);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.pitch-film__title {
+  font-family: var(--font-display);
+  font-size: max(2.1vw, 21px);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--pitch-text);
+}
+
+.pitch-film__desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--pitch-muted);
+  max-width: 40rem;
+  margin: 6px 0 18px calc(max(1.4vw, 15px) + 18px);
+}
+
+.pitch-film__desc--empty {
+  margin-bottom: 18px;
+}
+
+/* Portrait films: center at a width that caps height at ~80svh */
+.pitch-film__stage {
+  position: relative;
+}
+
+.pitch-film__stage--portrait {
+  max-width: min(46svh, 420px);
+  margin: 0 auto;
+}
+
+.pitch-film__master {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 9px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pitch-muted);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.pitch-film__master:hover {
+  color: var(--pitch-text);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Scroll reveals (IO-driven from the island) ── */
+.pitch-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+.pitch-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Safety net: in-app browsers throttle IntersectionObserver hard on cold
+   loads — if the reveal never fires, force visibility so content can never
+   stay invisible (same pattern as the main site's data-animate fallback). */
+.pitch-reveal:not(.is-visible) {
+  animation: pitch-reveal-fallback 0.8s var(--ease) 2.5s forwards;
+}
+
+@keyframes pitch-reveal-fallback {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .pitch-reveal {
+    transform: translateY(14px);
+    transition-duration: 0.45s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pitch-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .pitch-veil {
+    animation-delay: 2s;
+  }
+}
+
+/* ── Closing ── */
+.pitch-closing {
+  border-top: 1px solid var(--pitch-line);
+  padding: clamp(70px, 10vh, 130px) 0 clamp(60px, 8vh, 100px);
+  text-align: center;
+}
+
+.pitch-closing__headline {
+  font-family: var(--font-display);
+  font-size: max(4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0 0 28px;
+}
+
+.pitch-closing__contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  flex-wrap: wrap;
+  margin-bottom: 42px;
+}
+
+.pitch-closing__link {
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  color: var(--pitch-muted);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  padding-bottom: 2px;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.pitch-closing__link:hover {
+  color: var(--pitch-text);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.pitch-closing__private {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.28);
+  max-width: 30rem;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.pitch-closing__wordmark {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Invalid link state ── */
+.pitch-invalid {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.pitch-invalid__eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pitch-faint);
+}
+
+.pitch-invalid__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.pitch-invalid__sub {
+  font-size: 13px;
+  color: var(--pitch-faint);
+}
+
+.pitch-invalid__sub a {
+  color: var(--pitch-muted);
+}
+
+/* ── Player ── */
+.pitch-player {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #0c0c0d;
+  cursor: pointer;
+}
+
+.pitch-player video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pitch-player__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s var(--ease), transform 1.2s var(--ease);
+  z-index: 1;
+}
+
+.pitch-player:hover .pitch-player__poster--armed {
+  transform: scale(1.02);
+}
+
+.pitch-player__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0.34)
+  );
+  z-index: 2;
+  transition: opacity 0.5s var(--ease);
+  pointer-events: none;
+}
+
+.pitch-player__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background: rgba(10, 10, 10, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 3;
+  transition: transform 0.45s var(--ease), background 0.45s var(--ease),
+    border-color 0.45s var(--ease), opacity 0.4s var(--ease);
+}
+
+html:not(.safari) .pitch-player__play {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.pitch-player:hover .pitch-player__play--armed {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: rgba(10, 10, 10, 0.45);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 768px) {
+  .pitch-player__play {
+    width: 60px;
+    height: 60px;
+  }
+}

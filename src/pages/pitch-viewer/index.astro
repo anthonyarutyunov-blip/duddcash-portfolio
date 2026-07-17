@@ -1,0 +1,98 @@
+---
+// Pitch viewer shell — the static "screening room" served for /p/<slug>.
+//
+// This page builds to the stable URL /pitch-viewer/index.html. The
+// pitch-page Netlify function fetches THIS built HTML, replaces the
+// sentinels below (title, __PITCH_DATA__ JSON, __PITCH_TITLE__ /
+// __PITCH_CLIENT__ veil text) and injects OG meta, then serves the result
+// at /p/<slug>. Because the function reads the current deploy's HTML, the
+// hashed /_astro asset URLs inside are always correct.
+//
+// Visited directly (data = null) it renders a quiet invalid-link state.
+//
+// Deliberately NO BaseLayout: no Lenis, no ClientRouter, no site nav —
+// native scroll only. That is the single biggest smoothness guarantee for
+// mobile / in-app browsers.
+import { PitchViewer } from '../../components/pitch/PitchViewer';
+import '../../styles/pitch.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <title>Private Screening | Duddcash Studios</title>
+    <meta name="description" content="A private screening prepared by Duddcash Studios." />
+
+    <!-- Warm up the video CDN early -->
+    <link rel="preconnect" href="https://vz-4fcbca30-3f7.b-cdn.net" crossorigin />
+    <link rel="dns-prefetch" href="https://vz-4fcbca30-3f7.b-cdn.net" />
+
+    <!-- Fonts (same setup as the main site) -->
+    <link
+      rel="preload"
+      href="/fonts/inter-variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/clash-display-medium.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        src: url('/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-display: swap;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('/fonts/clash-display-medium.woff2') format('woff2');
+        font-weight: 500;
+        font-display: swap;
+        font-style: normal;
+      }
+    </style>
+
+    <!-- WebKit perf class — ALL iOS browsers (incl. in-app) are WebKit -->
+    <script is:inline>
+      (function(){
+        var ua = navigator.userAgent;
+        if(/^((?!chrome|android).)*safari/i.test(ua) || /iPhone|iPad|iPod/i.test(ua)){
+          document.documentElement.classList.add('safari');
+        }
+      })();
+    </script>
+  </head>
+  <body class="pitch-body">
+    <!-- Pitch data injected by the pitch-page function -->
+    <script type="application/json" id="__PITCH_DATA__">null</script>
+
+    <!-- Arrival veil — pure HTML/CSS, visible before any JS loads. The
+         island fades it out once mounted; the noscript/failure case is
+         covered by a CSS animation that reveals content after 8s. -->
+    <div class="pitch-veil" id="pitch-veil" aria-hidden="true">
+      <div class="pitch-veil__inner">
+        <div class="pitch-veil__eyebrow">Duddcash Studios &middot; Private Screening</div>
+        <div class="pitch-veil__title">__PITCH_TITLE__</div>
+        <div class="pitch-veil__client">__PITCH_CLIENT__</div>
+      </div>
+    </div>
+
+    <main class="pitch-main">
+      <PitchViewer client:only="react" />
+    </main>
+  </body>
+</html>

@@ -47,6 +47,22 @@
   [headers.values]
     Cache-Control = "public, max-age=2592000"
 
+# Private pitch pages — served dynamically by a function (200 rewrite keeps
+# the /p/<slug> path). NOTE: [[headers]] blocks below do NOT apply to
+# function responses — pitch-page.mts sets its own headers.
+[[redirects]]
+  from = "/p/*"
+  to = "/.netlify/functions/pitch-page"
+  status = 200
+
+# The static viewer shell (fetched + rewritten by pitch-page.mts) must never
+# be indexed or cached long
+[[headers]]
+  for = "/pitch-viewer/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-cache"
+
 # Safety net: /v/<id> pages are pre-built per project at deploy time. If a
 # share link points at a project added in the editor AFTER the last deploy,
 # no static page exists yet — redirect to the homepage deep-link instead of
