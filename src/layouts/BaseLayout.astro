@@ -105,6 +105,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           if (location.pathname === '/' && /(?:^|[?&])project=/.test(location.search)) {
             var html = document.documentElement;
             html.classList.add('deeplink-loading');
+            // Generous failsafe — in-app browsers can take >6s to hydrate on
+            // cold loads, and dropping the veil mid-landing looks like the
+            // page bouncing around. The settle logic reveals much sooner on
+            // any healthy load.
             setTimeout(function(){
               if (html.classList.contains('deeplink-loading')) {
                 html.classList.add('deeplink-ready');
@@ -112,7 +116,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
                   html.classList.remove('deeplink-loading', 'deeplink-ready');
                 }, 500);
               }
-            }, 6000);
+            }, 12000);
           }
         } catch (e) {}
       })();

@@ -59,7 +59,13 @@ export function IntroScreen() {
   )
 
   useEffect(() => {
-    setShouldPlay(shouldPlayIntro())
+    const play = shouldPlayIntro()
+    setShouldPlay(play)
+    // Safety net: if the intro won't play, make sure the hero headline isn't
+    // stuck waiting for it (hero--with-intro hides the title for ~5.6s).
+    if (!play) {
+      document.getElementById("hero")?.classList.remove("hero--with-intro")
+    }
   }, [])
 
   const tick = useCallback((timestamp: number) => {

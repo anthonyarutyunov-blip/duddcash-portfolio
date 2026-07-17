@@ -226,50 +226,67 @@ export default function PortfolioGrid() {
     // Switch to All tab to ensure project is visible (usually a no-op — the
     // filter initializer already picked All for ?project= links)
     setFilter("All")
+
+    // Everything below happens UNDER the loading veil. Strategy: pin the
+    // target instantly, re-pin on EVERY layout shift (ResizeObserver on
+    // body), and only fade the veil out once the page has been still for
+    // 500ms — however slow the connection. Fixed timers failed here: in-app
+    // browsers hydrate/load so slowly that the page was still churning when
+    // a timer-based reveal fired, which read as "bouncing all over".
+    const settleThenReveal = (anchor: () => void) => {
+      let lastShift = performance.now()
+      let ro: ResizeObserver | null = null
+      try {
+        ro = new ResizeObserver(() => {
+          lastShift = performance.now()
+          anchor()
+        })
+        ro.observe(document.body)
+      } catch {}
+      const started = performance.now()
+      const iv = setInterval(() => {
+        anchor()
+        const quiet = performance.now() - lastShift > 500
+        const timedOut = performance.now() - started > 6000
+        if (quiet || timedOut) {
+          clearInterval(iv)
+          anchor()
+          revealPage()
+          // Quiet late corrections for stragglers, then stop watching
+          setTimeout(anchor, 900)
+          setTimeout(() => {
+            anchor()
+            try { ro?.disconnect() } catch {}
+          }, 2200)
+        }
+      }, 250)
+    }
+
     setTimeout(() => {
       setExpandedId(projectParam)
       const videoParam = params.get("video")
       if (videoParam) {
         // Poll for the video DOM element — it may not render immediately on
         // slow mobile networks or before hydration completes.
-        const deadline = Date.now() + 5000
-
-        // Land on the video INSTANTLY, then re-correct after the media above
-        // it loads and shifts layout. A smooth scroll here (the old behavior)
-        // animated against a page whose height was still churning — on mobile
-        // it visibly "jumped all over" and often stopped at the wrong spot.
-        const scrollToVideo = (smooth: boolean) => {
+        const deadline = Date.now() + 6000
+        const scrollToVideo = () => {
           const el = document.querySelector(`[data-video-id="${videoParam}"]`)
           if (!el) return
           const lenis = (window as any).__lenis
           if (lenis) {
-            lenis.scrollTo(el, {
-              offset: -120,
-              duration: smooth ? 1.0 : 0,
-              immediate: !smooth,
-            })
+            lenis.scrollTo(el, { offset: -120, immediate: true })
           } else {
             const top = el.getBoundingClientRect().top + window.scrollY - 90
             window.scrollTo(0, top)
           }
         }
-
         const pollForVideo = () => {
           const videoEl = document.querySelector(
             `[data-video-id="${videoParam}"]`
           )
           if (videoEl) {
-            // Under the veil everything lands instantly — no visible motion.
-            scrollToVideo(false)
-            // Settle corrections — layout above the video keeps shifting as
-            // thumbnails/players mount, so re-anchor after it calms down.
-            // Reveal the page right after the first correction: the visitor
-            // sees the video already in place instead of the page jumping.
-            setTimeout(() => {
-              scrollToVideo(false)
-              revealPage()
-            }, 700)
-            setTimeout(() => scrollToVideo(false), 1600)
+            scrollToVideo()
+            settleThenReveal(scrollToVideo)
             return
           }
           if (Date.now() < deadline) {
@@ -278,11 +295,21 @@ export default function PortfolioGrid() {
             revealPage()
           }
         }
-        // Start polling after the expand render begins
         setTimeout(pollForVideo, 300)
       } else {
-        // Project-only link: reveal once the expand + section scroll settles
-        setTimeout(revealPage, 650)
+        // Project-only link: pin the expanded project's top edge
+        const anchorProject = () => {
+          const el = document.querySelector(".expanded-project")
+          if (!el) return
+          const lenis = (window as any).__lenis
+          const top = el.getBoundingClientRect().top + window.scrollY - 80
+          if (lenis) {
+            lenis.scrollTo(top, { immediate: true })
+          } else {
+            window.scrollTo(0, top)
+          }
+        }
+        setTimeout(() => settleThenReveal(anchorProject), 300)
       }
     }, 250)
   }, [overrides])

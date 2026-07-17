@@ -4,6 +4,7 @@ import { SpotlightCard } from "../ui/spotlight-card"
 import { CardPreview } from "./CardPreview"
 import { ExpandedProject } from "./ExpandedProject"
 import { thumbnailUrl } from "../../lib/bunny"
+import { mobileGallerySrc } from "../../lib/mobile-image"
 import { type PortfolioItem } from "../../data/portfolio"
 import { getMergedCardAspectRatio, getMergedVideos } from "../../lib/layout-merge"
 import { SizeSelector } from "../admin/SizeSelector"
@@ -238,12 +239,28 @@ export function PortfolioCard({
             }}
             className="portfolio-card"
           >
-            {/* Static thumbnail */}
+            {/* Static thumbnail — phones get the lightweight /gallery/m/
+                WebP variant of custom thumbnails (10x smaller decode) */}
             <img
-              src={customThumb || thumbnailUrl(primaryVideoId)}
+              src={
+                customThumb
+                  ? isMobile
+                    ? mobileGallerySrc(customThumb)
+                    : customThumb
+                  : thumbnailUrl(primaryVideoId)
+              }
               alt={item.title}
               loading="lazy"
               decoding="async"
+              onError={(e) => {
+                const img = e.currentTarget
+                if (
+                  customThumb &&
+                  img.src !== new URL(customThumb, window.location.origin).href
+                ) {
+                  img.src = customThumb
+                }
+              }}
               style={{
                 width: "100%",
                 height: "100%",

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { TextEffect } from "../ui/text-effect"
+import { mobileGallerySrc } from "../../lib/mobile-image"
 
 /* ------------------------------------------------------------------ */
 /*  Photo data — artistically arranged for color & mood flow          */
@@ -311,18 +312,26 @@ function getSharedObserver() {
 /*  Gallery Image — lazy-loaded with shared IntersectionObserver      */
 /* ------------------------------------------------------------------ */
 
-// Mobile: no per-image reveal animation. Dozens of staggered opacity/transform
-// transitions firing during touch scroll made scrolling feel sticky — images
-// render immediately instead.
-const GALLERY_REDUCED_MOTION =
-  typeof window !== "undefined" && window.innerWidth <= 768
-
-function GalleryImage({ photo, index }: { photo: Photo; index: number }) {
+// Mobile ("reduced") mode: no per-image reveal animation (dozens of staggered
+// transitions firing during touch scroll made scrolling feel sticky) and
+// lightweight /gallery/m/ WebP variants instead of full-size JPEGs.
+// The flag is passed DOWN from StickyScrollGallery's single isMobile check —
+// deriving it independently here caused the two checks to disagree in some
+// webviews, mixing desktop assets into the mobile layout.
+function GalleryImage({
+  photo,
+  index,
+  reduced,
+}: {
+  photo: Photo
+  index: number
+  reduced: boolean
+}) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(GALLERY_REDUCED_MOTION)
+  const [visible, setVisible] = useState(reduced)
 
   useEffect(() => {
-    if (GALLERY_REDUCED_MOTION) return
+    if (reduced) return
     const el = ref.current
     if (!el) return
     const obs = getSharedObserver()
@@ -332,7 +341,7 @@ function GalleryImage({ photo, index }: { photo: Photo; index: number }) {
       observerCallbacks.delete(el)
       obs.unobserve(el)
     }
-  }, [])
+  }, [reduced])
 
   return (
     <div
@@ -341,21 +350,29 @@ function GalleryImage({ photo, index }: { photo: Photo; index: number }) {
       style={{
         height: SIZE_MAP[photo.size],
         opacity: visible ? 1 : 0,
-        transform: GALLERY_REDUCED_MOTION
+        transform: reduced
           ? undefined
           : visible
             ? "translateY(0)"
             : "translateY(24px)",
-        transition: GALLERY_REDUCED_MOTION
+        transition: reduced
           ? undefined
           : `opacity 0.6s ease ${index * 0.06}s, transform 0.6s ease ${index * 0.06}s`,
       }}
     >
       <img
-        src={photo.src}
+        src={reduced ? mobileGallerySrc(photo.src) : photo.src}
         alt={photo.alt}
         loading="lazy"
+        decoding="async"
         draggable={false}
+        onError={(e) => {
+          // Mobile variant missing — fall back to the original JPEG
+          const img = e.currentTarget
+          if (img.src !== new URL(photo.src, window.location.origin).href) {
+            img.src = photo.src
+          }
+        }}
         style={{
           width: "100%",
           height: "100%",
@@ -372,11 +389,17 @@ function GalleryImage({ photo, index }: { photo: Photo; index: number }) {
 /*  Photo Column — renders a vertical stack of images                  */
 /* ------------------------------------------------------------------ */
 
-function PhotoColumn({ photos }: { photos: Photo[] }) {
+function PhotoColumn({
+  photos,
+  reduced = false,
+}: {
+  photos: Photo[]
+  reduced?: boolean
+}) {
   return (
     <div className="gallery-col">
       {photos.map((p, i) => (
-        <GalleryImage key={p.src} photo={p} index={i} />
+        <GalleryImage key={p.src} photo={p} index={i} reduced={reduced} />
       ))}
     </div>
   )
@@ -386,7 +409,7 @@ function PhotoColumn({ photos }: { photos: Photo[] }) {
 /*  Editorial Break — animated text between photo halves               */
 /* ------------------------------------------------------------------ */
 
-function EditorialBreak() {
+function EditorialBreak({ reduced = false }: { reduced?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const [triggered, setTriggered] = useState(false)
 
@@ -412,7 +435,7 @@ function EditorialBreak() {
         per="char"
         as="h2"
         trigger={triggered}
-        variants={GALLERY_REDUCED_MOTION ? slideVariantsMobile : blurSlideVariants}
+        variants={reduced ? slideVariantsMobile : blurSlideVariants}
         className="editorial-break__text"
       >
         Where cinematic isn't just a buzz word.
@@ -434,19 +457,19 @@ export default function StickyScrollGallery() {
         <>
           {/* Mobile: 3 curated columns — top half (13 rows) */}
           <div className="sticky-gallery-grid">
-            <div className="gallery-cell"><PhotoColumn photos={mobileColA_top} /></div>
-            <div className="gallery-cell"><PhotoColumn photos={mobileColB_top} /></div>
-            <div className="gallery-cell"><PhotoColumn photos={mobileColC_top} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColA_top} reduced /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColB_top} reduced /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColC_top} reduced /></div>
           </div>
 
           {/* Editorial break */}
-          <EditorialBreak />
+          <EditorialBreak reduced />
 
           {/* Mobile: 3 curated columns — bottom half (13 rows) */}
           <div className="sticky-gallery-grid">
-            <div className="gallery-cell"><PhotoColumn photos={mobileColA_bottom} /></div>
-            <div className="gallery-cell"><PhotoColumn photos={mobileColB_bottom} /></div>
-            <div className="gallery-cell"><PhotoColumn photos={mobileColC_bottom} /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColA_bottom} reduced /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColB_bottom} reduced /></div>
+            <div className="gallery-cell"><PhotoColumn photos={mobileColC_bottom} reduced /></div>
           </div>
         </>
       ) : (

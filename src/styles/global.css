@@ -431,3 +431,11 @@ html.deeplink-loading.deeplink-ready::after {
   transition: opacity 0.45s ease;
   pointer-events: none;
 }
+
+/* Portfolio section manages its own scroll position (expand/collapse and
+   deep-link anchoring). Browser scroll anchoring fights those adjustments
+   when content above the viewport changes height — visible as small jumps
+   during project expand on mobile. */
+#portfolio {
+  overflow-anchor: none;
+}

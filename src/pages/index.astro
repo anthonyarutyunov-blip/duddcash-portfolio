@@ -215,6 +215,16 @@ import { IntroScreen } from '../components/ui/intro-screen';
     // Normal flow: play intro on first visit or refresh, skip on nav.
     // "duddcash_nav" is set by a click listener on internal links (in BaseLayout).
     // On refresh no click happens, so the flag is absent → intro plays.
+    //
+    // IMPORTANT: hero--with-intro hides the headline for ~5.6s (timed to the
+    // intro's end). It must NEVER be added when the intro won't actually play,
+    // or the hero title just looks missing. In-app browsers skip the intro
+    // (IntroScreen bails), so they must skip this class too.
+    var isIAB = /Instagram|FBAN|FBAV|FB_IAB|Messenger|MicroMessenger|Snapchat|TikTok|musical_ly|LinkedInApp|Twitter|Line\//i.test(navigator.userAgent);
+    if (isIAB) {
+      try { sessionStorage.setItem("duddcash_visited", "1"); } catch (e) {}
+      return;
+    }
     var hero = document.getElementById("hero");
     if (!hero) return;
     var visited = sessionStorage.getItem("duddcash_visited");
