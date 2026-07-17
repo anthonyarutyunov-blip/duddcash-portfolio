@@ -147,6 +147,22 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
 
   const library = useMemo(buildLibrary, [])
 
+  // Lenis (the site's smooth-scroll engine on desktop) intercepts wheel
+  // events globally and scrolls the PAGE — inside this modal that meant the
+  // library pane never received wheel input (page moved behind the popup
+  // instead). Stop Lenis while the modal is open; the data-lenis-prevent
+  // attribute on the overlay lets native wheel scrolling through to the
+  // modal's own scroll containers.
+  useEffect(() => {
+    const lenis = (window as any).__lenis
+    lenis?.stop?.()
+    document.body.style.overflow = "hidden"
+    return () => {
+      lenis?.start?.()
+      document.body.style.overflow = ""
+    }
+  }, [])
+
   const refreshList = useCallback(async () => {
     setError(null)
     try {
@@ -316,6 +332,7 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
 
   return createPortal(
     <div
+      data-lenis-prevent
       style={{
         position: "fixed",
         inset: 0,
@@ -326,6 +343,7 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
+        overscrollBehavior: "contain",
       }}
       onClick={onClose}
     >
