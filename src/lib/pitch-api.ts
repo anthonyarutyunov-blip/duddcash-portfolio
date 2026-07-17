@@ -14,6 +14,7 @@ export interface PitchItem {
   posterUrl: string
   projectRef?: string
   masterDownloadUrl?: string
+  instagramUrl?: string
 }
 
 export interface Pitch {

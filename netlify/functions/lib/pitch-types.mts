@@ -17,6 +17,8 @@ export interface PitchItem {
   projectRef?: string;
   /** Optional link to the full-quality master file (Dropbox/Bunny storage/…) */
   masterDownloadUrl?: string;
+  /** Optional link to the piece on Instagram */
+  instagramUrl?: string;
 }
 
 export interface Pitch {
@@ -93,6 +95,8 @@ export function validatePitchBody(raw: any): Omit<Pitch, 'slug' | 'createdAt' | 
     if (projectRef) item.projectRef = projectRef;
     const master = cleanStr(it?.masterDownloadUrl, 800);
     if (master && /^https?:\/\//i.test(master)) item.masterDownloadUrl = master;
+    const insta = cleanStr(it?.instagramUrl, 800);
+    if (insta && /^https?:\/\//i.test(insta)) item.instagramUrl = insta;
     return item;
   });
 

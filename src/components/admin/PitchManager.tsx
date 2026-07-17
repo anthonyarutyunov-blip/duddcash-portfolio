@@ -39,7 +39,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { portfolioItems } from "../../data/portfolio"
+import { portfolioItems, categories as siteCategories } from "../../data/portfolio"
 import { getMergedItems, getMergedVideos } from "../../lib/layout-merge"
 import { thumbnailUrl, normalizeVideoId } from "../../lib/bunny"
 import {
@@ -65,6 +65,8 @@ interface LibraryVideo {
   projectTitle: string
   projectRef: string
   sectionTitle?: string
+  /** Site tabs the parent project lives in (for the library tab filter) */
+  categories: string[]
 }
 
 function buildLibrary(): LibraryVideo[] {
@@ -112,6 +114,7 @@ function pushVideo(
     projectTitle: item.title || "",
     projectRef: item.id || "",
     sectionTitle,
+    categories: Array.isArray(item.categories) ? item.categories : [],
   })
 }
 
@@ -135,6 +138,7 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
   const [items, setItems] = useState<PitchItem[]>([])
   const [heroVideoId, setHeroVideoId] = useState<string | null>(null)
   const [search, setSearch] = useState("")
+  const [libTab, setLibTab] = useState<string>("All")
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
 
   // Published state
@@ -299,14 +303,16 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
 
   const filteredLibrary = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return library
-    return library.filter(
-      (v) =>
+    return library.filter((v) => {
+      if (libTab !== "All" && !v.categories.includes(libTab)) return false
+      if (!q) return true
+      return (
         v.title.toLowerCase().includes(q) ||
         v.projectTitle.toLowerCase().includes(q) ||
         (v.sectionTitle || "").toLowerCase().includes(q)
-    )
-  }, [library, search])
+      )
+    })
+  }, [library, search, libTab])
 
   return createPortal(
     <div
@@ -401,7 +407,7 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
 
         {/* ── List ── */}
         {view === "list" && (
-          <div style={{ padding: 22, overflowY: "auto" }}>
+          <div style={{ padding: 22, overflowY: "auto", flex: 1, minHeight: 0 }}>
             <button onClick={startNew} style={primaryBtn}>
               <Plus size={14} /> New Pitch
             </button>
@@ -503,6 +509,41 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
               }}
             >
               <div style={{ padding: "14px 16px 10px", flexShrink: 0 }}>
+                {/* Tab filter — same tabs as the site's work section */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 4,
+                    marginBottom: 10,
+                  }}
+                >
+                  {siteCategories.map((cat) => {
+                    const active = libTab === cat
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setLibTab(cat)}
+                        style={{
+                          padding: "5px 11px",
+                          fontSize: 10,
+                          fontWeight: 600,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          border: "none",
+                          borderRadius: 999,
+                          cursor: "pointer",
+                          background: active ? "#fff" : "rgba(255,255,255,0.06)",
+                          color: active ? "#111" : "rgba(255,255,255,0.5)",
+                          transition: "background 0.15s ease, color 0.15s ease",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    )
+                  })}
+                </div>
                 <div style={{ position: "relative" }}>
                   <Search
                     size={13}
@@ -518,13 +559,18 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder={`Search ${library.length} videos…`}
+                    placeholder={`Search ${filteredLibrary.length} video${filteredLibrary.length === 1 ? "" : "s"}…`}
                     style={{ ...inputStyle, paddingLeft: 30 }}
                   />
                 </div>
               </div>
               <div
                 style={{
+                  // flex:1 + minHeight:0 makes THIS the scroll container —
+                  // without them it grows to content height, the modal clips
+                  // it, and the pane can never scroll
+                  flex: 1,
+                  minHeight: 0,
                   overflowY: "auto",
                   padding: "0 16px 16px",
                   display: "grid",
@@ -631,7 +677,7 @@ export function PitchManager({ onClose }: { onClose: () => void }) {
                 minHeight: 240,
               }}
             >
-              <div style={{ padding: "14px 16px", overflowY: "auto", flex: 1 }}>
+              <div style={{ padding: "14px 16px", overflowY: "auto", flex: 1, minHeight: 0 }}>
                 <input
                   type="text"
                   value={title}
@@ -926,6 +972,13 @@ function SortablePitchRow({
             value={item.masterDownloadUrl || ""}
             onChange={(e) => onPatch({ masterDownloadUrl: e.target.value })}
             placeholder="Master download URL (optional — Dropbox etc.)"
+            style={inputStyle}
+          />
+          <input
+            type="url"
+            value={item.instagramUrl || ""}
+            onChange={(e) => onPatch({ instagramUrl: e.target.value })}
+            placeholder="Instagram link (optional — post/reel URL)"
             style={inputStyle}
           />
         </div>
