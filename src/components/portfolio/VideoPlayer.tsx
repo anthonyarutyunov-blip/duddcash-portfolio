@@ -60,24 +60,28 @@ export function VideoPlayer({
     }
   }, [])
 
-  // Intersection Observer — only autoplay when visible
+  // Intersection Observer — only autoplay when visible.
+  // Mobile gets a much larger preroll margin so the video starts buffering
+  // well before it scrolls into view — by the time it's on screen it's
+  // already playing instead of showing the spinner.
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
+    const margin = isMobile ? 600 : 200
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1, rootMargin: "200px 0px" }
+      { threshold: 0.1, rootMargin: `${margin}px 0px` }
     )
     observer.observe(container)
     // Check initial state — with client:visible hydration, the IO callback may have
     // already "missed" the element entering the viewport before React mounted
     const rect = container.getBoundingClientRect()
-    if (rect.top < window.innerHeight + 200 && rect.bottom > -200) {
+    if (rect.top < window.innerHeight + margin && rect.bottom > -margin) {
       setIsVisible(true)
     }
     return () => observer.disconnect()
-  }, [])
+  }, [isMobile])
 
   // Play/pause based on visibility (respects user pause)
   useEffect(() => {

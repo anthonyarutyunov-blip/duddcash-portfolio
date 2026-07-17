@@ -7,15 +7,16 @@ import StickyScrollGallery from '../components/home/StickyScrollGallery';
 import PortfolioGrid from '../components/home/PortfolioGrid';
 import { InfiniteGrid } from '../components/ui/the-infinite-grid';
 import { IntroScreen } from '../components/ui/intro-screen';
-import { AnnouncementPill } from '../components/ui/announcement-pill';
 ---
 
 <BaseLayout title="Home" description="Duddcash — Creative agency for brands, artists, and events.">
   <!-- Intro Screen -->
   <IntroScreen client:load />
 
-  <!-- New-work announcement (dismissible pill, config in src/data/announcement.ts) -->
-  <AnnouncementPill client:load />
+  <!-- New-work announcement pill: currently disabled. To bring it back, set
+       enabled: true in src/data/announcement.ts and re-add
+       <AnnouncementPill client:load /> here
+       (import { AnnouncementPill } from '../components/ui/announcement-pill'). -->
 
   <!-- Hero -->
   <section class="hero" id="hero">

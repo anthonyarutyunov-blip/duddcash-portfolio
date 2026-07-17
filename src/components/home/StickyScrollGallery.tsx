@@ -256,6 +256,29 @@ const blurSlideVariants = {
   },
 }
 
+/* Mobile variant: no per-character blur — animating ~40 simultaneous blur
+   filters stutters badly on phone GPUs. Opacity + slide only, and quicker. */
+const slideVariantsMobile = {
+  container: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.015 },
+    },
+  },
+  item: {
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.35,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
+  },
+}
+
 /* ------------------------------------------------------------------ */
 /*  Shared IntersectionObserver — one instance for all gallery images  */
 /* ------------------------------------------------------------------ */
@@ -389,7 +412,7 @@ function EditorialBreak() {
         per="char"
         as="h2"
         trigger={triggered}
-        variants={blurSlideVariants}
+        variants={GALLERY_REDUCED_MOTION ? slideVariantsMobile : blurSlideVariants}
         className="editorial-break__text"
       >
         Where cinematic isn't just a buzz word.

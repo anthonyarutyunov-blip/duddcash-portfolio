@@ -116,7 +116,23 @@ function SortableCard({
 }
 
 export default function PortfolioGrid() {
-  const [filter, setFilter] = useState<"All" | Category>("Featured")
+  // Initialize the tab from the URL synchronously — share links (?project=)
+  // need the All tab and ?filter= picks a specific one. Doing this in the
+  // initializer instead of an effect avoids rendering the Featured grid and
+  // immediately re-rendering with a different tab (a full relayout that made
+  // deep links visibly jump, especially on mobile).
+  const [filter, setFilter] = useState<"All" | Category>(() => {
+    if (typeof window === "undefined") return "Featured"
+    try {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get("project")) return "All"
+      const urlFilter = params.get("filter")
+      if (urlFilter && categories.includes(urlFilter as any)) {
+        return urlFilter as "All" | Category
+      }
+    } catch {}
+    return "Featured"
+  })
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const filterBarRef = useRef<HTMLDivElement>(null)
@@ -195,37 +211,58 @@ export default function PortfolioGrid() {
     }
 
     deepLinkHandled.current = true
-    // Switch to All tab to ensure project is visible
+    // Switch to All tab to ensure project is visible (usually a no-op — the
+    // filter initializer already picked All for ?project= links)
     setFilter("All")
     setTimeout(() => {
       setExpandedId(projectParam)
       const videoParam = params.get("video")
       if (videoParam) {
         // Poll for the video DOM element — it may not render immediately on
-        // slow mobile networks, after pagination, or before hydration completes.
-        // Check every 100ms up to 5s. As soon as it exists, scroll to it.
+        // slow mobile networks or before hydration completes.
         const deadline = Date.now() + 5000
+
+        // Land on the video INSTANTLY, then re-correct after the media above
+        // it loads and shifts layout. A smooth scroll here (the old behavior)
+        // animated against a page whose height was still churning — on mobile
+        // it visibly "jumped all over" and often stopped at the wrong spot.
+        const scrollToVideo = (smooth: boolean) => {
+          const el = document.querySelector(`[data-video-id="${videoParam}"]`)
+          if (!el) return
+          const lenis = (window as any).__lenis
+          if (lenis) {
+            lenis.scrollTo(el, {
+              offset: -120,
+              duration: smooth ? 1.0 : 0,
+              immediate: !smooth,
+            })
+          } else {
+            const top = el.getBoundingClientRect().top + window.scrollY - 90
+            window.scrollTo(0, top)
+          }
+        }
+
         const pollForVideo = () => {
           const videoEl = document.querySelector(
             `[data-video-id="${videoParam}"]`
           )
           if (videoEl) {
-            const lenis = (window as any).__lenis
-            if (lenis) {
-              lenis.scrollTo(videoEl, { offset: -200, duration: 1.0 })
-            } else {
-              videoEl.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
+            // Desktop (Lenis) gets one smooth glide; mobile lands instantly.
+            scrollToVideo(!!(window as any).__lenis)
+            // Settle corrections — layout above the video keeps shifting as
+            // thumbnails/players mount, so re-anchor after it calms down.
+            setTimeout(() => scrollToVideo(false), 700)
+            setTimeout(() => scrollToVideo(false), 1600)
             return
           }
           if (Date.now() < deadline) {
             setTimeout(pollForVideo, 100)
           }
         }
-        // Start polling after the expand animation begins (~400ms)
-        setTimeout(pollForVideo, 400)
+        // Start polling after the expand render begins
+        setTimeout(pollForVideo, 300)
       }
-    }, 400)
+    }, 250)
   }, [overrides])
 
   // Close expanded card when filter changes

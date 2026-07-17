@@ -55,6 +55,33 @@
       transform: translateY(0) translateZ(0);
     }
   }
+
+  /* Mobile: shorter, tighter reveals. Phones scroll fast relative to the
+     viewport — 0.8s staggered entrances feel like the site is lagging behind
+     the thumb, and long-running transitions compete with touch scrolling. */
+  @media (max-width: 768px) {
+    [data-animate] {
+      transform: translateY(16px) translateZ(0);
+      transition-duration: 0.45s;
+    }
+
+    [data-animate-stagger] > * {
+      transform: translateY(14px) translateZ(0);
+      transition-duration: 0.45s;
+    }
+
+    [data-animate-stagger].is-visible > *:nth-child(1) { transition-delay: 0s; }
+    [data-animate-stagger].is-visible > *:nth-child(2) { transition-delay: 0.05s; }
+    [data-animate-stagger].is-visible > *:nth-child(3) { transition-delay: 0.1s; }
+    [data-animate-stagger].is-visible > *:nth-child(4) { transition-delay: 0.15s; }
+    [data-animate-stagger].is-visible > *:nth-child(5) { transition-delay: 0.2s; }
+    [data-animate-stagger].is-visible > *:nth-child(6) { transition-delay: 0.25s; }
+
+    [data-animate]:not(.is-visible),
+    [data-animate-stagger]:not(.is-visible) > * {
+      animation-duration: 0.45s;
+    }
+  }
 }
 
 /* Reduced motion — show everything immediately */

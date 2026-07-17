@@ -6,7 +6,7 @@
  * id). Set `enabled: false` to turn it off entirely.
  */
 export const announcement = {
-  enabled: true,
+  enabled: false,
   /** Change this every time you announce something new */
   id: "wynn-world-cup-2026",
   /** Small uppercase kicker */
