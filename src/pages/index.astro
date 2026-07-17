@@ -55,7 +55,12 @@ import { IntroScreen } from '../components/ui/intro-screen';
 <style>
   .hero {
     position: relative;
+    /* svh = small viewport height — does NOT change when in-app browsers
+       (Instagram/Facebook) or Safari collapse their toolbars during scroll.
+       With plain 100vh the hero resized mid-scroll and shoved the entire
+       page below it up and down ("jumping"). Plain vh kept as fallback. */
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
